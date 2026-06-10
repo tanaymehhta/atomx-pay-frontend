@@ -8,49 +8,62 @@
 <style>
   body { margin:0; background: var(--paper); color: var(--n-800); font-family: var(--font-ui);
     min-height:100vh; display:grid; place-items:center; padding:40px 20px; }
-  .wrap { width:100%; max-width:880px; }
+  .wrap { width:100%; max-width:920px; }
   .eyebrow { font-family:var(--font-mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--warm-deep); font-weight:600; }
   h1 { font-family:var(--font-display); font-weight:800; font-size:clamp(30px,5vw,46px); letter-spacing:-0.03em; color:var(--v-950); margin:10px 0 6px; }
-  p.lead { color:var(--n-600); font-size:16px; margin:0 0 30px; max-width:46em; }
+  h1 .serif { font-family:var(--font-serif); font-style:italic; font-weight:500; color:var(--warm-deep); }
+  p.lead { color:var(--n-600); font-size:16px; margin:0 0 30px; max-width:46em; line-height:1.55; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  .v { border-radius:22px; padding:26px; border:1px solid var(--hair-light); box-shadow:var(--shadow-md); position:relative; overflow:hidden; }
+  .v { border-radius:24px; border:1px solid var(--hair-light); box-shadow:var(--shadow-md); position:relative; overflow:hidden; transition: transform .35s var(--ease-spring), box-shadow .3s; }
+  .v:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+  .v .ph { height:150px; position:relative; }
+  .v .ph img { width:100%; height:100%; object-fit:cover; display:block; }
+  .v1 .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 30%, rgba(253,248,242,.96)); }
+  .v2x .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(160deg, rgba(58,18,118,.82), rgba(109,49,196,.7)); }
+  .v .inner { padding:6px 26px 26px; position:relative; }
   .v1 { background:#fff; }
-  .v2 { background: linear-gradient(135deg,#3a1276,#5e29a3 55%,#6d31c4); color:#fff; }
+  .v2x { background: linear-gradient(135deg,#3a1276,#5e29a3 55%,#6d31c4); color:#fff; }
   .v .tag { font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; }
   .v h2 { font-family:var(--font-display); font-weight:800; font-size:24px; letter-spacing:-0.02em; margin:8px 0 4px; }
-  .v1 h2 { color:var(--v-950); } .v2 h2 { color:#fff; }
+  .v1 h2 { color:var(--v-950); } .v2x h2 { color:#fff; }
   .v .desc { font-size:14px; line-height:1.5; margin:0 0 20px; }
-  .v1 .desc { color:var(--n-600); } .v2 .desc { color:rgba(255,255,255,.82); }
+  .v1 .desc { color:var(--n-600); } .v2x .desc { color:rgba(255,255,255,.82); }
   .links { display:flex; gap:10px; flex-wrap:wrap; }
-  .b { font-family:var(--font-ui); font-weight:600; font-size:14px; border-radius:12px; padding:11px 16px; display:inline-flex; align-items:center; gap:7px; transition:transform .3s var(--ease-spring); text-decoration:none; }
+  .b { font-family:var(--font-ui); font-weight:600; font-size:14px; border-radius:100px; padding:11px 18px; display:inline-flex; align-items:center; gap:7px; transition:transform .3s var(--ease-spring); text-decoration:none; }
   .b:hover { transform:translateY(-2px); }
-  .v1 .b.primary { background:var(--v-600); color:#fff; } .v1 .b.ghost { background:var(--n-50); color:var(--v-700); }
-  .v2 .b.primary { background:#fff; color:#5e29a3; } .v2 .b.ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3); }
+  .v1 .b.primary { background:var(--warm); color:#fff; } .v1 .b.ghost { background:var(--n-50); color:var(--v-700); }
+  .v2x .b.primary { background:#fff; color:#5e29a3; } .v2x .b.ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3); }
   @media (max-width:680px){ .grid { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <span class="eyebrow">AtomX Pay · frontend</span>
-  <h1>Two versions to compare</h1>
-  <p class="lead">Same layout, same warm and emotional vibe. V1 is the bright ivory + coral palette. V2 keeps everything identical but uses the original site's deep-violet purple on a white theme, with the orange chevron accent.</p>
+  <h1>Two versions, one <span class="serif">feeling</span></h1>
+  <p class="lead">Same redesigned layout — family photography, festival warmth, live-rate motion. V1 is the bright ivory + coral flagship. V2 keeps everything identical but wears the original site's deep-violet purple on white, with the orange chevron accent.</p>
   <div class="grid">
     <div class="v v1">
-      <span class="tag">Version 1</span>
-      <h2>Warm ivory</h2>
-      <p class="desc">Bright ivory canvas, marigold + coral warmth, purple kept. The emotional flagship.</p>
-      <div class="links">
-        <a class="b primary" href="home.html">Home →</a>
-        <a class="b ghost" href="dashboard.html">Dashboard →</a>
+      <div class="ph"><img src="https://images.unsplash.com/photo-1769618097083-48516fc6e23a?q=80&w=800&auto=format&fit=crop" alt="A joyful Indian family celebrating together" /></div>
+      <div class="inner">
+        <span class="tag">Version 1</span>
+        <h2>Warm ivory</h2>
+        <p class="desc">Bright ivory canvas, marigold + coral warmth, purple kept. The emotional flagship.</p>
+        <div class="links">
+          <a class="b primary" href="home.html">Home →</a>
+          <a class="b ghost" href="dashboard.html">Dashboard →</a>
+        </div>
       </div>
     </div>
-    <div class="v v2">
-      <span class="tag">Version 2</span>
-      <h2>Purple + white</h2>
-      <p class="desc">Old-site deep violet on white, bold purple hero, orange chevron accent. Same vibe, original colors.</p>
-      <div class="links">
-        <a class="b primary" href="home-v2.html">Home →</a>
-        <a class="b ghost" href="dashboard-v2.html">Dashboard →</a>
+    <div class="v v2x">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1758686254023-09e191043c88?q=80&w=800&auto=format&fit=crop" alt="Grandparents waving at a smartphone on a video call" /></div>
+      <div class="inner">
+        <span class="tag">Version 2</span>
+        <h2>Purple + white</h2>
+        <p class="desc">Old-site deep violet on white, bold purple hero, orange chevron accent. Same vibe, original colors.</p>
+        <div class="links">
+          <a class="b primary" href="home-v2.html">Home →</a>
+          <a class="b ghost" href="dashboard-v2.html">Dashboard →</a>
+        </div>
       </div>
     </div>
   </div>

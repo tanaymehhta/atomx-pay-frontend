@@ -1,8 +1,9 @@
 /* ============================================================
    AtomX Pay — V2 theme overlay  (old-site PURPLE + WHITE)
-   Same layout/vibe as V1; re-skinned to the deep-violet brand
-   (#5e29a3 family) on a clean white theme, with orange kept as
-   the single small accent (logo chevron + "15 minutes" highlight).
+   Same layout, photography and motion as V1; re-skinned to the
+   deep-violet brand (#5e29a3 family) on a clean white theme,
+   with orange kept as the single small accent (logo chevron,
+   serif highlights, gradient tips).
    Load AFTER assets/atomx.css. Pages opt in with <body class="v2">.
    ============================================================ */
 
@@ -26,7 +27,7 @@
   /* the "warm" accent slot now carries the PURPLE primary (CTAs, eyebrows) */
   --warm:        #6d31c4;
   --warm-deep:   #5e29a3;
-  --sun:         #8b5cf6;
+  --sun:         #f0823a;
   --sun-deep:    #6d31c4;
   --rose:        #b18cff;
   --orange:      #f0593a;
@@ -38,7 +39,7 @@
 
   /* section tints: lavender / periwinkle family (keeps it white + purple) */
   --tint-violet: #f3eeff;
-  --tint-peach:  #edefff;
+  --tint-peach:  #f1ecfd;
   --tint-sun:    #f6f1ff;
   --tint-rose:   #f2ecfb;
 
@@ -59,7 +60,8 @@ body.v2 .sky {
 }
 
 /* ---- nav: clean translucent white ---- */
-body.v2 nav.bar { background: rgba(255,255,255,0.82); border-bottom-color: rgba(46,18,89,0.10); }
+body.v2 nav.bar { background: rgba(255,255,255,0.84); border-bottom-color: rgba(46,18,89,0.10); }
+body.v2 .navside .signin { color: var(--warm-deep); }
 
 /* ============================================================
    HOME hero -> bold deep-violet band with white text
@@ -67,9 +69,9 @@ body.v2 nav.bar { background: rgba(255,255,255,0.82); border-bottom-color: rgba(
    ============================================================ */
 body.v2 header.hero {
   background: linear-gradient(135deg, #3a1276 0%, #5e29a3 52%, #6d31c4 100%);
-  padding: 84px 0 64px;
+  padding: 88px 0 96px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 body.v2 header.hero::before {
@@ -81,6 +83,8 @@ body.v2 header.hero::before {
 }
 body.v2 header.hero .wrap { position: relative; z-index: 1; }
 body.v2 .hero h1.hh { color: #ffffff; }
+body.v2 .hero h1.hh .home-w { color: #ffb393; }
+body.v2 .hero h1.hh .joy { background: linear-gradient(100deg, #cdb3ff 0%, #ff9d73 90%); -webkit-background-clip: text; background-clip: text; }
 body.v2 .hero p.sub { color: rgba(255,255,255,0.82); }
 body.v2 .hero p.sub b { color: #ffffff; }
 body.v2 .hero .badge {
@@ -90,7 +94,9 @@ body.v2 .hero .badge {
   box-shadow: none;
 }
 body.v2 .hero-meta .m { color: rgba(255,255,255,0.9); }
-body.v2 .hero-meta .m .d { background: var(--sun); }
+body.v2 .hero-meta .m .d,
+body.v2 .hero-meta .m:nth-child(2) .d,
+body.v2 .hero-meta .m:nth-child(3) .d { background: #f0823a; }
 
 /* on the violet hero, primary CTA goes white for contrast; secondary is glass */
 body.v2 .hero .btn-warm {
@@ -104,5 +110,63 @@ body.v2 .hero .btn-soft {
 }
 body.v2 .hero .btn-soft:hover { border-color: rgba(255,255,255,0.6); }
 
-/* the family-photo frame reads cleaner with a white edge on violet */
-body.v2 .photo-frame { box-shadow: 0 40px 80px -30px rgba(20,8,50,0.6); }
+/* photo collage on violet: brighter white frames, orange scribble */
+body.v2 .pcard { box-shadow: 0 40px 80px -30px rgba(20,8,50,0.6); border-color: rgba(255,255,255,0.4); }
+body.v2 .scribble { color: #ffb393; }
+body.v2 .chip { box-shadow: 0 18px 40px -18px rgba(20,8,50,0.55); }
+
+/* ticker band sits right under the violet hero: go ink-dark for contrast */
+body.v2 .tickerband { background: #1c0a3e; margin-top: -26px; }
+body.v2 .tick .star { color: #ff9d73; }
+
+/* calculator points keep the orange tick (single warm accent) */
+body.v2 .calc-points .ck { background: #fdeee7; color: #f0593a; }
+
+/* eyebrows: violet primary with orange reserved for serif moments */
+body.v2 .eyebrow2 { color: var(--warm-deep); }
+body.v2 .stitle .serif, body.v2 h1.hh + * .serif { color: #f0593a; }
+body.v2 .mo .min { color: #5e29a3; }
+
+/* stat band accent hues on deep violet */
+body.v2 .statband .stat:nth-child(1) .sv { color: #ff9d73; }
+body.v2 .statband .stat:nth-child(2) .sv { color: #cdb3ff; }
+body.v2 .statband .stat:nth-child(3) .sv { color: #b18cff; }
+body.v2 .statband .stat:nth-child(4) .sv { color: #e9defc; }
+
+/* winner row: violet border + lavender wash */
+body.v2 .crow.win { border-color: #7c3aed; background: linear-gradient(120deg, #ffffff, #f3eeff); box-shadow: var(--shadow-glow); }
+body.v2 .crow.win .name small, body.v2 .crow.win .cmeta { color: #6d31c4; }
+
+/* how-it-works numbers: violet scale with one orange step */
+body.v2 .hc:nth-child(1) .n { background: #7c3aed; }
+body.v2 .hc:nth-child(2) .n { background: #5e29a3; }
+body.v2 .hc:nth-child(3) .n { background: #f0593a; }
+body.v2 .hc:nth-child(1)::after { background: #7c3aed; }
+body.v2 .hc:nth-child(2)::after { background: #5e29a3; }
+body.v2 .hc:nth-child(3)::after { background: #f0593a; }
+
+/* testimonial open-quote + final CTA wash */
+body.v2 .testi blockquote::before { color: #7c3aed; }
+body.v2 .faq-q:hover { color: #6d31c4; }
+body.v2 .faq-q .pm { color: #f0593a; }
+body.v2 .final .card::before { background: linear-gradient(180deg, rgba(38,12,80,.82), rgba(38,12,80,.7) 45%, rgba(58,18,118,.88)); }
+
+/* ============================================================
+   DASHBOARD (v2): same dark-violet sidebar; active item goes
+   bright violet instead of coral, coral pulse becomes violet
+   ============================================================ */
+body.v2 .side { background: linear-gradient(180deg, #2a1259, #220e47 70%, #1c0a3e); }
+body.v2 .side::after { background: radial-gradient(circle, rgba(157,107,255,.26), transparent 70%); }
+body.v2 .nav a.on { background: linear-gradient(100deg, #7c3aed, #6d31c4); box-shadow: 0 10px 22px -10px rgba(124,58,237,.65); }
+body.v2 .transfer-bar::after { background: #f3eeff; }
+body.v2 .tb-who .avatar { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #7c3aed; }
+body.v2 .tstep.active .tnode { box-shadow: 0 0 0 3px #7c3aed, 0 0 0 8px rgba(124,58,237,.18); animation-name: tpulse-v2; }
+@keyframes tpulse-v2 {
+  0%,100% { box-shadow: 0 0 0 3px #7c3aed, 0 0 0 8px rgba(124,58,237,.18); }
+  50%      { box-shadow: 0 0 0 3px #7c3aed, 0 0 0 14px rgba(124,58,237,.03); }
+}
+body.v2 .tstep.active .ttime, body.v2 .tb-sub2 .cd { color: #6d31c4; }
+body.v2 .pill.inprog { background: rgba(124,58,237,.12); color: #6d31c4; }
+body.v2 .recip:hover .avatar { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #7c3aed; }
+body.v2 .greet h1 .serif, body.v2 .sec-h h2 .serif { color: #f0593a; }
+body.v2 .tb-head .lab { color: #6d31c4; }
