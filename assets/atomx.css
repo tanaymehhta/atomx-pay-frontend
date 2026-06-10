@@ -1,0 +1,140 @@
+/* ============================================================
+   AtomX Pay — shared brand system  (v2: bright + warm + human)
+   Joyful violet, marigold/coral warmth, warm ivory neutrals.
+   The feeling: pride and joy of sending money home to family.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,16..72,400;0,16..72,500;1,16..72,400;1,16..72,500&display=swap');
+
+:root {
+  /* --- Joyful violet (hue ~285-295) --- */
+  --v-ink:   #1c0a3e;   /* deep violet for occasional dark moments */
+  --v-950:   #2a1259;   /* deep royal violet: headings, hairlines */
+  --v-900:   #371c70;
+  --v-850:   #422088;
+  --v-800:   #4f259e;
+  --v-700:   #5e29a3;   /* legacy AtomX brand */
+  --v-600:   #6d31c4;
+  --v-550:   #7a3ee0;
+  --v-500:   #7c3aed;
+  --v-450:   #8b5cf6;
+  --v-400:   #9d6bff;   /* bright violet */
+  --v-350:   #b18cff;
+  --v-300:   #c6abff;
+  --v-200:   #ddccff;
+  --v-200x:  #ddccff;
+  --v-100:   #eee4ff;
+  --v-50:    #f6f0ff;
+
+  /* primary action / accent */
+  --accent:        #7c3aed;
+  --accent-bright: #9d6bff;
+  --accent-glow:   #9d6bff;
+
+  /* --- Warmth: marigold + coral (the emotional, human accents) --- */
+  --warm:        #ff7a5c;  /* coral */
+  --warm-deep:   #f0593a;
+  --sun:         #ffb23e;  /* marigold / saffron */
+  --sun-deep:    #f59415;
+  --rose:        #ff8fb1;  /* affection pink */
+  --orange:      #f0593a;  /* legacy mark, now part of the warm family */
+
+  /* joyful gradients (use sparingly, on emotional moments) */
+  --joy:    linear-gradient(105deg, #7c3aed 0%, #b14ad6 38%, #ff7a5c 78%, #ffb23e 100%);
+  --joy-soft: linear-gradient(120deg, #9d6bff, #ff8fb1 60%, #ffb23e);
+  --sunrise: linear-gradient(180deg, #fff6e6 0%, #fff1ea 50%, #f6f0ff 100%);
+
+  /* soft section tints */
+  --tint-violet: #f4eeff;
+  --tint-peach:  #fff1ea;
+  --tint-sun:    #fff6e6;
+  --tint-rose:   #ffeff4;
+
+  /* --- Warm ivory neutral system --- */
+  --n-0:    #ffffff;
+  --paper:  #fdf8f2;   /* warm ivory page bg */
+  --n-25:   #fdf9f4;
+  --n-50:   #f8f1e9;
+  --n-100:  #f0e7dc;
+  --n-150:  #e7dbcd;
+  --n-200:  #d9cabb;
+  --n-300:  #bfae9c;
+  --n-400:  #998a7b;
+  --n-500:  #6f655a;
+  --n-600:  #534a42;   /* warm body text */
+  --n-700:  #3d362f;
+  --n-800:  #2a241f;
+  --n-900:  #1a1611;
+  --n-950:  #0f0c09;
+
+  /* hairline borders */
+  --hair-light: rgba(42,18,89,0.10);
+  --hair-mid:   rgba(42,18,89,0.16);
+  --hair-dark:  rgba(255,255,255,0.14);
+  --hair-dark2: rgba(255,255,255,0.08);
+
+  /* semantic */
+  --positive: #1f9d6b;
+  --positive-bright: #19c483;
+
+  /* type */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-ui: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-serif: 'Newsreader', Georgia, serif;
+
+  /* warm layered depth */
+  --shadow-sm: 0 1px 2px rgba(70,40,20,0.07), 0 1px 1px rgba(70,40,20,0.05);
+  --shadow-md: 0 10px 28px -10px rgba(90,50,30,0.20), 0 2px 6px rgba(90,50,30,0.08);
+  --shadow-lg: 0 36px 70px -28px rgba(80,40,30,0.34), 0 10px 26px -14px rgba(80,40,30,0.20);
+  --shadow-glow: 0 28px 80px -26px rgba(124,58,237,0.42);
+  --shadow-warm: 0 28px 70px -28px rgba(255,122,92,0.45);
+
+  --ease-spring: linear(0,0.006,0.025 2.8%,0.101 6.1%,0.539 18.9%,0.721 25.3%,0.849 31.5%,0.937 38.1%,0.968 41.8%,0.991 45.7%,1.006 50.1%,1.015 55%,1.017 63.9%,1.001);
+  --ease-out: cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out: cubic-bezier(0.65,0,0.35,1);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* numbers: tabular, the hero of the product */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-feature-settings: 'tnum','zero'; letter-spacing: -0.01em; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tnum { font-variant-numeric: tabular-nums; }
+/* big display numbers stay warm (display face) but tabular-aligned */
+.bignum { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; letter-spacing: -0.03em; }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dotgrid {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* live dot */
+.livedot { width: 7px; height: 7px; border-radius: 50%; background: var(--positive-bright); box-shadow: 0 0 0 0 rgba(25,196,131,0.5); animation: livepulse 2.4s var(--ease-out) infinite; display: inline-block; }
+@keyframes livepulse { 0% { box-shadow: 0 0 0 0 rgba(25,196,131,0.45);} 70%{box-shadow:0 0 0 7px rgba(25,196,131,0);} 100%{box-shadow:0 0 0 0 rgba(25,196,131,0);} }
+
+.flash-up { animation: flashUp 0.7s var(--ease-out); }
+.flash-down { animation: flashDown 0.7s var(--ease-out); }
+@keyframes flashUp { 0%{color:var(--positive);} 100%{} }
+@keyframes flashDown { 0%{color:var(--warm-deep);} 100%{} }
+
+::selection { background: var(--v-200x); color: var(--v-950); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}

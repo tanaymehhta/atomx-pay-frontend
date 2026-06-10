@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AtomX Pay — Send money home</title>
+<link rel="stylesheet" href="assets/atomx.css" />
+<link rel="stylesheet" href="assets/atomx-v2.css" />
+<style>
+  body { background: var(--paper); color: var(--n-800); overflow-x: hidden; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  a { color: inherit; text-decoration: none; }
+  h1,h2,h3,h4 { font-family: var(--font-display); }
+
+  /* warm ambient wash, structural (not a floating blob) */
+  .sky { position: fixed; inset: 0; z-index: -1; background:
+      radial-gradient(70% 50% at 78% -8%, var(--tint-sun) 0%, transparent 60%),
+      radial-gradient(60% 46% at 10% 0%, var(--tint-rose) 0%, transparent 55%),
+      var(--paper); }
+
+  /* nav */
+  nav.bar { position: sticky; top: 0; z-index: 60; backdrop-filter: blur(12px); background: rgba(253,248,242,0.72); border-bottom: 1px solid var(--hair-light); }
+  nav.bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .links { display: flex; gap: 30px; }
+  .links a { font-size: 15px; font-weight: 500; color: var(--n-600); transition: color .2s; }
+  .links a:hover { color: var(--v-700); }
+  .btn { font-family: var(--font-ui); font-weight: 600; font-size: 15px; border-radius: 13px; padding: 12px 20px; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 9px; transition: transform .35s var(--ease-spring), box-shadow .3s, filter .2s; }
+  .btn:active { transform: scale(.97); }
+  .btn-violet { background: var(--v-600); color: #fff; box-shadow: 0 10px 24px -10px rgba(124,58,237,.5); }
+  .btn-violet:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -12px rgba(124,58,237,.62); }
+  .btn-warm { background: var(--warm); color: #fff; box-shadow: var(--shadow-warm); }
+  .btn-warm:hover { transform: translateY(-2px); filter: brightness(1.04); }
+  .btn-soft { background: #fff; color: var(--v-700); border: 1.5px solid var(--hair-mid); }
+  .btn-soft:hover { transform: translateY(-2px); border-color: var(--v-300); }
+  .btn .arr { transition: transform .35s var(--ease-spring); }
+  .btn:hover .arr { transform: translateX(5px); }
+
+  /* hero */
+  .hero { padding: 56px 0 40px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 54px; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: 9px; padding: 8px 14px; border-radius: 100px; background: #fff; border: 1px solid var(--hair-light); font-size: 13px; font-weight: 600; color: var(--v-700); box-shadow: var(--shadow-sm); }
+  h1.hh { font-weight: 800; font-size: clamp(44px, 6vw, 78px); line-height: 0.98; letter-spacing: -0.035em; color: var(--v-950); margin: 22px 0 0; text-wrap: balance; }
+  h1.hh .joy { background: var(--joy); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { font-size: 19px; line-height: 1.55; color: var(--n-600); margin: 22px 0 0; max-width: 30em; }
+  .hero p.sub b { color: var(--n-800); font-weight: 600; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 26px; }
+  .hero-meta .m { display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 500; color: var(--n-700); }
+  .hero-meta .m .d { width: 7px; height: 7px; border-radius: 50%; background: var(--sun); }
+
+  /* hero right: family photo + delivered card + mini calc */
+  .stage { position: relative; }
+  .photo-frame { position: relative; border-radius: 26px; overflow: hidden; box-shadow: var(--shadow-lg); border: 6px solid #fff; background: var(--joy-soft); }
+  .photo-frame image-slot { display: block; width: 100%; height: 420px; }
+  .delivered { position: absolute; left: -18px; bottom: 26px; background: #fff; border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; border: 1px solid var(--hair-light); animation: rise 0.8s var(--ease-spring) both; }
+  .delivered .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--positive); display: grid; place-items: center; color: #fff; flex: none; }
+  .delivered .amt { font-family: var(--font-mono); font-weight: 700; font-size: 18px; color: var(--v-950); }
+  .delivered .meta { font-size: 12px; color: var(--n-500); margin-top: 2px; }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+  .floatcard { position: absolute; right: -16px; top: 26px; background: #fff; border-radius: 16px; padding: 12px 15px; box-shadow: var(--shadow-md); border: 1px solid var(--hair-light); display: flex; align-items: center; gap: 10px; }
+  .floatcard .em { font-size: 22px; }
+  .floatcard .t { font-size: 13px; font-weight: 600; color: var(--n-700); }
+  .floatcard .t small { display: block; font-weight: 400; color: var(--n-500); font-size: 11.5px; }
+
+  /* calculator */
+  .calc-band { padding: 30px 0 70px; }
+  .calc { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 24px; box-shadow: var(--shadow-lg); border: 1px solid var(--hair-light); overflow: hidden; }
+  .calc-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--hair-light); background: var(--tint-violet); }
+  .calc-head .t { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: var(--v-950); }
+  .live-ring { display: inline-flex; align-items: center; gap: 12px; }
+  .rate-now { font-family: var(--font-mono); font-size: 13px; color: var(--v-700); }
+  .rate-now b { color: var(--v-950); }
+  .ring { position: relative; width: 32px; height: 32px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .bgc { stroke: var(--v-100); }
+  .ring .fgc { stroke: var(--positive); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .ring .cd { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--v-700); }
+  .calc-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 22px 24px; }
+  .field { background: var(--n-25); border: 1.5px solid var(--hair-light); border-radius: 16px; padding: 16px 18px; transition: border-color .25s; }
+  .field:focus-within { border-color: var(--v-300); }
+  .field .l { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--n-500); }
+  .field .row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .amt-input, .amt-out { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(30px,4vw,40px); letter-spacing: -0.02em; color: var(--v-950); line-height: 1; }
+  .amt-input { background: transparent; border: none; outline: none; width: 100%; min-width: 0; }
+  .amt-out { transition: color .5s, transform .25s var(--ease-spring); transform-origin: left; }
+  .amt-out.bump { transform: scale(1.05); }
+  .ccy { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1.5px solid var(--hair-mid); border-radius: 12px; padding: 9px 12px; font-family: var(--font-mono); font-weight: 700; font-size: 13px; flex: none; }
+  .ccy .fl { width: 20px; height: 14px; border-radius: 3px; }
+  .fl-us { background: linear-gradient(180deg,#b22234 0 33%,#fff 33% 66%,#3c3b6e 66%); }
+  .fl-in { background: linear-gradient(180deg,#ff9933 0 33%,#fff 33% 66%,#138808 66%); }
+  .calc-foot { display: grid; grid-template-columns: repeat(3,1fr) auto; gap: 0; align-items: center; padding: 0 24px 8px; }
+  .calc-foot .c { padding: 14px 0; }
+  .calc-foot .c + .c { border-left: 1px solid var(--hair-light); padding-left: 18px; }
+  .calc-foot .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--n-500); }
+  .calc-foot .v { font-family: var(--font-mono); font-weight: 600; font-size: 14px; margin-top: 5px; color: var(--v-950); }
+  .calc-foot .v.g { color: var(--positive); }
+  .calc-cta { padding: 4px 24px 22px; }
+  .calc-cta .btn-warm { width: 100%; justify-content: center; padding: 15px; font-size: 16px; }
+  .calc-note { text-align: center; font-size: 12.5px; color: var(--n-500); margin: 12px 0 0; }
+
+  /* sections */
+  section { padding: 80px 0; }
+  .eyebrow2 { font-family: var(--font-mono); font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--warm-deep); font-weight: 600; }
+  .stitle { font-weight: 800; font-size: clamp(30px,4.2vw,50px); letter-spacing: -0.03em; line-height: 1.02; color: var(--v-950); margin: 14px 0 0; }
+  .ssub { font-size: 17px; color: var(--n-600); margin: 14px 0 0; max-width: 40em; line-height: 1.5; }
+  .center { text-align: center; } .center .ssub { margin-inline: auto; }
+
+  /* trust */
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 34px; }
+  .trust .t { display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 100px; background: #fff; border: 1px solid var(--hair-light); font-size: 13px; font-weight: 500; color: var(--n-700); box-shadow: var(--shadow-sm); }
+  .trust .t .d { width: 6px; height: 6px; border-radius: 50%; background: var(--positive-bright); }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .stat { background: #fff; border: 1px solid var(--hair-light); border-radius: 20px; padding: 26px; box-shadow: var(--shadow-sm); }
+  .stat:nth-child(1){ background: var(--tint-violet); }
+  .stat:nth-child(2){ background: var(--tint-peach); }
+  .stat:nth-child(3){ background: var(--tint-sun); }
+  .stat:nth-child(4){ background: var(--tint-rose); }
+  .stat .sv { font-family: var(--font-display); font-weight: 800; font-variant-numeric: tabular-nums; font-size: clamp(34px,4.6vw,52px); letter-spacing: -0.03em; color: var(--v-950); }
+  .stat .sk { font-size: 14px; color: var(--n-600); margin-top: 10px; }
+
+  /* compare */
+  .cmp { display: grid; gap: 14px; }
+  .crow { display: grid; grid-template-columns: 1.1fr 2.4fr auto; gap: 22px; align-items: center; background: #fff; border: 1px solid var(--hair-light); border-radius: 18px; padding: 20px 24px; box-shadow: var(--shadow-sm); }
+  .crow.win { border: 2px solid var(--v-400); background: linear-gradient(120deg, #fff, var(--tint-violet)); box-shadow: var(--shadow-glow); }
+  .crow .name { font-family: var(--font-display); font-weight: 700; font-size: 19px; color: var(--v-950); }
+  .crow .name small { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 11.5px; color: var(--n-500); margin-top: 4px; }
+  .crow.win .name small { color: var(--v-600); }
+  .track { position: relative; height: 46px; border-radius: 11px; background: var(--n-50); overflow: hidden; }
+  .fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 11px; transition: width 1.3s var(--ease-out); }
+  .fill.f1 { background: var(--n-200); } .fill.f2 { background: var(--v-200x); } .fill.f3 { background: var(--joy); }
+  .bval { position: absolute; top: 50%; transform: translateY(-50%); left: 14px; font-family: var(--font-mono); font-weight: 700; font-size: 17px; color: var(--v-950); }
+  .crow.win .bval { color: #fff; right: 14px; left: auto; }
+  .cmeta { font-family: var(--font-mono); font-size: 12px; color: var(--n-500); text-align: right; line-height: 1.7; white-space: nowrap; }
+  .crow.win .cmeta { color: var(--v-700); }
+  .save { margin-top: 22px; text-align: center; padding: 30px; border-radius: 22px; background: var(--joy); color: #fff; box-shadow: var(--shadow-warm); }
+  .save .sv { font-family: var(--font-display); font-weight: 800; font-size: clamp(32px,5vw,58px); letter-spacing: -0.02em; }
+  .save .sk { font-size: 16px; opacity: .95; margin-top: 6px; }
+
+  /* how */
+  .how { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  .hc { background: #fff; border: 1px solid var(--hair-light); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease-spring); }
+  .hc:hover { transform: translateY(-6px); }
+  .hc .n { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; color: #fff; }
+  .hc:nth-child(1) .n { background: var(--v-500); } .hc:nth-child(2) .n { background: var(--warm); } .hc:nth-child(3) .n { background: var(--sun-deep); }
+  .hc h3 { font-weight: 700; font-size: 22px; color: var(--v-950); margin: 18px 0 8px; letter-spacing: -0.02em; }
+  .hc p { margin: 0; color: var(--n-600); font-size: 15px; line-height: 1.55; }
+  .hc .tm { font-family: var(--font-mono); font-size: 12px; color: var(--positive); margin-top: 14px; }
+
+  /* why: asymmetric, with warm pull-quote */
+  .why { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; }
+  .why .lead { grid-row: 1 / 3; background: var(--v-950); color: #fff; border-radius: 22px; padding: 34px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-lg); }
+  .why .lead .q { font-family: var(--font-serif); font-style: italic; font-size: 30px; line-height: 1.25; letter-spacing: -0.01em; }
+  .why .lead .q b { font-style: normal; background: var(--joy); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .why .lead .wn { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; color: var(--v-300); }
+  .why .c { background: #fff; border: 1px solid var(--hair-light); border-radius: 20px; padding: 26px; box-shadow: var(--shadow-sm); }
+  .why .c h4 { font-weight: 700; font-size: 18px; color: var(--v-950); margin: 0 0 8px; }
+  .why .c p { margin: 0; color: var(--n-600); font-size: 14px; line-height: 1.5; }
+
+  /* testimonial */
+  .testi { display: grid; grid-template-columns: auto 1fr; gap: 44px; align-items: center; background: #fff; border: 1px solid var(--hair-light); border-radius: 24px; padding: 42px; box-shadow: var(--shadow-md); }
+  .testi .score .v { font-family: var(--font-display); font-weight: 800; font-size: 58px; color: var(--v-950); letter-spacing: -0.02em; }
+  .testi .score .k { font-family: var(--font-mono); font-size: 12.5px; color: var(--n-500); margin-top: 6px; }
+  .testi blockquote { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: 27px; line-height: 1.35; color: var(--n-800); letter-spacing: -0.01em; }
+  .testi .cite { font-family: var(--font-mono); font-size: 12.5px; color: var(--n-500); margin-top: 16px; }
+  .testi .cite b { color: var(--v-700); }
+
+  /* faq */
+  .faq-item { border-bottom: 1px solid var(--hair-light); }
+  .faq-q { width: 100%; background: none; border: none; cursor: pointer; padding: 22px 0; display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--v-950); }
+  .faq-q .pm { color: var(--warm); font-size: 24px; transition: transform .35s var(--ease-spring); flex: none; }
+  .faq-item.open .pm { transform: rotate(45deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .45s var(--ease-out); }
+  .faq-a p { margin: 0 0 22px; color: var(--n-600); font-size: 15.5px; line-height: 1.6; max-width: 52em; }
+
+  /* final */
+  .final { text-align: center; }
+  .final .card { position: relative; overflow: hidden; border-radius: 30px; padding: 72px 40px; background: var(--v-950); color: #fff; box-shadow: var(--shadow-lg); }
+  .final .card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 80% at 80% 0%, rgba(255,122,92,.4), transparent 60%), radial-gradient(50% 70% at 12% 100%, rgba(157,107,255,.5), transparent 60%); }
+  .final .card > * { position: relative; }
+  .final h2 { font-weight: 800; font-size: clamp(36px,5.4vw,70px); letter-spacing: -0.035em; line-height: 0.98; margin: 0 0 14px; }
+  .final h2 .joy { background: var(--joy); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .final .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+  .final .btn-soft { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.3); }
+
+  footer { padding: 50px 0 40px; border-top: 1px solid var(--hair-light); margin-top: 60px; }
+  footer .fr { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; align-items: center; }
+  footer .leg { font-family: var(--font-mono); font-size: 12px; color: var(--n-500); }
+
+  .rv { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease-out), transform .8s var(--ease-spring); }
+  .rv.in { opacity: 1; transform: none; }
+
+  @media (max-width: 920px) {
+    .links { display: none; }
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .calc-body { grid-template-columns: 1fr; }
+    .calc-foot { grid-template-columns: 1fr 1fr; }
+    .calc-foot .c:nth-child(3) { border-left: none; padding-left: 0; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .how { grid-template-columns: 1fr; }
+    .why { grid-template-columns: 1fr; } .why .lead { grid-row: auto; }
+    .crow { grid-template-columns: 1fr; gap: 12px; } .cmeta { text-align: left; }
+    .testi { grid-template-columns: 1fr; gap: 22px; text-align: center; }
+  }
+</style>
+</head>
+<body class="v2">
+<div class="sky"></div>
+
+<nav class="bar"><div class="wrap">
+  <a href="#" id="logo"></a>
+  <div class="links">
+    <a href="#how">How it works</a>
+    <a href="#compare">Compare</a>
+    <a href="#why">Why AtomX</a>
+    <a href="#about">Our story</a>
+  </div>
+  <a class="btn btn-violet" href="dashboard-v2.html">Get Started <span class="arr">→</span></a>
+</div></nav>
+
+<header class="hero"><div class="wrap"><div class="hero-grid">
+  <div>
+    <span class="badge"><span class="livedot"></span> Live mid-market rate, regulated US to India</span>
+    <h1 class="hh">Send money home<br>in <span class="joy">15 minutes</span>.</h1>
+    <p class="sub">The rent. The festival. The just-because. Send USD to India and watch it land in their bank before the call ends. <b>Real rate, zero spread, no fee.</b></p>
+    <div class="hero-cta">
+      <a class="btn btn-warm" href="#calc">Start a Transfer <span class="arr">→</span></a>
+      <a class="btn btn-soft" href="#how">See how it works</a>
+    </div>
+    <div class="hero-meta">
+      <div class="m"><span class="d"></span> 15-minute settlement</div>
+      <div class="m"><span class="d"></span> 0% hidden spread</div>
+      <div class="m"><span class="d"></span> 24×7×365</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="photo-frame">
+      <image-slot id="hero-family" shape="rect" placeholder="Drop a family / home photo" src=""></image-slot>
+    </div>
+    <div class="floatcard"><span class="em">🪔</span><span class="t">Diwali sorted<small>Sent in 12 min</small></span></div>
+    <div class="delivered">
+      <span class="ic">✓</span>
+      <div><div class="amt">₹95,382 received</div><div class="meta">Mom · 14 minutes ago</div></div>
+    </div>
+  </div>
+</div></div></header>
+
+<section class="calc-band" id="calc"><div class="wrap">
+  <div class="calc">
+    <div class="calc-head">
+      <span class="t">How much are you sending?</span>
+      <div class="live-ring">
+        <span class="rate-now">1 USD = <b id="rate-now">95.3820</b></span>
+        <div class="ring"><svg width="32" height="32"><circle class="bgc" cx="16" cy="16" r="13" fill="none" stroke-width="3"></circle><circle class="fgc" id="ring-fg" cx="16" cy="16" r="13" fill="none" stroke-width="3"></circle></svg><span class="cd" id="ring-cd">30</span></div>
+      </div>
+    </div>
+    <div class="calc-body">
+      <div class="field"><span class="l">You send</span><div class="row"><input id="send" class="amt-input" inputmode="decimal" value="1,000" aria-label="USD" /><span class="ccy"><span class="fl fl-us"></span> USD</span></div></div>
+      <div class="field"><span class="l">They receive</span><div class="row"><span class="amt-out" id="receive">95,382.41</span><span class="ccy"><span class="fl fl-in"></span> INR</span></div></div>
+    </div>
+    <div class="calc-foot">
+      <div class="c"><div class="k">Exchange rate</div><div class="v" id="rate-cell">95.3820</div></div>
+      <div class="c"><div class="k">Our fee</div><div class="v g">$0.00</div></div>
+      <div class="c"><div class="k">Arrives in</div><div class="v">~15 min</div></div>
+      <div class="c" style="border:none;"></div>
+    </div>
+    <div class="calc-cta">
+      <a class="btn btn-warm" href="dashboard-v2.html">Send this home <span class="arr">→</span></a>
+      <p class="calc-note">Rates refresh every 30 seconds. No account needed to preview.</p>
+    </div>
+  </div>
+  <div class="trust">
+    <span class="t"><span class="d"></span> FinCEN-registered MSB</span>
+    <span class="t"><span class="d"></span> FIU-IND registered</span>
+    <span class="t"><span class="d"></span> AML / CFT screening</span>
+    <span class="t"><span class="d"></span> SOC 2 aligned</span>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="stats">
+    <div class="stat rv"><div class="sv" data-count="15" data-suffix=" min">15 min</div><div class="sk">Typical time to land</div></div>
+    <div class="stat rv"><div class="sv">0%</div><div class="sk">Hidden FX spread, ever</div></div>
+    <div class="stat rv"><div class="sv">24×7</div><div class="sk">Holidays included</div></div>
+    <div class="stat rv"><div class="sv" data-count="12400" data-suffix="+">12,400+</div><div class="sk">Happy transfers home</div></div>
+  </div>
+</div></section>
+
+<section id="compare"><div class="wrap">
+  <div class="center rv" style="margin-bottom:42px;">
+    <span class="eyebrow2">The $1,000 test</span>
+    <h2 class="stitle">More of your money, actually arrives.</h2>
+    <p class="ssub">Same $1,000 sent three ways. The longer the bar, the more lands in your family's account.</p>
+  </div>
+  <div class="cmp">
+    <div class="crow rv"><div class="name">Traditional bank <small>Correspondent wire</small></div><div class="track"><div class="fill f1" data-w="89.7"><span class="bval">₹89,743</span></div></div><div class="cmeta">2 to 5 days · ~2.5% spread<br>$25 to $45 fee</div></div>
+    <div class="crow rv"><div class="name">Banking-rail MSB <small>Money service business</small></div><div class="track"><div class="fill f2" data-w="93.7"><span class="bval">₹93,673</span></div></div><div class="cmeta">1 to 2 days · ~1.0% spread<br>$5 to $12 fee</div></div>
+    <div class="crow win rv"><div class="name">AtomX Pay <small>Blockchain rails</small></div><div class="track"><div class="fill f3" data-w="100"><span class="bval">₹95,382</span></div></div><div class="cmeta">~15 min · 0% spread<br>$0 fee · always on</div></div>
+  </div>
+  <div class="save rv"><div class="sv" data-count="5639" data-prefix="Save up to ₹">Save up to ₹5,639</div><div class="sk">per $1,000, versus a traditional bank wire. That stays with your family.</div></div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <div class="rv" style="margin-bottom:40px;"><span class="eyebrow2">How it works</span><h2 class="stitle">Three steps, then it is home.</h2></div>
+  <div class="how">
+    <div class="hc rv"><div class="n">1</div><h3>Verify once</h3><p>A photo ID and a quick selfie, screened against AML and CFT lists. Most people are cleared in about two minutes.</p><div class="tm">~2 min</div></div>
+    <div class="hc rv"><div class="n">2</div><h3>Lock the real rate</h3><p>You see the true mid-market rate with no spread. Lock it, and the amount your family receives is fixed.</p><div class="tm">~30 sec</div></div>
+    <div class="hc rv"><div class="n">3</div><h3>It lands in INR</h3><p>Money settles straight to their Indian bank, tracked on-chain the whole way, with a receipt you both can see.</p><div class="tm">~15 min</div></div>
+  </div>
+</div></section>
+
+<section id="why"><div class="wrap">
+  <div class="rv" style="margin-bottom:40px;"><span class="eyebrow2">Why AtomX</span><h2 class="stitle">Built for the people sending it home.</h2></div>
+  <div class="why rv">
+    <div class="lead"><span class="wn">Our belief</span><div class="q">Money should move like a <b>message</b>. Instant, warm, and free of the toll-booths built into old banking rails.</div><span class="wn">AtomX Pay · US to India</span></div>
+    <div class="c"><h4>It lands in 15 minutes</h4><p>Real funds in a real account, the same evening you send them.</p></div>
+    <div class="c"><h4>The honest rate</h4><p>The rate you see on Google, applied for real. Zero spread, $0 fee.</p></div>
+    <div class="c"><h4>Safe by design</h4><p>MPC and MultiSig custody, passwordless sign-in, real-time fraud checks.</p></div>
+    <div class="c"><h4>Money-back guarantee</h4><p>If it cannot complete, it comes back to you. Always.</p></div>
+  </div>
+</div></section>
+
+<section id="about"><div class="wrap">
+  <div class="testi rv">
+    <div class="score"><div class="v">4.9★</div><div class="k">12,400+ verified transfers</div></div>
+    <div>
+      <blockquote>“Sent rent home on a Sunday night and it landed before I went to bed. The rate was exactly what Google showed.”</blockquote>
+      <div class="cite">Verified transfer · settled in <b>14 min</b> · $1,200 became ₹114,458</div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="rv" style="margin-bottom:26px;"><span class="eyebrow2">Good questions</span><h2 class="stitle">Everything you might ask.</h2></div>
+  <div class="rv" id="faq">
+    <div class="faq-item"><button class="faq-q">How long does a transfer really take?<span class="pm">+</span></button><div class="faq-a"><p>Most transfers land in the recipient's Indian bank in about 15 minutes, any day of the year. No business-day waiting.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What rate and fees do you use?<span class="pm">+</span></button><div class="faq-a"><p>The live mid-market rate, with no spread added and a $0 transfer fee. What the calculator shows is what your family receives.</p></div></div>
+    <div class="faq-item"><button class="faq-q">Are you regulated?<span class="pm">+</span></button><div class="faq-a"><p>Yes. A FinCEN-registered MSB in the US and FIU-IND registered partners in India, with AML and CFT screening on every transfer.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What documents do I need?<span class="pm">+</span></button><div class="faq-a"><p>A government photo ID and a quick selfie. It is a one-time step that usually clears in about two minutes.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What if a transfer fails?<span class="pm">+</span></button><div class="faq-a"><p>Your money is never lost. It comes straight back to you, and our money-back guarantee covers you either way.</p></div></div>
+  </div>
+</div></section>
+
+<section class="final"><div class="wrap"><div class="card rv">
+  <h2>Someone is waiting<br>for this. <span class="joy">Send it home.</span></h2>
+  <p class="ssub" style="margin-inline:auto;color:rgba(255,255,255,.8);">No account needed to preview your live rate.</p>
+  <div class="actions"><a class="btn btn-warm" href="dashboard-v2.html">Start a Transfer <span class="arr">→</span></a><a class="btn btn-soft" href="#how">See how it works</a></div>
+</div></div></section>
+
+<footer><div class="wrap"><div class="fr">
+  <a href="#" id="logo-foot"></a>
+  <span class="leg">© 2026 AtomX Pay · FinCEN MSB · FIU-IND · 1 USD = <span id="foot-rate">95.3820</span> INR</span>
+</div></div></footer>
+
+<script src="assets/image-slot.js"></script>
+<script src="assets/atomx.js"></script>
+<script>
+  document.getElementById('logo').innerHTML = AtomX.logo({ color: 'var(--v-950)', size: 25, accent: '#f0593a' });
+  document.getElementById('logo-foot').innerHTML = AtomX.logo({ color: 'var(--v-950)', size: 21, accent: '#f0593a' });
+  AtomX.startEngine();
+
+  var sendEl = document.getElementById('send'), recvEl = document.getElementById('receive');
+  function parseAmt(){ var v = parseFloat(sendEl.value.replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; }
+  var lastRecv = 95382.41;
+  function recompute(animate){ var out = parseAmt()*AtomX.getRate(); if(animate) AtomX.countUp(recvEl,lastRecv,out,600,AtomX.fmtINR); else recvEl.textContent = AtomX.fmtINR(out); recvEl.classList.add('bump'); setTimeout(function(){recvEl.classList.remove('bump');},260); lastRecv = out; }
+  sendEl.addEventListener('input', function(){ var raw = sendEl.value.replace(/[^0-9.]/g,''); var p = raw.split('.'); var f = p[0]?Number(p[0]).toLocaleString('en-US'):''; if(p.length>1) f += '.'+p[1].slice(0,2); var pos = sendEl.selectionStart + (f.length - sendEl.value.length); sendEl.value = f; try{sendEl.setSelectionRange(pos,pos);}catch(e){} recompute(false); });
+
+  var CIRC = 2*Math.PI*13;
+  document.getElementById('ring-fg').setAttribute('stroke-dasharray', CIRC.toFixed(1));
+  AtomX.onCountdown(function(n){ document.getElementById('ring-cd').textContent = n; document.getElementById('ring-fg').setAttribute('stroke-dashoffset',(CIRC*(1-n/30)).toFixed(1)); });
+  AtomX.onRate(function(r,delta,dir,kind){ document.getElementById('rate-now').textContent = AtomX.fmtRate(r); document.getElementById('rate-cell').textContent = AtomX.fmtRate(r); var fr=document.getElementById('foot-rate'); if(fr) fr.textContent = AtomX.fmtRate(r); if(kind==='refresh') recompute(true); else recompute(false); if(dir==='up'||dir==='down'){ recvEl.classList.remove('flash-up','flash-down'); void recvEl.offsetWidth; recvEl.classList.add(dir==='up'?'flash-up':'flash-down'); } });
+
+  AtomX.onReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });
+  AtomX.onReveal(document.querySelectorAll('[data-count]'), function(el){ var to=+el.getAttribute('data-count'); var suf=el.getAttribute('data-suffix')||''; var pre=el.getAttribute('data-prefix')||''; AtomX.countUp(el,0,to,1100,function(v){ return pre+Math.round(v).toLocaleString('en-IN')+suf; }); });
+  AtomX.onReveal(document.querySelectorAll('.fill'), function(el){ setTimeout(function(){ el.style.width = el.getAttribute('data-w')+'%'; },120); });
+
+  document.querySelectorAll('.faq-q').forEach(function(q){ q.addEventListener('click', function(){ var it=q.parentElement, a=it.querySelector('.faq-a'); var open=it.classList.toggle('open'); a.style.maxHeight = open?a.scrollHeight+'px':0; }); });
+</script>
+</body>
+</html>
