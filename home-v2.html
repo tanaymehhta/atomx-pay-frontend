@@ -300,7 +300,7 @@
 <div class="sky"></div>
 
 <nav class="bar"><div class="wrap">
-  <a href="#" id="logo"></a>
+  <a href="#" id="logo"><img src="PNG/atomx%20logo%20horizontal%20color.png" alt="AtomX Pay" height="28" style="display:block;" /></a>
   <div class="links">
     <a href="#how">How it works</a>
     <a href="#compare">Compare</a>
@@ -513,7 +513,7 @@
 <footer><div class="wrap">
   <div class="fgrid">
     <div>
-      <a href="#" id="logo-foot"></a>
+      <a href="#" id="logo-foot"><img src="PNG/atomx%20logo%20horizontal%20color.png" alt="AtomX Pay" height="22" style="display:block;" /></a>
       <p class="blurb">Send USD to India on blockchain rails — the real rate, zero spread, $0 fee, landing in about 15 minutes. Built for the people sending it home.</p>
     </div>
     <div class="col"><h5>Product</h5><a href="#calc">Calculator</a><a href="#how">How it works</a><a href="#compare">Compare</a><a href="dashboard-v2.html">Dashboard</a></div>
@@ -528,8 +528,6 @@
 
 <script src="assets/atomx.js"></script>
 <script>
-  document.getElementById('logo').innerHTML = AtomX.logo({ color: 'var(--v-950)', size: 25, accent: '#f0593a' });
-  document.getElementById('logo-foot').innerHTML = AtomX.logo({ color: 'var(--v-950)', size: 22, accent: '#f0593a' });
   AtomX.startEngine();
 
   var sendEl = document.getElementById('send'), recvEl = document.getElementById('receive');

@@ -199,7 +199,7 @@
 <div class="app">
   <!-- sidebar -->
   <aside class="side" id="side">
-    <div class="brand"><a href="home-v2.html" id="logo"></a></div>
+    <div class="brand"><a href="home-v2.html" id="logo"><img src="PNG/atomx%20logo%20horizontal%20white.png" alt="AtomX Pay" height="24" style="display:block;" /></a></div>
     <nav class="nav">
       <a class="on" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11l9-8 9 8M5 9.5V21h14V9.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Home</a>
       <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg> Send money</a>
@@ -363,7 +363,6 @@
 
 <script src="assets/atomx.js"></script>
 <script>
-  document.getElementById('logo').innerHTML = AtomX.logo({ color: '#ffffff', size: 24, accent: '#f0593a' });
   AtomX.startEngine();
 
   document.getElementById('menu').addEventListener('click', function(){ document.getElementById('side').classList.toggle('open'); });
