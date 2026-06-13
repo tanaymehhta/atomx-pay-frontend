@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AtomX Pay — Send money home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     AtomX Pay V3 — "zesty citrus on royal violet"
+     Lemon Squeezy design system. Flat color, 48px cards,
+     obsidian/white CTAs, royal-violet bands, lemon-zest accents.
+     ============================================================ */
+  :root {
+    --royal-violet: #5423e7;
+    --electric-iris: #7047eb;
+    --lemon-zest:   #ffc233;
+    --orchid:       #cf75ff;
+    --lilac-mist:   #e5b5fe;
+    --blush:        #fcc7f3;
+    --emerald:      #1e874c;
+    --obsidian:     #121217;
+    --paper:        #ffffff;
+    --fog:          #f7f7f8;
+    --slate:        #6c6c89;
+    --ash:          #d1d1db;
+
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-body:    'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+    --max: 1200px;
+    --radius-card: 48px;
+    --radius-btn: 8px;
+    --radius-cta: 32px;
+    --radius-pill: 40px;
+
+    --shadow-card: 0 4px 24px rgba(18,18,23,.06);
+    --shadow-tablet: 0 20px 60px rgba(18,18,23,.15);
+    --shadow-btn: 0 1px 2px rgba(18,18,23,.08);
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--fog); color: var(--obsidian);
+    font-family: var(--font-body); font-size: 16px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 32px; }
+
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; }
+
+  /* ---- type helpers ---- */
+  .eyebrow { font-family: var(--font-body); font-weight: 500; font-size: 14px;
+    text-transform: uppercase; letter-spacing: 2px; color: var(--slate); }
+  .eyebrow.on-violet { color: var(--lemon-zest); }
+  .display { font-size: clamp(40px, 5.4vw, 56px); line-height: 1.13; letter-spacing: -0.04em; }
+  .h2 { font-size: clamp(30px, 4vw, 48px); line-height: 1.14; letter-spacing: -0.04em; }
+  .h3 { font-size: 26px; line-height: 1.25; letter-spacing: -0.03em; }
+  .lead { font-size: 18px; line-height: 1.6; letter-spacing: -0.18px; color: var(--slate); }
+
+  /* ---- buttons ---- */
+  .btn { font-family: var(--font-body); font-weight: 500; font-size: 15px;
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    border-radius: var(--radius-btn); padding: 12px 20px; border: 1px solid transparent;
+    transition: transform .25s var(--ease), box-shadow .25s, background .2s, border-color .2s; }
+  .btn .arr { transition: transform .25s var(--ease); }
+  .btn:hover .arr { transform: translateX(4px); }
+  .btn:active { transform: translateY(0) scale(.99); }
+  .btn-dark { background: var(--obsidian); color: #fff; box-shadow: var(--shadow-btn); }
+  .btn-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 22px -8px rgba(18,18,23,.45); }
+  .btn-white { background: #fff; color: var(--obsidian); box-shadow: var(--shadow-btn); }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 26px -10px rgba(0,0,0,.4); }
+  .btn-ghost { background: transparent; color: var(--obsidian); border-color: var(--ash); }
+  .btn-ghost:hover { border-color: var(--slate); }
+  .btn-ghost-v { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); }
+  .btn-ghost-v:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+  .btn-lg { border-radius: var(--radius-cta); padding: 16px 28px; font-size: 16px; }
+
+  /* ---- announcement banner ---- */
+  .announce { background: var(--lemon-zest); }
+  .announce .wrap { display: flex; align-items: center; justify-content: center; gap: 18px;
+    padding: 11px 32px; flex-wrap: wrap; }
+  .announce .msg { font-weight: 500; font-size: 14px; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--obsidian); }
+  .announce .pill { background: #fff; color: var(--obsidian); font-weight: 500; font-size: 14px;
+    border-radius: var(--radius-pill); padding: 8px 16px; display: inline-flex; align-items: center; gap: 7px;
+    transition: transform .25s var(--ease); }
+  .announce .pill:hover { transform: translateY(-1px); }
+
+  /* ---- nav ---- */
+  nav.bar { position: sticky; top: 0; z-index: 60; background: #fff; border-bottom: 1px solid var(--ash); }
+  nav.bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a { font-size: 15px; font-weight: 500; color: var(--slate); padding: 8px 16px;
+    border-radius: var(--radius-pill); transition: background .2s, color .2s; }
+  .nav-links a:hover { color: var(--obsidian); background: var(--fog); }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-right .signin { font-size: 15px; font-weight: 500; color: var(--slate); }
+  .nav-right .signin:hover { color: var(--obsidian); }
+
+  /* ---- hero (full-bleed royal violet) ---- */
+  .hero { background: var(--royal-violet); color: #fff; padding: 88px 0 96px; position: relative; overflow: hidden; }
+  #heroflow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  .hero > .wrap { position: relative; z-index: 1; }
+  .hero-grid { display: grid; grid-template-columns: 1.04fr 0.96fr; gap: 56px; align-items: center; }
+  .hero h1 { color: #fff; margin-top: 18px; text-wrap: balance; }
+  .hero h1 .zest { color: var(--lemon-zest); }
+  .hero .lead { color: rgba(255,255,255,.82); margin-top: 22px; max-width: 30em; }
+  .hero .lead b { color: #fff; font-weight: 600; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 34px; }
+  .hero-meta .m { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,.9); }
+  .hero-meta .m .d { width: 7px; height: 7px; border-radius: 50%; background: var(--lemon-zest); }
+
+  /* ---- product tablet (the UI is the hero) ---- */
+  .stage { position: relative; }
+  .tablet { background: #fff; border-radius: 26px; padding: 12px; box-shadow: var(--shadow-tablet);
+    transform: perspective(1500px) rotateY(-15deg) rotateX(5deg) rotate(1deg);
+    transition: transform .7s var(--ease); will-change: transform; }
+  .stage:hover .tablet { transform: perspective(1500px) rotateY(-6deg) rotateX(2deg); }
+  .screen { background: var(--paper); border-radius: 16px; overflow: hidden; border: 1px solid var(--fog); }
+  .screen-top { display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px; border-bottom: 1px solid var(--fog); }
+  .screen-top .t { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--obsidian); }
+  .screen-top .live { display: inline-flex; align-items: center; gap: 7px; font-size: 12px;
+    font-weight: 500; color: var(--emerald); }
+  .screen-top .live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald);
+    box-shadow: 0 0 0 0 rgba(30,135,76,.5); animation: pulse 2s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(30,135,76,.5);} 70%{ box-shadow: 0 0 0 7px rgba(30,135,76,0);} 100%{box-shadow:0 0 0 0 rgba(30,135,76,0);} }
+  .screen-body { padding: 22px; display: grid; gap: 12px; }
+  .srow { background: var(--fog); border-radius: 14px; padding: 16px 18px; }
+  .srow .k { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--slate); font-weight: 500; }
+  .srow .amt { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums;
+    font-size: 32px; letter-spacing: -0.03em; color: var(--obsidian); margin-top: 6px; }
+  .srow .amt .ccy { font-size: 14px; color: var(--slate); font-weight: 500; margin-left: 6px; }
+  .screen-foot { display: grid; grid-template-columns: repeat(3,1fr); border-top: 1px solid var(--fog); }
+  .screen-foot .c { padding: 16px 22px; }
+  .screen-foot .c + .c { border-left: 1px solid var(--fog); }
+  .screen-foot .k { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); }
+  .screen-foot .v { font-weight: 600; font-size: 14px; margin-top: 4px; color: var(--obsidian); }
+  .screen-foot .v.g { color: var(--emerald); }
+
+  .float-card { position: absolute; background: #fff; border-radius: 18px; box-shadow: var(--shadow-card),
+    0 12px 30px rgba(18,18,23,.12); display: flex; align-items: center; gap: 12px; padding: 14px 16px; z-index: 5;
+    animation: floaty 5s ease-in-out infinite; }
+  .float-card .ic { width: 38px; height: 38px; border-radius: 11px; background: var(--emerald); color: #fff;
+    display: grid; place-items: center; flex: none; }
+  .float-card .amt { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--obsidian); }
+  .float-card .meta { font-size: 12px; color: var(--slate); }
+  .fc-delivered { left: -26px; bottom: 54px; }
+  .fc-lemon { right: -14px; top: 28px; background: var(--lemon-zest); animation-delay: 1s; padding: 12px 16px; }
+  .fc-lemon .em { font-size: 20px; } .fc-lemon .t { font-weight: 600; font-size: 13px; color: var(--obsidian); }
+  .fc-lemon .t small { display: block; font-weight: 500; color: rgba(18,18,23,.6); font-size: 11px; }
+  @keyframes floaty { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-9px);} }
+
+  /* ---- ticker (flat obsidian band) ---- */
+  .tickerband { background: var(--obsidian); color: #fff; }
+  .ticker { overflow: hidden; padding: 14px 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .ticker-track { display: flex; width: max-content; animation: marquee 40s linear infinite; }
+  .ticker:hover .ticker-track { animation-play-state: paused; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .tick { display: inline-flex; align-items: center; gap: 9px; padding: 0 28px; font-size: 14px;
+    white-space: nowrap; color: rgba(255,255,255,.78); }
+  .tick .star { color: var(--lemon-zest); }
+  .tick b { color: #fff; font-weight: 600; }
+  .tick .g { color: #4fd18b; }
+
+  /* ---- section scaffolding ---- */
+  section { padding: 80px 0; }
+  .center { text-align: center; }
+  .center .lead { margin-left: auto; margin-right: auto; }
+  .sec-head .h2 { margin-top: 14px; }
+  .sec-head .lead { margin-top: 16px; max-width: 40em; }
+
+  /* ---- card ---- */
+  .card { background: #fff; border-radius: var(--radius-card); padding: 40px; box-shadow: var(--shadow-card); }
+
+  /* ---- calculator section ---- */
+  .calc-grid { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 56px; align-items: center; }
+  .calc-points { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 16px; }
+  .calc-points li { display: flex; gap: 14px; align-items: flex-start; font-size: 16px; color: var(--slate); }
+  .calc-points li b { color: var(--obsidian); font-weight: 600; }
+  .calc-points .ck { width: 24px; height: 24px; border-radius: 7px; background: rgba(30,135,76,.12);
+    color: var(--emerald); display: grid; place-items: center; flex: none; font-weight: 700; font-size: 13px; margin-top: 3px; }
+  .calc { padding: 0; overflow: hidden; }
+  .calc-head { display: flex; align-items: center; justify-content: space-between; padding: 26px 32px 18px; }
+  .calc-head .t { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+  .calc-head .live-ring { display: inline-flex; align-items: center; gap: 12px; }
+  .rate-now { font-size: 13px; color: var(--slate); } .rate-now b { color: var(--obsidian); font-weight: 600; }
+  .ring { position: relative; width: 32px; height: 32px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .bgc { stroke: var(--fog); } .ring .fgc { stroke: var(--royal-violet); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .ring .cd { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; color: var(--slate); font-weight: 500; }
+  .calc-body { display: grid; gap: 12px; padding: 6px 32px 0; }
+  .field { background: var(--fog); border: 1.5px solid transparent; border-radius: 14px; padding: 16px 18px; transition: border-color .2s, box-shadow .2s; }
+  .field:focus-within { border-color: var(--electric-iris); box-shadow: 0 0 0 4px rgba(112,71,235,.12); }
+  .field .l { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); font-weight: 500; }
+  .field .row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .amt-input, .amt-out { font-family: var(--font-display); font-variant-numeric: tabular-nums;
+    font-weight: 700; font-size: clamp(28px,4vw,38px); letter-spacing: -0.03em; color: var(--obsidian); line-height: 1; }
+  .amt-input { background: transparent; border: none; outline: none; width: 100%; min-width: 0; }
+  .amt-out { transition: transform .25s var(--ease); transform-origin: left; }
+  .amt-out.bump { transform: scale(1.04); }
+  .ccy { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--ash);
+    border-radius: var(--radius-pill); padding: 9px 14px; font-weight: 600; font-size: 13px; flex: none; }
+  .ccy .fl { width: 20px; height: 14px; border-radius: 3px; }
+  .fl-us { background: linear-gradient(180deg,#b22234 0 33%,#fff 33% 66%,#3c3b6e 66%); }
+  .fl-in { background: linear-gradient(180deg,#ff9933 0 33%,#fff 33% 66%,#138808 66%); }
+  .calc-foot { display: grid; grid-template-columns: repeat(3,1fr); padding: 18px 32px 0; }
+  .calc-foot .c { padding: 6px 0; } .calc-foot .c + .c { border-left: 1px solid var(--fog); padding-left: 20px; }
+  .calc-foot .k { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); }
+  .calc-foot .v { font-weight: 600; font-size: 14px; margin-top: 5px; } .calc-foot .v.g { color: var(--emerald); }
+  .calc-cta { padding: 22px 32px 32px; }
+  .calc-cta .btn { width: 100%; justify-content: center; padding: 16px; }
+  .calc-note { text-align: center; font-size: 13px; color: var(--slate); margin: 12px 0 0; }
+  .trustpills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 44px; }
+  .trustpills .t { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-pill);
+    background: #fff; border: 1px solid var(--ash); font-size: 13px; font-weight: 500; color: var(--slate); }
+  .trustpills .t .d { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
+
+  /* ---- moment (the one retained photo) ---- */
+  .moment { display: grid; grid-template-columns: 1.15fr 1fr; gap: 0; background: #fff;
+    border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); }
+  .moment .photo { position: relative; min-height: 440px; }
+  .moment .photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .moment .photo .min { position: absolute; left: 20px; bottom: 20px; background: rgba(255,255,255,.94);
+    backdrop-filter: blur(6px); color: var(--obsidian); font-size: 12px; font-weight: 600; border-radius: var(--radius-pill);
+    padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .moment .photo .min .d { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
+  .moment .body { padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
+  .moment .body .q { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,2.4vw,32px);
+    line-height: 1.28; letter-spacing: -0.03em; color: var(--obsidian); }
+  .moment .body .q .zest { color: var(--royal-violet); }
+  .moment .body .c { font-size: 14px; color: var(--slate); margin-top: 22px; }
+
+  /* ---- stat band (flat violet) ---- */
+  .statband { background: var(--royal-violet); border-radius: var(--radius-card); padding: 56px 50px; color: #fff; }
+  .statband .srowg { display: grid; grid-template-columns: repeat(4,1fr); gap: 30px; }
+  .statband .stat .sv { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums;
+    font-size: clamp(38px,4.6vw,56px); letter-spacing: -0.04em; }
+  .statband .stat:nth-child(odd) .sv { color: var(--lemon-zest); }
+  .statband .stat .sk { font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-top: 12px; }
+
+  /* ---- compare ---- */
+  /* two-beat intro: "Imagine you're sending $1,000 home." -> "There are three ways it can travel." */
+  .cmp-intro { display: grid; justify-items: center; text-align: center; margin: 0 0 18px; }
+  .ci-line { grid-area: 1 / 1; font-family: var(--font-display); font-weight: 600; letter-spacing: -0.03em;
+    line-height: 1.3; font-size: clamp(24px, 3.6vw, 40px); color: var(--obsidian);
+    opacity: 0; transform: translateY(12px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+  .ci-line b { color: var(--royal-violet); font-weight: 700; }
+  .ci-line.show { opacity: 1; transform: none; }
+  .ci-line.hide { opacity: 0; transform: translateY(-12px); }
+  .cmp-note { text-align: center; font-size: 14.5px; color: var(--slate); line-height: 1.6; margin: 0 auto 36px; max-width: 46em; }
+  .cmp-note b { color: var(--obsidian); font-weight: 600; }
+
+  .cmp { display: grid; gap: 14px; }
+  .crow { display: grid; grid-template-columns: 1.15fr 2.4fr auto; gap: 24px; align-items: center; background: #fff;
+    border: 1px solid var(--ash); border-radius: 24px; padding: 22px 28px; transition: box-shadow .3s var(--ease); }
+  .crow:hover { box-shadow: 0 10px 30px -18px rgba(18,18,23,.22); }
+  .crow.win { border: 2px solid var(--royal-violet); box-shadow: 0 14px 40px -22px rgba(84,35,231,.55); }
+  .crow .name { font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--obsidian);
+    display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .crow .name small { display: block; width: 100%; font-weight: 400; font-size: 12px; color: var(--slate); margin-top: 4px; font-family: var(--font-body); }
+  .tagbest { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    background: var(--lemon-zest); color: var(--obsidian); border-radius: var(--radius-pill); padding: 3px 10px; }
+  .track { position: relative; height: 46px; border-radius: 10px; overflow: hidden; background: rgba(213,11,62,.07); }
+  .crow.win .track { background: rgba(30,135,76,.10); }
+  .track .goal { position: absolute; right: 0; top: 0; bottom: 0; width: 2px; z-index: 2;
+    background: repeating-linear-gradient(180deg, var(--ash) 0 5px, transparent 5px 10px); }
+  .fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 10px; transition: width 1.9s var(--ease); }
+  .fill.f1 { background: #b7b7c5; } .fill.f2 { background: var(--electric-iris); } .fill.f3 { background: var(--royal-violet); }
+  .bval { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); font-family: var(--font-display);
+    font-weight: 700; font-size: 16px; color: #fff; white-space: nowrap; }
+  .fill.f1 .bval { color: var(--obsidian); }
+  .cmeta { font-size: 12px; color: var(--slate); text-align: right; line-height: 1.7; white-space: nowrap; }
+  .cmeta .lost { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #d50b3e; }
+  .cmeta .kept { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--emerald); }
+
+  /* staged reveal — driven only by the on-view orchestrator (no preload) */
+  .staged { opacity: 0; transform: translateY(16px); transition: opacity .75s var(--ease), transform .75s var(--ease); }
+  .staged.show { opacity: 1; transform: none; }
+
+  .save { margin-top: 14px; text-align: center; padding: 40px 30px; border-radius: var(--radius-card);
+    background: var(--royal-violet); color: #fff; }
+  .save .sv { font-family: var(--font-display); font-weight: 700; font-size: clamp(34px,5vw,56px); letter-spacing: -0.04em; color: var(--lemon-zest); }
+  .save .sk { font-size: 16px; color: rgba(255,255,255,.85); margin-top: 10px; }
+
+  /* ---- how ---- */
+  .how { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 48px; }
+  .hc { background: #fff; border-radius: var(--radius-card); padding: 38px 36px; box-shadow: var(--shadow-card);
+    transition: transform .3s var(--ease); }
+  .hc:hover { transform: translateY(-3px); }
+  .hc .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--fog); color: var(--obsidian);
+    display: grid; place-items: center; }
+  .hc .n { font-size: 13px; letter-spacing: .1em; color: var(--slate); font-weight: 500; margin-top: 24px; }
+  .hc h3 { margin: 10px 0 10px; color: var(--obsidian); }
+  .hc p { margin: 0; color: var(--slate); font-size: 15px; line-height: 1.6; }
+  .hc .tm { display: inline-flex; font-size: 12px; color: var(--slate); margin-top: 18px;
+    background: var(--fog); padding: 6px 12px; border-radius: var(--radius-pill); font-weight: 500; }
+
+  /* ---- why ---- */
+  .why { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 20px; margin-top: 48px; }
+  .why .lead-card { grid-row: 1 / 3; background: var(--royal-violet); color: #fff; border-radius: var(--radius-card);
+    padding: 44px; display: flex; flex-direction: column; justify-content: space-between; }
+  .why .lead-card .wn { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--lemon-zest); }
+  .why .lead-card .q { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px,2.2vw,30px);
+    line-height: 1.3; letter-spacing: -0.03em; }
+  .why .lead-card .q b { color: var(--lemon-zest); font-weight: 600; }
+  .why .c { background: #fff; border-radius: var(--radius-card); padding: 32px; box-shadow: var(--shadow-card);
+    transition: transform .3s var(--ease); }
+  .why .c:hover { transform: translateY(-3px); }
+  .why .c .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--fog); color: var(--obsidian);
+    display: grid; place-items: center; margin-bottom: 16px; }
+  .why .c h3 { font-size: 18px; color: var(--obsidian); margin-bottom: 8px; }
+  .why .c p { margin: 0; color: var(--slate); font-size: 14px; line-height: 1.55; }
+
+  /* ---- testimonial ---- */
+  .testi { background: #fff; border-radius: var(--radius-card); padding: 56px 60px; box-shadow: var(--shadow-card);
+    display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: center; }
+  .testi .score { text-align: center; }
+  .testi .score .v { font-family: var(--font-display); font-weight: 700; font-size: 48px; letter-spacing: -0.04em; color: var(--royal-violet); }
+  .testi .score .k { font-size: 12px; color: var(--slate); margin-top: 6px; letter-spacing: .04em; }
+  .testi blockquote { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: clamp(20px,2vw,26px);
+    line-height: 1.5; letter-spacing: -0.02em; color: var(--obsidian); }
+  .testi .cite { font-size: 13px; color: var(--slate); margin-top: 22px; } .testi .cite b { color: var(--royal-violet); font-weight: 600; }
+
+  /* ---- compliance ---- */
+  .comp { display: grid; grid-template-columns: repeat(4,1fr); gap: 32px; margin-top: 44px; }
+  .comp .tc { border-top: 1px solid var(--ash); padding-top: 20px; }
+  .comp .tc h3 { font-size: 16px; color: var(--obsidian); margin-bottom: 8px; }
+  .comp .tc p { margin: 0; color: var(--slate); font-size: 14px; line-height: 1.55; }
+  .comp-legal { font-size: 12px; color: var(--slate); line-height: 1.7; margin: 34px 0 0; max-width: 62em; }
+
+  /* ---- faq ---- */
+  .faq-wrap { max-width: 800px; }
+  .faq-item { border-bottom: 1px solid var(--ash); }
+  .faq-q { width: 100%; background: none; border: none; cursor: pointer; padding: 24px 0; display: flex;
+    justify-content: space-between; gap: 16px; align-items: center; text-align: left; font-family: var(--font-display);
+    font-weight: 600; font-size: 19px; color: var(--obsidian); transition: color .2s; }
+  .faq-q:hover { color: var(--royal-violet); }
+  .faq-q .pm { color: var(--royal-violet); font-size: 26px; transition: transform .35s var(--ease); flex: none; }
+  .faq-item.open .pm { transform: rotate(45deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .45s var(--ease); }
+  .faq-a p { margin: 0 0 24px; color: var(--slate); font-size: 16px; line-height: 1.6; max-width: 52em; }
+
+  /* ---- final CTA band ---- */
+  .final-band { background: var(--royal-violet); }
+  .final { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; color: #fff; }
+  .final h2 { color: #fff; margin-top: 16px; text-wrap: balance; }
+  .final .lead { color: rgba(255,255,255,.82); margin-top: 16px; }
+  .final .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+  .final-mini { background: #fff; border-radius: 22px; padding: 12px; box-shadow: var(--shadow-tablet);
+    transform: perspective(1400px) rotateY(12deg) rotateX(4deg); }
+  .final-mini .fm-screen { background: var(--fog); border-radius: 14px; padding: 24px; }
+  .final-mini .fm-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
+  .final-mini .fm-row + .fm-row { border-top: 1px solid var(--ash); }
+  .final-mini .fm-k { font-size: 12px; color: var(--slate); text-transform: uppercase; letter-spacing: .08em; }
+  .final-mini .fm-v { font-family: var(--font-display); font-weight: 700; color: var(--obsidian); }
+  .final-mini .fm-v.g { color: var(--emerald); }
+
+  /* ---- footer ---- */
+  footer { background: #fff; border-top: 1px solid var(--ash); padding: 64px 0 40px; }
+  .fgrid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
+  .fgrid .blurb { font-size: 14px; color: var(--slate); line-height: 1.6; margin-top: 16px; max-width: 26em; }
+  .fgrid h4 { font-family: var(--font-body); font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--slate); margin: 0 0 16px; font-weight: 600; }
+  .fgrid .col a { display: block; font-size: 14px; font-weight: 500; color: var(--obsidian); padding: 6px 0; }
+  .fgrid .col a:hover { color: var(--royal-violet); }
+  footer .leg { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-size: 13px;
+    color: var(--slate); border-top: 1px solid var(--ash); margin-top: 44px; padding-top: 26px; }
+
+  /* ---- reveal ---- */
+  .rv { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .8s var(--ease); transition-delay: var(--d,0s); }
+  .rv.in { opacity: 1; transform: none; }
+
+  /* ====== microanimations ====== */
+  @keyframes amx-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  @keyframes amx-in { from { opacity: 0; transform: translateY(30px) scale(.97); } to { opacity: 1; transform: none; } }
+  @keyframes amx-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.55); opacity: .55; } }
+  @keyframes amx-zest { 0%,100% { filter: none; } 50% { filter: drop-shadow(0 0 16px rgba(255,255,255,.5)); } }
+  @keyframes amx-shimmer { to { transform: translateX(100%); } }
+
+  /* hero entrance — staggered reveal on load */
+  .hero-grid > div:first-child > * { opacity: 0; animation: amx-up .8s var(--ease) both; }
+  .hero-grid > div:first-child > *:nth-child(1) { animation-delay: .08s; }
+  .hero-grid > div:first-child > *:nth-child(2) { animation-delay: .18s; }
+  .hero-grid > div:first-child > *:nth-child(3) { animation-delay: .28s; }
+  .hero-grid > div:first-child > *:nth-child(4) { animation-delay: .40s; }
+  .hero-grid > div:first-child > *:nth-child(5) { animation-delay: .52s; }
+  .stage { opacity: 0; animation: amx-in 1s var(--ease) .44s both; }
+  .hero h1 .zest { display: inline-block; animation: amx-zest 3.6s ease-in-out 1.6s infinite; }
+
+  /* hero meta dots — staggered pulse */
+  .hero-meta .m .d { animation: amx-pulse 2.4s ease-in-out infinite; }
+  .hero-meta .m:nth-child(2) .d { animation-delay: .3s; }
+  .hero-meta .m:nth-child(3) .d { animation-delay: .6s; }
+
+  /* buttons — sheen sweep on hover */
+  .btn { position: relative; overflow: hidden; }
+  .btn::after { content: ""; position: absolute; top: 0; left: -160%; width: 55%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent); transform: skewX(-20deg);
+    transition: left .6s var(--ease); pointer-events: none; }
+  .btn-white::after { background: linear-gradient(100deg, transparent, rgba(18,18,23,.07), transparent); }
+  .btn:hover::after { left: 170%; }
+
+  /* nav logo + announcement pill */
+  nav.bar a img { transition: transform .3s var(--ease); }
+  nav.bar a:hover img { transform: scale(1.04); }
+  .announce .pill span { display: inline-block; transition: transform .25s var(--ease); }
+  .announce .pill:hover span { transform: translateX(4px); }
+
+  /* feature cards — icon spring + deeper lift on hover */
+  .hc .ic, .why .c .ic { transition: transform .4s var(--ease), background .3s; }
+  .hc:hover .ic, .why .c:hover .ic { transform: translateY(-3px) rotate(-6deg) scale(1.08); }
+  .hc:hover, .why .c:hover { box-shadow: 0 18px 40px -16px rgba(18,18,23,.22); }
+
+  /* moment photo — slow zoom on hover */
+  .moment .photo img { transition: transform 1.1s var(--ease); }
+  .moment:hover .photo img { transform: scale(1.05); }
+
+  /* trust pills — hover lift */
+  .trustpills .t { transition: transform .25s var(--ease), border-color .2s; }
+  .trustpills .t:hover { transform: translateY(-3px); border-color: var(--electric-iris); }
+
+  /* compare winner bar — travelling shine */
+  .fill.f3::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+    transform: translateX(-100%); animation: amx-shimmer 2.8s linear 1.6s infinite; }
+
+  /* faq rows — nudge in on hover */
+  .faq-q { transition: color .2s, padding-left .3s var(--ease); }
+  .faq-q:hover { padding-left: 8px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-grid > div:first-child > *, .stage { animation: none; opacity: 1; }
+    .hero h1 .zest, .hero-meta .m .d, .fill.f3::after { animation: none; }
+    .btn::after { display: none; }
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width: 980px) {
+    .nav-links, .nav-right .signin { display: none; }
+    .hero-grid { grid-template-columns: 1fr; gap: 64px; }
+    .tablet { transform: none; } .stage:hover .tablet { transform: none; }
+    .calc-grid { grid-template-columns: 1fr; gap: 40px; }
+    .moment { grid-template-columns: 1fr; } .moment .photo { min-height: 320px; position: relative; }
+    .statband .srowg { grid-template-columns: 1fr 1fr; gap: 28px; }
+    .how, .why { grid-template-columns: 1fr; } .why .lead-card { grid-row: auto; }
+    .testi { grid-template-columns: 1fr; gap: 28px; text-align: left; }
+    .comp { grid-template-columns: 1fr 1fr; }
+    .final { grid-template-columns: 1fr; } .final-mini { transform: none; }
+    .crow { grid-template-columns: 1fr; gap: 14px; } .cmeta { text-align: left; }
+    .fgrid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 20px; }
+    .hero { padding: 64px 0 72px; }
+    .float-card { display: none; }
+    .statband .srowg { grid-template-columns: 1fr; } .comp { grid-template-columns: 1fr; }
+    .fgrid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- announcement -->
+<div class="announce"><div class="wrap">
+  <span class="msg">Live mid-market rate · regulated US to India</span>
+  <a class="pill" href="#calc">Start a transfer <span>→</span></a>
+</div></div>
+
+<!-- nav -->
+<nav class="bar"><div class="wrap">
+  <a href="#"><img src="assets/atomx-logo-horizontal-color.png" alt="AtomX Pay" height="30" /></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#compare">Compare</a>
+    <a href="#why">Why AtomX</a>
+    <a href="#about">Our story</a>
+  </div>
+  <div class="nav-right">
+    <a class="signin" href="dashboard.html">Sign in</a>
+    <a class="btn btn-dark" href="dashboard.html">Get started <span class="arr">→</span></a>
+  </div>
+</div></nav>
+
+<!-- hero -->
+<header class="hero"><canvas id="heroflow" aria-hidden="true"></canvas><div class="wrap"><div class="hero-grid">
+  <div>
+    <span class="eyebrow on-violet">US → India · 15-minute settlement</span>
+    <h1 class="display">Send money home<br>in <span class="zest">15 minutes</span>.</h1>
+    <p class="lead">The rent. The festival. The just-because. Send USD to India and watch it land in their bank before the call ends. <b>Real rate, zero spread, no fee.</b></p>
+    <div class="hero-cta">
+      <a class="btn btn-white" href="#calc">Start a transfer <span class="arr">→</span></a>
+      <a class="btn btn-ghost-v" href="#how">See how it works</a>
+    </div>
+    <div class="hero-meta">
+      <div class="m"><span class="d"></span> 15-minute settlement</div>
+      <div class="m"><span class="d"></span> 0% hidden spread</div>
+      <div class="m"><span class="d"></span> 24×7×365</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="tablet">
+      <div class="screen">
+        <div class="screen-top">
+          <span class="t">Your transfer</span>
+          <span class="live"><span class="dot"></span> 1 USD = <span id="h-rate">95.3820</span></span>
+        </div>
+        <div class="screen-body">
+          <div class="srow"><div class="k">You send</div><div class="amt">$1,000<span class="ccy">USD</span></div></div>
+          <div class="srow"><div class="k">They receive</div><div class="amt"><span id="h-receive">95,382</span><span class="ccy">INR</span></div></div>
+        </div>
+        <div class="screen-foot">
+          <div class="c"><div class="k">Fee</div><div class="v g">$0.00</div></div>
+          <div class="c"><div class="k">Spread</div><div class="v">0%</div></div>
+          <div class="c"><div class="k">Arrives</div><div class="v">~15 min</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="float-card fc-delivered">
+      <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <div><div class="amt">₹95,382 received</div><div class="meta">Mom · 14 minutes ago</div></div>
+    </div>
+    <div class="float-card fc-lemon"><span class="em">🪔</span><div class="t">Diwali sorted<small>Sent in 12 min</small></div></div>
+  </div>
+</div></div></header>
+
+<!-- ticker -->
+<div class="tickerband"><div class="ticker"><div class="ticker-track" id="ticker">
+  <span class="tick"><span class="star">✦</span> ₹95,382 landed in <b>Mumbai</b> · 14 min</span>
+  <span class="tick"><span class="star">🪔</span> Diwali gift landed in <b>Delhi</b> · 12 min</span>
+  <span class="tick"><span class="g">$0 fee</span> · <span class="g">0% spread</span> · always</span>
+  <span class="tick"><span class="star">✦</span> Rent landed in <b>Bengaluru</b> · 11 min</span>
+  <span class="tick">4.9★ · <b>12,400+</b> transfers home</span>
+  <span class="tick"><span class="star">✦</span> School fees landed in <b>Pune</b> · 15 min</span>
+  <span class="tick">FinCEN-registered · FIU-IND</span>
+  <span class="tick"><span class="star">✦</span> A just-because landed in <b>Kochi</b> · 13 min</span>
+</div></div></div>
+
+<!-- calculator -->
+<section id="calc" style="background:var(--fog);"><div class="wrap">
+  <div class="calc-grid">
+    <div class="calc-copy rv">
+      <span class="eyebrow">The honest calculator</span>
+      <h2 class="h2" style="margin-top:14px;">What you see is what they get.</h2>
+      <ul class="calc-points">
+        <li><span class="ck">✓</span><span><b>The Google rate, for real.</b> The live mid-market rate with zero spread added on top.</span></li>
+        <li><span class="ck">✓</span><span><b>No fee, no asterisk.</b> $0 to send, every day of the year, holidays included.</span></li>
+        <li><span class="ck">✓</span><span><b>Locked when you send.</b> The INR amount your family receives is fixed the moment you confirm.</span></li>
+      </ul>
+    </div>
+    <div class="card calc rv" style="--d:.1s">
+      <div class="calc-head">
+        <span class="t">How much are you sending?</span>
+        <div class="live-ring">
+          <span class="rate-now">1 USD = <b id="rate-now">95.3820</b></span>
+          <div class="ring"><svg width="32" height="32"><circle class="bgc" cx="16" cy="16" r="13" fill="none" stroke-width="3"></circle><circle class="fgc" id="ring-fg" cx="16" cy="16" r="13" fill="none" stroke-width="3"></circle></svg><span class="cd" id="ring-cd">30</span></div>
+        </div>
+      </div>
+      <div class="calc-body">
+        <div class="field"><span class="l">You send</span><div class="row"><input id="send" class="amt-input" inputmode="decimal" value="1,000" aria-label="USD" /><span class="ccy"><span class="fl fl-us"></span> USD</span></div></div>
+        <div class="field"><span class="l">They receive</span><div class="row"><span class="amt-out" id="receive">95,382.41</span><span class="ccy"><span class="fl fl-in"></span> INR</span></div></div>
+      </div>
+      <div class="calc-foot">
+        <div class="c"><div class="k">Exchange rate</div><div class="v" id="rate-cell">95.3820</div></div>
+        <div class="c"><div class="k">Our fee</div><div class="v g">$0.00</div></div>
+        <div class="c"><div class="k">Arrives in</div><div class="v">~15 min</div></div>
+      </div>
+      <div class="calc-cta">
+        <a class="btn btn-dark" href="dashboard.html">Send this home <span class="arr">→</span></a>
+        <p class="calc-note">Rates refresh every 30 seconds. No account needed to preview.</p>
+      </div>
+    </div>
+  </div>
+  <div class="trustpills rv">
+    <span class="t"><span class="d"></span> FinCEN-registered MSB</span>
+    <span class="t"><span class="d"></span> FIU-IND registered</span>
+    <span class="t"><span class="d"></span> AML / CFT screening</span>
+    <span class="t"><span class="d"></span> SOC 2 aligned</span>
+  </div>
+</div></section>
+
+<!-- moment (one retained photo) -->
+<section id="moments"><div class="wrap">
+  <div class="center sec-head rv" style="margin-bottom:46px;">
+    <span class="eyebrow">Why it matters</span>
+    <h2 class="h2">Every transfer is someone's good news.</h2>
+    <p class="lead">Behind every rate and receipt is a kitchen, a festival, a phone lighting up at home.</p>
+  </div>
+  <div class="moment rv">
+    <div class="photo">
+      <img src="https://images.unsplash.com/photo-1769618097083-48516fc6e23a?q=80&w=1100&auto=format&fit=crop" alt="A joyful Indian family celebrating together at home" loading="lazy" />
+      <span class="min"><span class="d"></span> Landed in 14 min</span>
+    </div>
+    <div class="body">
+      <div class="q">“Money should move like a <span class="zest">message</span> — instant, warm, and free of toll-booths.”</div>
+      <div class="c">Sunday in Jaipur, right after it landed · AtomX Pay · US → India</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- stats -->
+<section style="padding-top:0;"><div class="wrap">
+  <div class="statband rv">
+    <div class="srowg">
+      <div class="stat"><div class="sv" data-count="15" data-suffix=" min">15 min</div><div class="sk">Typical time to land</div></div>
+      <div class="stat"><div class="sv">0%</div><div class="sk">Hidden FX spread, ever</div></div>
+      <div class="stat"><div class="sv">24×7</div><div class="sk">Holidays included</div></div>
+      <div class="stat"><div class="sv" data-count="12400" data-suffix="+">12,400+</div><div class="sk">Happy transfers home</div></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- compare -->
+<section id="compare"><div class="wrap">
+  <div class="center sec-head rv" style="margin-bottom:24px;">
+    <span class="eyebrow">The $1,000 test</span>
+    <h2 class="h2">More of your money, actually arrives.</h2>
+  </div>
+  <div class="cmp-intro" aria-label="Imagine you're sending $1,000 home. There are three ways it can travel.">
+    <span class="ci-line ci-1">Imagine you're sending <b>$1,000</b> home.</span>
+    <span class="ci-line ci-2">There are <b>three ways</b> it can travel.</span>
+  </div>
+  <p class="cmp-note staged">Each bar is what actually lands, measured against the real <b>₹95,382</b> your $1,000 is worth at today's mid-market rate.</p>
+  <div class="cmp">
+    <div class="crow staged" data-arrive="94.09">
+      <div class="name">Traditional bank <small>Correspondent wire</small></div>
+      <div class="track"><span class="goal"></span><div class="fill f1"><span class="bval">₹89,743</span></div></div>
+      <div class="cmeta"><span class="lost">−₹5,639 lost</span><br>2 to 5 days · ~2.5% spread · $25 to $45 fee</div>
+    </div>
+    <div class="crow staged" data-arrive="98.21">
+      <div class="name">Banking-rail MSB <small>Money service business</small></div>
+      <div class="track"><span class="goal"></span><div class="fill f2"><span class="bval">₹93,673</span></div></div>
+      <div class="cmeta"><span class="lost">−₹1,709 lost</span><br>1 to 2 days · ~1.0% spread · $5 to $12 fee</div>
+    </div>
+    <div class="crow win staged" data-arrive="100">
+      <div class="name">AtomX Pay <span class="tagbest">Best value</span> <small>Blockchain rails</small></div>
+      <div class="track"><span class="goal"></span><div class="fill f3"><span class="bval">₹95,382</span></div></div>
+      <div class="cmeta"><span class="kept">Full value kept</span><br>~15 min · 0% spread · $0 fee · always on</div>
+    </div>
+  </div>
+  <div class="save staged"><div class="sv">Save up to ₹5,639</div><div class="sk">per $1,000, versus a traditional bank wire. That stays with your family.</div></div>
+</div></section>
+
+<!-- how -->
+<section id="how" style="background:var(--fog);"><div class="wrap">
+  <div class="center sec-head rv"><span class="eyebrow">How it works</span><h2 class="h2">Three steps, then it is home.</h2></div>
+  <div class="how">
+    <div class="hc rv">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <div class="n">01</div><h3 class="h3">Verify once</h3><p>A photo ID and a quick selfie, screened against AML and CFT lists. Most people are cleared in about two minutes.</p><span class="tm">~2 min</span>
+    </div>
+    <div class="hc rv" style="--d:.1s">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      <div class="n">02</div><h3 class="h3">Lock the real rate</h3><p>You see the true mid-market rate with no spread. Lock it, and the amount your family receives is fixed.</p><span class="tm">~30 sec</span>
+    </div>
+    <div class="hc rv" style="--d:.2s">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></span>
+      <div class="n">03</div><h3 class="h3">It lands in INR</h3><p>Money settles straight to their Indian bank, tracked on-chain the whole way, with a receipt you both can see.</p><span class="tm">~15 min</span>
+    </div>
+  </div>
+</div></section>
+
+<!-- why -->
+<section id="why"><div class="wrap">
+  <div class="sec-head rv"><span class="eyebrow">Why AtomX</span><h2 class="h2">Built for the people sending it home.</h2></div>
+  <div class="why rv">
+    <div class="lead-card">
+      <span class="wn">Our belief</span>
+      <div class="q">Money should move like a <b>message</b>. Instant, warm, and free of the toll-booths built into old banking rails.</div>
+      <span class="wn">AtomX Pay · US to India</span>
+    </div>
+    <div class="c"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><h3 class="h3">It lands in 15 minutes</h3><p>Real funds in a real account, the same evening you send them.</p></div>
+    <div class="c"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><h3 class="h3">The honest rate</h3><p>The rate you see on Google, applied for real. Zero spread, $0 fee.</p></div>
+    <div class="c"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><h3 class="h3">Safe by design</h3><p>MPC and MultiSig custody, passwordless sign-in, real-time fraud checks.</p></div>
+    <div class="c"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span><h3 class="h3">Money-back guarantee</h3><p>If it cannot complete, it comes back to you. Always.</p></div>
+  </div>
+</div></section>
+
+<!-- testimonial -->
+<section id="about" style="background:var(--fog);"><div class="wrap">
+  <div class="testi rv">
+    <div class="score">
+      <div class="v">4.9★</div>
+      <div class="k">12,400+ verified transfers</div>
+    </div>
+    <div>
+      <blockquote>Sent rent home on a Sunday night and it landed before I went to bed. The rate was exactly what Google showed.</blockquote>
+      <div class="cite">Verified transfer · settled in <b>14 min</b> · $1,200 became ₹114,458</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- compliance -->
+<section id="trust"><div class="wrap">
+  <div class="sec-head rv"><span class="eyebrow">Security and compliance</span><h2 class="h2">Regulated, audited, accountable.</h2></div>
+  <div class="comp rv">
+    <div class="tc"><h3>FinCEN-registered MSB</h3><p>AtomX Pay operates as a registered Money Services Business in the United States.</p></div>
+    <div class="tc"><h3>FIU-IND registered partners</h3><p>INR payouts are made through partners registered with the Financial Intelligence Unit, India.</p></div>
+    <div class="tc"><h3>MPC and MultiSig custody</h3><p>Funds in transit are held in multi-party computation wallets with multi-signature controls.</p></div>
+    <div class="tc"><h3>Money-back guarantee</h3><p>If a transfer cannot complete, the full amount is returned to your account.</p></div>
+  </div>
+  <p class="comp-legal">Every transfer is screened against AML and CFT watchlists before settlement. AtomX Pay Inc. is registered with FinCEN as a Money Services Business. Transfers to India are executed through FIU-IND registered payout partners.</p>
+</div></section>
+
+<!-- faq -->
+<section style="background:var(--fog);"><div class="wrap">
+  <div class="sec-head rv" style="margin-bottom:26px;"><span class="eyebrow">Good questions</span><h2 class="h2">Everything you might ask.</h2></div>
+  <div class="rv faq-wrap" id="faq">
+    <div class="faq-item"><button class="faq-q">How long does a transfer really take?<span class="pm">+</span></button><div class="faq-a"><p>Most transfers land in the recipient's Indian bank in about 15 minutes, any day of the year. No business-day waiting.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What rate and fees do you use?<span class="pm">+</span></button><div class="faq-a"><p>The live mid-market rate, with no spread added and a $0 transfer fee. What the calculator shows is what your family receives.</p></div></div>
+    <div class="faq-item"><button class="faq-q">Are you regulated?<span class="pm">+</span></button><div class="faq-a"><p>Yes. A FinCEN-registered MSB in the US and FIU-IND registered partners in India, with AML and CFT screening on every transfer.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What documents do I need?<span class="pm">+</span></button><div class="faq-a"><p>A government photo ID and a quick selfie. It is a one-time step that usually clears in about two minutes.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What if a transfer fails?<span class="pm">+</span></button><div class="faq-a"><p>Your money is never lost. It comes straight back to you, and our money-back guarantee covers you either way.</p></div></div>
+  </div>
+</div></section>
+
+<!-- final CTA -->
+<section class="final-band"><div class="wrap"><div class="final rv">
+  <div>
+    <span class="eyebrow on-violet">No account needed to preview</span>
+    <h2 class="display">Someone is waiting for this. Send it home.</h2>
+    <p class="lead">Preview your live rate in seconds. Start a transfer when you are ready.</p>
+    <div class="actions">
+      <a class="btn btn-white btn-lg" href="dashboard.html">Start a transfer <span class="arr">→</span></a>
+      <a class="btn btn-ghost-v btn-lg" href="#how">See how it works</a>
+    </div>
+  </div>
+  <div class="final-mini">
+    <div class="fm-screen">
+      <div class="fm-row"><span class="fm-k">You send</span><span class="fm-v">$1,000</span></div>
+      <div class="fm-row"><span class="fm-k">They get</span><span class="fm-v"><span id="f-receive">95,382</span> INR</span></div>
+      <div class="fm-row"><span class="fm-k">Fee</span><span class="fm-v g">$0.00</span></div>
+      <div class="fm-row"><span class="fm-k">Arrives</span><span class="fm-v">~15 min</span></div>
+    </div>
+  </div>
+</div></div></section>
+
+<!-- footer -->
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div>
+      <img src="assets/atomx-logo-horizontal-color.png" alt="AtomX Pay" height="28" />
+      <p class="blurb">Send USD to India on blockchain rails — the real rate, zero spread, $0 fee, landing in about 15 minutes. Built for the people sending it home.</p>
+    </div>
+    <div class="col"><h4>Product</h4><a href="#calc">Calculator</a><a href="#how">How it works</a><a href="#compare">Compare</a><a href="dashboard.html">Dashboard</a></div>
+    <div class="col"><h4>Company</h4><a href="#about">Our story</a><a href="#why">Why AtomX</a><a href="#faq">FAQ</a></div>
+    <div class="col"><h4>Trust</h4><a href="#trust">FinCEN MSB</a><a href="#trust">FIU-IND</a><a href="#trust">AML / CFT</a><a href="#trust">SOC 2</a></div>
+  </div>
+  <div class="leg">
+    <span>© 2026 AtomX Pay · FinCEN MSB · FIU-IND</span>
+    <span>1 USD = <span id="foot-rate">95.3820</span> INR · live</span>
+  </div>
+</div></footer>
+
+<script src="assets/atomx.js"></script>
+<script>
+  AtomX.startEngine();
+
+  var sendEl = document.getElementById('send'), recvEl = document.getElementById('receive');
+  function parseAmt(){ var v = parseFloat(sendEl.value.replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; }
+  var lastRecv = 95382.41;
+  function recompute(animate){ var out = parseAmt()*AtomX.getRate(); if(animate) AtomX.countUp(recvEl,lastRecv,out,600,AtomX.fmtINR); else recvEl.textContent = AtomX.fmtINR(out); recvEl.classList.add('bump'); setTimeout(function(){recvEl.classList.remove('bump');},260); lastRecv = out; }
+  sendEl.addEventListener('input', function(){ var raw = sendEl.value.replace(/[^0-9.]/g,''); var p = raw.split('.'); var f = p[0]?Number(p[0]).toLocaleString('en-US'):''; if(p.length>1) f += '.'+p[1].slice(0,2); var pos = sendEl.selectionStart + (f.length - sendEl.value.length); sendEl.value = f; try{sendEl.setSelectionRange(pos,pos);}catch(e){} recompute(false); });
+
+  var CIRC = 2*Math.PI*13;
+  document.getElementById('ring-fg').setAttribute('stroke-dasharray', CIRC.toFixed(1));
+  AtomX.onCountdown(function(n){ document.getElementById('ring-cd').textContent = n; document.getElementById('ring-fg').setAttribute('stroke-dashoffset',(CIRC*(1-n/30)).toFixed(1)); });
+
+  function setText(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+  AtomX.onRate(function(r,delta,dir,kind){
+    setText('rate-now', AtomX.fmtRate(r));
+    setText('rate-cell', AtomX.fmtRate(r));
+    setText('h-rate', AtomX.fmtRate(r));
+    setText('foot-rate', AtomX.fmtRate(r));
+    setText('h-receive', AtomX.fmtINR0(1000*r));
+    setText('f-receive', AtomX.fmtINR0(1000*r));
+    if(kind==='refresh') recompute(true); else recompute(false);
+  });
+
+  // seamless marquee loop
+  var tk = document.getElementById('ticker'); tk.innerHTML += tk.innerHTML;
+
+  // scroll reveals — fire ONLY on real viewport entry, no timed fallback (nothing preloads off-screen)
+  function amxReveal(els, cb, opts){
+    opts = opts || {}; var list = Array.prototype.slice.call(els); if(!list.length) return;
+    if(!('IntersectionObserver' in window)){ list.forEach(cb); return; }
+    var io = new IntersectionObserver(function(ents){
+      ents.forEach(function(e){ if(e.isIntersecting){ cb(e.target); io.unobserve(e.target); } });
+    }, { threshold: opts.threshold || 0.18, rootMargin: opts.rootMargin || '0px 0px -8% 0px' });
+    list.forEach(function(el){ io.observe(el); });
+  }
+  amxReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });
+  amxReveal(document.querySelectorAll('[data-count]'), function(el){ var to=+el.getAttribute('data-count'); var suf=el.getAttribute('data-suffix')||''; var pre=el.getAttribute('data-prefix')||''; AtomX.countUp(el,0,to,1100,function(v){ return pre+Math.round(v).toLocaleString('en-IN')+suf; }); });
+
+  // ===== compare: staged story — "send $1,000" -> "three ways" -> bars -> savings. Plays once, on view. =====
+  (function(){
+    var sec = document.getElementById('compare'); if(!sec) return;
+    var cmp  = sec.querySelector('.cmp');
+    var ci1  = sec.querySelector('.ci-1');
+    var ci2  = sec.querySelector('.ci-2');
+    var note = sec.querySelector('.cmp-note');
+    var rows = sec.querySelectorAll('.crow');
+    var save = sec.querySelector('.save');
+    var saveSv = save ? save.querySelector('.sv') : null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function fillRow(r){ var f = r.querySelector('.fill'); if(f) f.style.width = r.getAttribute('data-arrive')+'%'; }
+    function reveal(el){ if(el) el.classList.add('show'); }
+    function showSave(){ if(!save) return; reveal(save);
+      if(saveSv) AtomX.countUp(saveSv, 0, 5639, 1700, function(v){ return 'Save up to ₹'+Math.round(v).toLocaleString('en-IN'); }); }
+
+    function run(){
+      reveal(ci1);                                                                 // "Imagine you're sending $1,000 home."
+      setTimeout(function(){ if(ci1) ci1.classList.add('hide'); reveal(ci2); }, 1900);  // "There are three ways it can travel."
+      setTimeout(function(){ reveal(note); reveal(rows[0]); fillRow(rows[0]); }, 3700);  // way 1
+      setTimeout(function(){ reveal(rows[1]); fillRow(rows[1]); }, 5900);               // way 2
+      setTimeout(function(){ reveal(rows[2]); fillRow(rows[2]); }, 8100);               // way 3 (AtomX)
+      setTimeout(showSave, 10300);                                                       // ends here
+    }
+    function finalState(){ if(ci1) ci1.classList.add('hide'); reveal(ci2); reveal(note);
+      for(var i=0;i<rows.length;i++){ reveal(rows[i]); fillRow(rows[i]); } showSave(); }
+
+    if(reduce){ finalState(); return; }
+    if(!('IntersectionObserver' in window)){ run(); return; }
+    var io = new IntersectionObserver(function(ents){
+      ents.forEach(function(e){ if(e.isIntersecting){ io.disconnect(); run(); } });
+    }, { threshold: 0.25 });
+    io.observe(cmp);
+  })();
+
+  document.querySelectorAll('.faq-q').forEach(function(q){ q.addEventListener('click', function(){ var it=q.parentElement, a=it.querySelector('.faq-a'); var open=it.classList.toggle('open'); a.style.maxHeight = open?a.scrollHeight+'px':0; }); });
+</script>
+
+<!-- hero WebGL flow field: soft brand-colored ribbons drifting toward "home" -->
+<script>
+(function(){
+  var c = document.getElementById('heroflow'); if(!c) return;
+  var gl = c.getContext('webgl', { alpha:true, premultipliedAlpha:false, antialias:true }) ||
+           c.getContext('experimental-webgl', { alpha:true, premultipliedAlpha:false });
+  if(!gl) return; // graceful no-op: hero stays solid violet
+
+  function hex(v){ v=(v||'').trim().replace('#',''); if(v.length===3){ v=v[0]+v[0]+v[1]+v[1]+v[2]+v[2]; }
+    var n=parseInt(v||'ffffff',16); return [((n>>16)&255)/255, ((n>>8)&255)/255, (n&255)/255]; }
+  var cs = getComputedStyle(document.documentElement);
+  var A = hex(cs.getPropertyValue('--lemon-zest'));     // accent ribbons
+  var B = hex(cs.getPropertyValue('--electric-iris'));  // companion glow
+
+  var VS = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
+  var FS = [
+    'precision highp float;',
+    'uniform vec2 uRes; uniform float uTime; uniform vec3 uA; uniform vec3 uB;',
+    'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }',
+    'float noise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);',
+    '  float a=hash(i), b=hash(i+vec2(1.0,0.0)), c=hash(i+vec2(0.0,1.0)), d=hash(i+vec2(1.0,1.0));',
+    '  return mix(mix(a,b,f.x), mix(c,d,f.x), f.y); }',
+    'float fbm(vec2 p){ float v=0.0, a=0.5; for(int i=0;i<5;i++){ v+=a*noise(p); p*=2.02; a*=0.5; } return v; }',
+    'void main(){',
+    '  vec2 uv = gl_FragCoord.xy/uRes.xy;',
+    '  vec2 p = uv*vec2(uRes.x/uRes.y,1.0)*2.3;',
+    '  float t = uTime*0.05;',
+    '  vec2 q = vec2(fbm(p + t), fbm(p + vec2(5.2,1.3) - t));',
+    '  float f = fbm(p + 2.2*q + vec2(t,-t));',
+    '  float ribbon = smoothstep(0.35, 0.78, f);',
+    '  float hi = pow(smoothstep(0.55, 0.96, f), 2.0);',  // bright crests
+    '  vec3 col = mix(uB, uA, ribbon);',
+    '  col = mix(col, vec3(1.0), hi*0.55);',               // white-hot highlights
+    '  float side = smoothstep(0.12, 0.60, uv.x);',        // fade behind the headline
+    '  float alpha = (ribbon*0.40 + hi*0.34) * side;',
+    '  alpha *= smoothstep(1.30, 0.15, distance(uv, vec2(0.66,0.40)));',
+    '  gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.66));',
+    '}'
+  ].join('\n');
+
+  function sh(t,src){ var o=gl.createShader(t); gl.shaderSource(o,src); gl.compileShader(o); return o; }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog,'p'); gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  var uRes = gl.getUniformLocation(prog,'uRes'), uT = gl.getUniformLocation(prog,'uTime'),
+      uA = gl.getUniformLocation(prog,'uA'), uB = gl.getUniformLocation(prog,'uB');
+  gl.uniform3fv(uA, A); gl.uniform3fv(uB, B);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function resize(){ var r = c.getBoundingClientRect();
+    c.width = Math.max(1, (r.width*dpr)|0); c.height = Math.max(1, (r.height*dpr)|0);
+    gl.viewport(0,0,c.width,c.height); gl.uniform2f(uRes, c.width, c.height); }
+  window.addEventListener('resize', resize); resize();
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ gl.uniform1f(uT, 14.0); gl.drawArrays(gl.TRIANGLES, 0, 3); return; }
+  function frame(ts){ gl.uniform1f(uT, ts*0.001); gl.drawArrays(gl.TRIANGLES, 0, 3); requestAnimationFrame(frame); }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

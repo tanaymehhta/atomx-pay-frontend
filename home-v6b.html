@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AtomX Pay — Send money home</title>
+<title>AtomX Pay — Send money home (V6b · Spring)</title>
 <link rel="stylesheet" href="assets/atomx.css" />
 <style>
   body { background: var(--paper); color: var(--n-800); overflow-x: hidden; }
@@ -285,6 +285,30 @@
     .mo-tall { grid-column: 1; }
     .statband { padding: 40px 28px; }
   }
+
+  /* ====== V6b · SPRING PHYSICS motion theme ====== */
+  /* 3D-capable hero stage for spring tilt */
+  #stage { perspective: 1100px; }
+  #stage .pcard { transform-style: preserve-3d; }
+  /* JS spring loop drives .pcard transform; ease the transition out of the way so the
+     integrator (not CSS) governs the feel while the cursor is active. */
+  #stage.spring-on .pcard { transition: transform .05s linear; }
+
+  /* spring overshoot reveals: snappier, slightly-past-rest settle */
+  :root { --ease-spring-over: linear(0,0.018,0.07 4%,0.27 9%,0.62 15%,0.86 20%,1.04 26%,1.108 31%,1.105 37%,1.06 44%,1.012 54%,0.992 66%,1.001 84%,1); }
+  .rv.spring-rv { transition: opacity .6s var(--ease-out), transform .92s var(--ease-spring-over); }
+
+  /* spring number pop on the calculator output (JS sets --pop scale) */
+  .amt-out.spring-pop { transform: scale(var(--pop, 1)); transform-origin: left; }
+
+  /* button press spring: dip on active, bounce back on release */
+  .btn.spring-btn { transition: transform .42s var(--ease-spring), box-shadow .3s, filter .2s; }
+  .btn.spring-btn:active { transform: scale(.9); transition: transform .08s ease-out; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rv.spring-rv { transition: opacity .4s ease, transform .4s ease; }
+    .amt-out.spring-pop { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -327,7 +351,7 @@
       <div class="cap">Sunday in Jaipur, right after it landed.</div>
     </div>
     <div class="pcard pc-side" data-depth="16">
-      <img src="https://images.unsplash.com/photo-1704088030734-96769c4593a2?q=80&w=700&auto=format&fit=crop" alt="Indian mother in a saree smiling at the money that just landed on her phone" loading="eager" />
+      <img src="https://images.unsplash.com/photo-1758686254023-09e191043c88?q=80&w=700&auto=format&fit=crop" alt="Grandparents waving happily at a smartphone on a video call" loading="eager" />
       <div class="cap">“It's here, beta!”</div>
     </div>
     <div class="chip chip-delivered">
@@ -533,7 +557,30 @@
   var sendEl = document.getElementById('send'), recvEl = document.getElementById('receive');
   function parseAmt(){ var v = parseFloat(sendEl.value.replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; }
   var lastRecv = 95382.41;
-  function recompute(animate){ var out = parseAmt()*AtomX.getRate(); if(animate) AtomX.countUp(recvEl,lastRecv,out,600,AtomX.fmtINR); else recvEl.textContent = AtomX.fmtINR(out); recvEl.classList.add('bump'); setTimeout(function(){recvEl.classList.remove('bump');},260); lastRecv = out; }
+
+  // ---- V6b SPRING: scale-pop on the received amount, driven by a 1D spring integrator ----
+  var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+  recvEl.classList.add('spring-pop');
+  var popPos = 1, popVel = 0, popTarget = 1, popRAF = 0;
+  var POP_STIFF = 0.18, POP_DAMP = 0.62; // overshoots to ~1.12 then settles
+  function popStep(){
+    var a = (popTarget - popPos) * POP_STIFF;
+    popVel = (popVel + a) * POP_DAMP;
+    popPos += popVel;
+    if (popTarget < 1.001 && Math.abs(popPos-1) < 0.0015 && Math.abs(popVel) < 0.0015){
+      popPos = 1; popVel = 0; recvEl.style.setProperty('--pop','1'); popRAF = 0; return;
+    }
+    recvEl.style.setProperty('--pop', popPos.toFixed(4));
+    popRAF = requestAnimationFrame(popStep);
+  }
+  function springPop(){
+    if(!motionOK){ return; }
+    // kick: jump the spring out so it overshoots up toward ~1.12, target eases back to rest
+    popVel += 0.16; popTarget = 1;
+    if(!popRAF) popRAF = requestAnimationFrame(popStep);
+  }
+
+  function recompute(animate){ var out = parseAmt()*AtomX.getRate(); if(animate) AtomX.countUp(recvEl,lastRecv,out,600,AtomX.fmtINR); else recvEl.textContent = AtomX.fmtINR(out); springPop(); lastRecv = out; }
   sendEl.addEventListener('input', function(){ var raw = sendEl.value.replace(/[^0-9.]/g,''); var p = raw.split('.'); var f = p[0]?Number(p[0]).toLocaleString('en-US'):''; if(p.length>1) f += '.'+p[1].slice(0,2); var pos = sendEl.selectionStart + (f.length - sendEl.value.length); sendEl.value = f; try{sendEl.setSelectionRange(pos,pos);}catch(e){} recompute(false); });
 
   var CIRC = 2*Math.PI*13;
@@ -552,21 +599,83 @@
   var tk = document.getElementById('ticker');
   tk.innerHTML += tk.innerHTML;
 
-  // gentle pointer parallax on the hero collage (desktop, motion-allowed only)
+  // V6b SPRING: pointer parallax + 3D tilt on the hero collage, driven by a per-card
+  // spring integrator (stiffness/damping) so cards overshoot the cursor and settle.
   var stage = document.getElementById('stage');
   if (stage && window.matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').matches) {
-    var cards = stage.querySelectorAll('.pcard');
-    stage.addEventListener('pointermove', function(e){
-      var r = stage.getBoundingClientRect();
-      var nx = (e.clientX - r.left)/r.width - .5, ny = (e.clientY - r.top)/r.height - .5;
-      cards.forEach(function(c){
-        var d = +c.getAttribute('data-depth') || 10;
-        var base = c.classList.contains('pc-main') ? -2.4 : 3.2;
-        c.style.transform = 'rotate('+base+'deg) translate('+(nx*d)+'px,'+(ny*d)+'px)';
+    stage.classList.add('spring-on');
+    var cards = [];
+    stage.querySelectorAll('.pcard').forEach(function(c){
+      cards.push({
+        el: c,
+        depth: +c.getAttribute('data-depth') || 10,
+        base: c.classList.contains('pc-main') ? -2.4 : 3.2,
+        // state: x/y translate, rx/ry tilt — each with its own velocity
+        x:0, vx:0, y:0, vy:0, rx:0, vrx:0, ry:0, vry:0,
+        // targets, set from cursor on pointermove
+        tx:0, ty:0, trx:0, try_:0
       });
     });
-    stage.addEventListener('pointerleave', function(){ cards.forEach(function(c){ c.style.transform = ''; }); });
+
+    // softer stiffness on the heavier main card, springier on the small side card
+    var STIFF = 0.12, DAMP = 0.78;   // overshoots ~6% then settles in ~1s
+    var TILT_MAX = 9;                // deg of 3D tilt at the edges
+    var active = false, springRAF = 0;
+
+    function intg(o, key, vkey, target){
+      var a = (target - o[key]) * STIFF;
+      o[vkey] = (o[vkey] + a) * DAMP;
+      o[key] += o[vkey];
+      return Math.abs(target - o[key]) < 0.02 && Math.abs(o[vkey]) < 0.02;
+    }
+    function frame(){
+      var settled = true;
+      for (var i=0;i<cards.length;i++){
+        var o = cards[i];
+        var s1 = intg(o,'x','vx',o.tx);
+        var s2 = intg(o,'y','vy',o.ty);
+        var s3 = intg(o,'rx','vrx',o.trx);
+        var s4 = intg(o,'ry','vry',o.try_);
+        o.el.style.transform =
+          'perspective(1100px) rotate('+o.base.toFixed(3)+'deg) translate3d('+o.x.toFixed(2)+'px,'+o.y.toFixed(2)+'px,0) '+
+          'rotateX('+o.rx.toFixed(3)+'deg) rotateY('+o.ry.toFixed(3)+'deg)';
+        if(!(s1&&s2&&s3&&s4)) settled = false;
+      }
+      if (settled && !active){ springRAF = 0; return; }
+      springRAF = requestAnimationFrame(frame);
+    }
+    function kick(){ if(!springRAF) springRAF = requestAnimationFrame(frame); }
+
+    stage.addEventListener('pointermove', function(e){
+      active = true;
+      var r = stage.getBoundingClientRect();
+      var nx = (e.clientX - r.left)/r.width - .5, ny = (e.clientY - r.top)/r.height - .5;
+      for (var i=0;i<cards.length;i++){
+        var o = cards[i];
+        o.tx = nx * o.depth;
+        o.ty = ny * o.depth;
+        o.try_ = nx * TILT_MAX;     // rotateY follows horizontal cursor
+        o.trx = -ny * TILT_MAX;     // rotateX inverts vertical cursor
+      }
+      kick();
+    });
+    stage.addEventListener('pointerleave', function(){
+      active = false;
+      for (var i=0;i<cards.length;i++){ var o = cards[i]; o.tx=0; o.ty=0; o.trx=0; o.try_=0; }
+      kick();
+    });
   }
+
+  // V6b SPRING: give card-like reveals an overshoot easing, and spring the buttons on press
+  (function(){
+    var springReveals = document.querySelectorAll('.hc, .why .c, .crow, .mo, .calc');
+    for (var i=0;i<springReveals.length;i++){
+      var el = springReveals[i];
+      if (el.classList.contains('rv')) el.classList.add('spring-rv');
+    }
+    var btns = document.querySelectorAll('.btn');
+    for (var j=0;j<btns.length;j++){ btns[j].classList.add('spring-btn'); }
+  })();
 
   AtomX.onReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });
   AtomX.onReveal(document.querySelectorAll('[data-count]'), function(el){ var to=+el.getAttribute('data-count'); var suf=el.getAttribute('data-suffix')||''; var pre=el.getAttribute('data-prefix')||''; AtomX.countUp(el,0,to,1100,function(v){ return pre+Math.round(v).toLocaleString('en-IN')+suf; }); });

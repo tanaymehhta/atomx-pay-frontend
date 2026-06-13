@@ -33,6 +33,34 @@
   .b:hover { transform:translateY(-2px); }
   .v1 .b.primary { background:var(--warm); color:#fff; } .v1 .b.ghost { background:var(--n-50); color:var(--v-700); }
   .v2x .b.primary { background:#fff; color:#5e29a3; } .v2x .b.ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3); }
+  .v3x { background:#5423e7; color:#fff; }
+  .v3x .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(160deg, rgba(84,35,231,.2), rgba(84,35,231,.92)); }
+  .v3x h2 { color:#fff; } .v3x .desc { color:rgba(255,255,255,.82); }
+  .v3x .b.primary { background:#fff; color:#5423e7; } .v3x .b.ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3); }
+  .v3x .lemon { color:#ffc233; }
+  .v5x { background:#4e148c; color:#fff; }
+  .v5x .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(160deg, rgba(78,20,140,.2), rgba(78,20,140,.92)); }
+  .v5x h2 { color:#fff; } .v5x .desc { color:rgba(255,255,255,.82); }
+  .v5x .b.primary { background:#fff; color:#4e148c; } .v5x .b.ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3); }
+  .v5x .orange { color:#f05a2b; }
+  .v6x { background:#fff; }
+  .v6x .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 30%, rgba(253,248,242,.96)); }
+  .v6x h2 { color:var(--v-950); } .v6x .desc { color:var(--n-600); }
+  .v6x .b.primary { background:var(--warm); color:#fff; } .v6x .b.ghost { background:var(--n-50); color:var(--v-700); }
+  .v6x .coral { color:var(--warm-deep); }
+  /* V7 — Slush sticker design language */
+  .v7x { background:#dceeff; border:1px solid #000; box-shadow:none; }
+  .v7x:hover { box-shadow:6px 6px 0 #000; }
+  .v7x .ph { background:#dceeff; border-bottom:1px solid #000; display:grid; place-items:center; overflow:hidden; }
+  .v7x .ph::after { display:none; }
+  .v7x .ribbon { width:78%; height:90px; border-radius:100px; background:#4da2ff; border:2px solid #000; transform:rotate(-8deg); position:relative; }
+  .v7x .ribbon .coin { position:absolute; right:-10px; top:-14px; width:38px; height:38px; border-radius:100px; background:#ffd731; border:2px solid #000; display:grid; place-items:center; font-family:var(--font-display); font-weight:800; color:#000; transform:rotate(8deg); }
+  .v7x .tag { color:#000; opacity:.85; }
+  .v7x h2 { color:#000; text-transform:uppercase; letter-spacing:0; }
+  .v7x .desc { color:#1a1a1a; }
+  .v7x .blue { color:#4da2ff; -webkit-text-stroke:1px #000; }
+  .v7x .b { border:1px solid #000; border-radius:100px; }
+  .v7x .b.primary { background:#000; color:#fff; } .v7x .b.ghost { background:#fff; color:#000; }
   @media (max-width:680px){ .grid { grid-template-columns:1fr; } }
 </style>
 </head>
@@ -63,6 +91,71 @@
         <div class="links">
           <a class="b primary" href="home-v2.html">Home →</a>
           <a class="b ghost" href="dashboard-v2.html">Dashboard →</a>
+        </div>
+      </div>
+    </div>
+    <div class="v v3x">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1769618097083-48516fc6e23a?q=80&w=800&auto=format&fit=crop" alt="A joyful Indian family celebrating together" /></div>
+      <div class="inner">
+        <span class="tag">Version 3</span>
+        <h2>Royal violet <span class="lemon">+ zest</span></h2>
+        <p class="desc">Lemon Squeezy system: full-bleed royal violet, lemon-zest accents, 48px cards, product UI as hero. Same calculator, new structure.</p>
+        <div class="links">
+          <a class="b primary" href="home-v3.html">Home →</a>
+          <a class="b ghost" href="dashboard-v3.html">Dashboard →</a>
+        </div>
+      </div>
+    </div>
+    <div class="v" style="background:#fff;">
+      <div class="ph" style="display:grid;place-items:center;background:radial-gradient(80% 80% at 80% 0%, var(--tint-sun), transparent 60%), radial-gradient(70% 70% at 10% 100%, var(--tint-violet), transparent 60%), var(--n-25);">
+        <div style="width:78%;background:#fff;border:1px solid var(--hair-light);border-radius:12px;box-shadow:var(--shadow-md);padding:11px 13px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--n-500);"><span>You send</span><b style="font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--v-950);">$1,000</b></div>
+          <div style="height:1px;background:var(--hair-light);margin:8px 0;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--n-500);"><span>They receive</span><b style="font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--warm-deep);">₹95,382</b></div>
+          <div style="height:5px;border-radius:100px;margin-top:9px;background:linear-gradient(90deg,var(--v-500),var(--warm) 70%,var(--sun));width:64%;"></div>
+        </div>
+      </div>
+      <div class="inner">
+        <span class="tag">Version 4</span>
+        <h2 style="color:var(--v-950);">Fintech product <span style="color:var(--warm-deep);">UI</span></h2>
+        <p class="desc" style="color:var(--n-600);">Shadcn-style finance cards, Lucide line icons, and a real dashboard: live in-flight tracker, transaction table, send composer. Product over photography.</p>
+        <div class="links">
+          <a class="b primary" href="home-v4.html" style="background:var(--v-700);color:#fff;">Home →</a>
+          <a class="b ghost" href="dashboard-v4.html" style="background:var(--n-50);color:var(--v-700);">Dashboard →</a>
+        </div>
+      </div>
+    </div>
+    <div class="v v5x">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1769618097083-48516fc6e23a?q=80&w=800&auto=format&fit=crop" alt="A joyful Indian family celebrating together" /></div>
+      <div class="inner">
+        <span class="tag">Version 5</span>
+        <h2>Brand purple <span class="orange">+ orange</span></h2>
+        <p class="desc">V3's structure recolored to the logo: deep purple #4e148c bands, orange #f05a2b accents. The actual AtomX brand palette.</p>
+        <div class="links">
+          <a class="b primary" href="home-v5.html">Home →</a>
+          <a class="b ghost" href="dashboard-v5.html">Dashboard →</a>
+        </div>
+      </div>
+    </div>
+    <div class="v v6x">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1769618097083-48516fc6e23a?q=80&w=800&auto=format&fit=crop" alt="A joyful Indian family celebrating together" /></div>
+      <div class="inner">
+        <span class="tag">Version 6 · lab</span>
+        <h2>Motion lab <span class="coral">· Componentry</span></h2>
+        <p class="desc">Four experiments on the V1 flagship, each bolting on one family of motion from the Componentry library: magnetic pull, spring physics, festival particles, kinetic scroll. Same page, four feels.</p>
+        <div class="links">
+          <a class="b primary" href="home-v6.html">Open the lab →</a>
+        </div>
+      </div>
+    </div>
+    <div class="v v7x">
+      <div class="ph"><div class="ribbon"><div class="coin">₹</div></div></div>
+      <div class="inner">
+        <span class="tag">Version 7</span>
+        <h2>Sticker pop <span class="blue">+ ribbons</span></h2>
+        <p class="desc">"Slush" design language: pastel paper canvas, inflated blue ribbons, rainbow sticker accents, crushed Anton display type, and hand-cut black outlines. Forex calculator front-and-center with pop-in motion and pointer parallax.</p>
+        <div class="links">
+          <a class="b primary" href="home-v7.html">Home →</a>
         </div>
       </div>
     </div>

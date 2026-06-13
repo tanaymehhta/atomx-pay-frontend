@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AtomX Pay — V6 motion lab (Componentry experiments)</title>
+<link rel="stylesheet" href="assets/atomx.css" />
+<style>
+  body { margin:0; background: var(--paper); color: var(--n-800); font-family: var(--font-ui);
+    min-height:100vh; display:grid; place-items:center; padding:56px 20px; }
+  .wrap { width:100%; max-width:960px; }
+  .eyebrow { font-family:var(--font-mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--warm-deep); font-weight:600; }
+  h1 { font-family:var(--font-display); font-weight:800; font-size:clamp(30px,5vw,48px); letter-spacing:-0.03em; color:var(--v-950); margin:10px 0 6px; }
+  h1 .serif { font-family:var(--font-serif); font-style:italic; font-weight:500; color:var(--warm-deep); }
+  p.lead { color:var(--n-600); font-size:16px; margin:0 0 14px; max-width:54em; line-height:1.6; }
+  .note { font-size:13.5px; color:var(--n-500); margin:0 0 34px; max-width:54em; line-height:1.55; }
+  .note b { color:var(--n-700); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .x { position:relative; border-radius:24px; border:1px solid var(--hair-light); background:#fff;
+    box-shadow:var(--shadow-md); padding:26px 26px 22px; overflow:hidden;
+    transition: transform .35s var(--ease-spring), box-shadow .3s; text-decoration:none; color:inherit; display:block; }
+  .x:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+  .x::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; }
+  .xa::before { background:linear-gradient(180deg,var(--warm),var(--sun)); }
+  .xb::before { background:linear-gradient(180deg,var(--v-500),var(--v-700)); }
+  .xc::before { background:linear-gradient(180deg,var(--sun),var(--warm)); }
+  .xd::before { background:linear-gradient(180deg,var(--v-700),var(--warm-deep)); }
+  .x .tag { font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--n-500); }
+  .x h2 { font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:-0.02em; color:var(--v-950); margin:9px 0 6px; }
+  .x h2 .ac { color:var(--warm-deep); }
+  .x .desc { font-size:14px; line-height:1.5; color:var(--n-600); margin:0 0 14px; }
+  .x .how { font-size:12.5px; line-height:1.5; color:var(--n-500); margin:0 0 16px; }
+  .x .how b { color:var(--n-700); font-weight:600; }
+  .x .go { font-family:var(--font-ui); font-weight:700; font-size:14px; color:var(--warm-deep); display:inline-flex; align-items:center; gap:7px; }
+  .x .go .arr { transition: transform .35s var(--ease-spring); }
+  .x:hover .go .arr { transform: translateX(5px); }
+  .foot { margin-top:30px; font-size:13px; color:var(--n-500); }
+  .foot a { color:var(--v-700); font-weight:600; text-decoration:none; }
+  @media (max-width:680px){ .grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">AtomX Pay · V6 · motion lab</span>
+  <h1>One page, four <span class="serif">physics</span></h1>
+  <p class="lead">Each experiment is the V1 warm flagship, untouched in layout and copy, with one family of motion borrowed from the Componentry library bolted on. Same page, four different ways it can feel alive.</p>
+  <p class="note">All effects are hand-built vanilla JS and CSS (no React, no Framer Motion), gated behind <b>prefers-reduced-motion</b> and desktop hover so touch and reduced-motion users get the calm base. Open each and move your cursor, type in the calculator, and scroll.</p>
+  <div class="grid">
+    <a class="x xa" href="home-v6a.html">
+      <span class="tag">Version 6a</span>
+      <h2>Magnetic <span class="ac">pull</span></h2>
+      <p class="desc">Interactive elements are physically attracted to the cursor. The closer you get, the more they lean in.</p>
+      <p class="how"><b>Where to feel it:</b> hover near the CTA buttons and nav links (they slide toward you, arrow pulls further), then sweep across the dark ticker (ticks swell and glow as they pass).</p>
+      <span class="go">Open 6a <span class="arr">→</span></span>
+    </a>
+    <a class="x xb" href="home-v6b.html">
+      <span class="tag">Version 6b</span>
+      <h2>Spring <span class="ac">physics</span></h2>
+      <p class="desc">Everything moves with elastic, slightly-overshooting springs instead of rigid tracking. It bounces, then settles.</p>
+      <p class="how"><b>Where to feel it:</b> tilt the hero photo cards with your cursor (they overshoot and wobble back), type in the calculator (the received amount pops), and scroll cards into view (they spring past, then settle).</p>
+      <span class="go">Open 6b <span class="arr">→</span></span>
+    </a>
+    <a class="x xc" href="home-v6c.html">
+      <span class="tag">Version 6c</span>
+      <h2>Festival <span class="ac">particles</span></h2>
+      <p class="desc">A restrained marigold particle system, tuned for Diwali warmth rather than generic confetti.</p>
+      <p class="how"><b>Where to feel it:</b> type a higher amount in the calculator (a gold petal burst rises from the received figure), watch the slow ambient petals drift behind the hero, and catch the ticker stars twinkle.</p>
+      <span class="go">Open 6c <span class="arr">→</span></span>
+    </a>
+    <a class="x xd" href="home-v6d.html">
+      <span class="tag">Version 6d</span>
+      <h2>Kinetic <span class="ac">scroll</span></h2>
+      <p class="desc">The page responds to how fast you scroll, and dark bands light up under your cursor.</p>
+      <p class="how"><b>Where to feel it:</b> scroll quickly (the ticker speeds up and skews with your velocity), then hover the dark ticker and final CTA (a warm spotlight follows the cursor).</p>
+      <span class="go">Open 6d <span class="arr">→</span></span>
+    </a>
+  </div>
+  <p class="foot">Back to <a href="index.html">all versions</a> · base reference: <a href="home.html">V1 warm flagship</a></p>
+</div>
+</body>
+</html>

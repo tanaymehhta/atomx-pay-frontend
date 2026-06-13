@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AtomX Pay · Send money home in 15 minutes (V4)</title>
+<link rel="stylesheet" href="assets/atomx.css" />
+<link rel="stylesheet" href="assets/atomx-v4.css" />
+<style>
+  body.v4 { overflow-x: hidden; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+  .v4 .serif { font-family: var(--font-serif); font-style: italic; font-weight: 500; }
+
+  /* ambient warm wash */
+  .sky { position: fixed; inset: 0; z-index: -1; background:
+    radial-gradient(60% 40% at 82% -8%, var(--tint-sun) 0%, transparent 60%),
+    radial-gradient(46% 36% at 2% 0%, var(--tint-peach) 0%, transparent 56%),
+    radial-gradient(40% 30% at 50% 4%, var(--tint-violet) 0%, transparent 60%),
+    var(--bg); }
+
+  /* nav */
+  nav.bar { position: sticky; top: 0; z-index: 60; backdrop-filter: blur(14px); background: rgba(253,248,242,.8); border-bottom: 1px solid var(--border); }
+  nav.bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+  nav.bar img { height: 32px; }
+  .links { display: flex; gap: 6px; }
+  .links a { font-size: 14px; font-weight: 500; color: var(--fg-2); padding: 8px 13px; border-radius: var(--r-xs); transition: .18s; }
+  .links a:hover { background: var(--surface-2); color: var(--primary); }
+  .navside { display: flex; align-items: center; gap: 12px; }
+
+  /* hero */
+  .hero { padding: 60px 0 28px; }
+  .hero-grid { display: grid; grid-template-columns: 1.04fr 0.96fr; gap: 52px; align-items: center; }
+  h1.hh { font-weight: 800; font-size: clamp(42px,5.2vw,72px); line-height: 1.0; letter-spacing: -0.035em; color: var(--v-950); margin: 22px 0 0; text-wrap: balance; }
+  h1.hh .joy { background: var(--joy); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+  h1.hh .home-w { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--accent-deep); }
+  .hero p.sub { font-size: 18px; line-height: 1.55; color: var(--fg-2); margin: 22px 0 0; max-width: 30em; }
+  .hero p.sub b { color: var(--fg); font-weight: 700; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 30px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 9px 22px; margin-top: 26px; }
+  .hero-meta .m { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--fg-2); }
+  .hero-meta .m [data-lucide] { width: 16px; height: 16px; color: var(--pos); }
+
+  /* hero product mockup */
+  .stage { position: relative; }
+  .appcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); overflow: hidden; }
+  .appcard .ah { display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-bottom: 1px solid var(--border); }
+  .appcard .ah .t { font-family: var(--font-display); font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .appcard .ah .t [data-lucide] { color: var(--primary); width: 16px; height: 16px; }
+  .appcard .ab { padding: 18px; }
+  .floatchip { position: absolute; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-md); padding: 12px 15px; display: flex; align-items: center; gap: 11px; animation: floaty 5s ease-in-out infinite; }
+  .floatchip .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: #fff; flex: none; }
+  .fc-landed { left: -26px; bottom: 40px; z-index: 4; }
+  .fc-landed .ic { background: var(--pos); }
+  .fc-landed .amt { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--v-950); }
+  .fc-landed .mt { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .fc-rate { right: -20px; top: -16px; z-index: 4; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); animation-delay: 1s; }
+  .fc-rate b { color: var(--v-950); }
+  @keyframes floaty { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-9px);} }
+
+  /* trust strip */
+  .strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin: 40px 0 0; }
+  .strip .pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 100px; background: var(--surface); border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--fg-2); box-shadow: var(--shadow-sm); }
+  .strip .pill [data-lucide] { width: 15px; height: 15px; color: var(--primary); }
+
+  /* sections */
+  section { padding: 78px 0; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-deep); font-weight: 600; }
+  .stitle { font-weight: 800; font-size: clamp(30px,4vw,50px); letter-spacing: -0.03em; line-height: 1.04; color: var(--v-950); margin: 12px 0 0; text-wrap: balance; }
+  .ssub { font-size: 16.5px; color: var(--fg-2); margin: 14px 0 0; max-width: 40em; line-height: 1.55; }
+  .center { text-align: center; } .center .ssub { margin-inline: auto; }
+
+  /* calculator section */
+  .calc-grid { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 50px; align-items: center; }
+  .calc-points { margin: 24px 0 0; display: grid; gap: 14px; }
+  .calc-points li { display: flex; gap: 12px; align-items: flex-start; list-style: none; font-size: 15px; color: var(--fg-2); line-height: 1.5; }
+  .calc-points li b { color: var(--v-950); }
+  .calc-points .ck { width: 26px; height: 26px; border-radius: 8px; background: rgba(31,157,107,.12); color: var(--pos); display: grid; place-items: center; flex: none; }
+  .calc-points .ck [data-lucide] { width: 15px; height: 15px; }
+  .calc-points ul { padding: 0; margin: 0; }
+
+  /* feature grid */
+  .feats { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 44px; }
+  .feat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease-spring), box-shadow .4s; }
+  .feat:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .feat .fi { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--primary-tint); color: var(--primary); margin-bottom: 16px; }
+  .feat .fi.warm { background: var(--tint-peach); color: var(--accent-deep); }
+  .feat .fi.gold { background: var(--tint-sun); color: var(--sun-deep); }
+  .feat .fi.pos { background: rgba(31,157,107,.12); color: var(--pos); }
+  .feat .fi [data-lucide] { width: 21px; height: 21px; }
+  .feat h3 { font-size: 18px; font-weight: 700; color: var(--v-950); margin: 0 0 7px; }
+  .feat p { margin: 0; font-size: 14px; color: var(--fg-2); line-height: 1.55; }
+
+  /* compare */
+  .cmp { display: grid; gap: 12px; margin-top: 40px; }
+  .crow { display: grid; grid-template-columns: 1.1fr 2.3fr auto; gap: 22px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 18px 22px; box-shadow: var(--shadow-sm); }
+  .crow.win { border: 2px solid var(--accent); background: linear-gradient(120deg, var(--surface), var(--tint-peach)); box-shadow: var(--shadow-warm); }
+  .crow .name { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: var(--v-950); }
+  .crow .name small { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .crow.win .name small { color: var(--accent-deep); }
+  .ctrack { position: relative; height: 44px; border-radius: 11px; background: var(--surface-3); overflow: hidden; }
+  .cfill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 11px; transition: width 1.4s var(--ease-out); }
+  .cfill.f1 { background: var(--n-200); } .cfill.f2 { background: var(--v-200x); } .cfill.f3 { background: var(--joy); }
+  .cbval { position: absolute; top: 50%; transform: translateY(-50%); left: 14px; font-family: var(--font-mono); font-weight: 700; font-size: 16px; color: var(--v-950); }
+  .crow.win .cbval { color: #fff; right: 14px; left: auto; }
+  .cmeta { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); text-align: right; line-height: 1.6; white-space: nowrap; }
+  .crow.win .cmeta { color: var(--accent-deep); }
+
+  /* steps */
+  .how { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 44px; }
+  .hc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 26px; box-shadow: var(--shadow-sm); }
+  .hc .hn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9px; background: var(--v-950); color: #fff; font-family: var(--font-mono); font-weight: 700; font-size: 13px; }
+  .hc h3 { font-size: 19px; font-weight: 700; color: var(--v-950); margin: 16px 0 7px; }
+  .hc p { margin: 0; color: var(--fg-2); font-size: 14px; line-height: 1.55; }
+  .hc .tm { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-top: 14px; }
+  .hc .tm [data-lucide] { width: 13px; height: 13px; }
+
+  /* faq */
+  .faq-wrap { max-width: 800px; margin-top: 16px; }
+  .faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); margin-bottom: 10px; overflow: hidden; }
+  .faq-q { width: 100%; background: none; border: none; cursor: pointer; padding: 18px 20px; display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 16.5px; color: var(--v-950); }
+  .faq-q .pm { color: var(--accent); transition: transform .35s var(--ease-spring); flex: none; display: grid; place-items: center; }
+  .faq-item.open .pm { transform: rotate(45deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .4s var(--ease-out); }
+  .faq-a p { margin: 0 20px 18px; color: var(--fg-2); font-size: 14.5px; line-height: 1.6; }
+
+  /* final cta */
+  .final .card { position: relative; overflow: hidden; border-radius: 28px; padding: 72px 40px; text-align: center; color: #fff; background: var(--v-950); box-shadow: var(--shadow-lg); }
+  .final .card::before { content:""; position:absolute; inset:0; background:
+    radial-gradient(50% 90% at 84% 0%, rgba(255,122,92,.34), transparent 60%),
+    radial-gradient(46% 80% at 8% 100%, rgba(157,107,255,.4), transparent 60%); }
+  .final .card > * { position: relative; }
+  .final h2 { font-size: clamp(34px,5vw,62px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.0; margin: 0 0 12px; }
+  .final .actions { display: flex; gap: 11px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+  .final .btn-soft { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.3); }
+  .final .btn-soft:hover { background: rgba(255,255,255,.2); color:#fff; }
+
+  /* footer */
+  footer { padding: 56px 0 40px; border-top: 1px solid var(--border); margin-top: 60px; }
+  .fgrid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 30px; }
+  .fgrid img { height: 28px; }
+  .fgrid .blurb { font-size: 13.5px; color: var(--fg-2); line-height: 1.6; margin-top: 14px; max-width: 26em; }
+  .fgrid h5 { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 2px 0 13px; font-weight: 600; }
+  .fgrid .col a { display: block; font-size: 14px; font-weight: 500; color: var(--fg-2); padding: 5px 0; }
+  .fgrid .col a:hover { color: var(--primary); }
+  footer .leg { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 36px; padding-top: 22px; }
+
+  /* reveal */
+  .rv { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease-out), transform .8s var(--ease-spring); transition-delay: var(--d,0s); }
+  .rv.in { opacity: 1; transform: none; }
+
+  @media (max-width: 980px) {
+    .links { display: none; }
+    .hero-grid { grid-template-columns: 1fr; gap: 56px; }
+    .calc-grid { grid-template-columns: 1fr; gap: 34px; }
+    .feats, .how { grid-template-columns: 1fr; }
+    .crow { grid-template-columns: 1fr; gap: 12px; } .cmeta { text-align: left; }
+    .fgrid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body class="v4">
+<div class="sky"></div>
+
+<nav class="bar"><div class="wrap">
+  <a href="#"><img src="assets/atomx-logo-horizontal-color.png" alt="AtomX Pay" /></a>
+  <div class="links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#compare">Compare</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="navside">
+    <a class="btn btn-ghost" href="dashboard-v4.html">Sign in</a>
+    <a class="btn btn-primary" href="dashboard-v4.html">Get started <i data-lucide="arrow-right"></i></a>
+  </div>
+</div></nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero"><div class="wrap"><div class="hero-grid">
+  <div>
+    <span class="badge badge-violet"><span class="livedot"></span> Live mid-market rate · regulated US → India</span>
+    <h1 class="hh">Send money <span class="home-w">home</span><br>in <span class="joy">15 minutes</span>.</h1>
+    <p class="sub">USD into your family's Indian bank before the call ends. <b>The real rate, zero spread, $0 fee</b>, tracked on-chain the whole way.</p>
+    <div class="hero-cta">
+      <a class="btn btn-accent btn-lg" href="#calc"><i data-lucide="send-horizontal"></i> Start a transfer</a>
+      <a class="btn btn-outline btn-lg" href="#how">See how it works</a>
+    </div>
+    <div class="hero-meta">
+      <span class="m"><i data-lucide="zap"></i> 15-min settlement</span>
+      <span class="m"><i data-lucide="badge-percent"></i> 0% hidden spread</span>
+      <span class="m"><i data-lucide="clock"></i> 24×7×365</span>
+    </div>
+  </div>
+
+  <!-- product mockup: the send composer card -->
+  <div class="stage">
+    <div class="appcard">
+      <div class="ah">
+        <span class="t"><i data-lucide="send"></i> Send money</span>
+        <span class="ratepill" style="box-shadow:none;border:none;padding:0;"><span class="livedot"></span> 1 USD = <b id="rate-hero">95.3820</b></span>
+      </div>
+      <div class="ab">
+        <div class="field">
+          <span class="fl">You send</span>
+          <div class="fr"><input id="send" class="num" inputmode="decimal" value="1,000" aria-label="USD" style="font-size:28px;font-weight:700;border:none;background:transparent;outline:none;width:100%;color:var(--fg);" /><span class="ccy"><span class="fl-us"></span> USD</span></div>
+        </div>
+        <div style="display:grid;place-items:center;margin:8px 0;"><span style="width:32px;height:32px;border-radius:9px;background:var(--surface);border:1px solid var(--border-strong);display:grid;place-items:center;color:var(--primary);"><i data-lucide="arrow-down" style="width:15px;height:15px;"></i></span></div>
+        <div class="field">
+          <span class="fl">They receive</span>
+          <div class="fr"><span id="receive" class="num" style="font-size:28px;font-weight:700;color:var(--fg);transition:color .5s;">95,382.41</span><span class="ccy"><span class="fl-in"></span> INR</span></div>
+        </div>
+        <div class="breakdown" style="display:grid;gap:8px;margin:15px 0;">
+          <div class="between" style="font-size:13px;"><span class="muted" style="display:flex;align-items:center;gap:7px;"><i data-lucide="repeat" style="width:14px;height:14px;color:var(--muted);"></i> Rate</span><span class="num" style="font-weight:600;" id="rate-cell">95.3820</span></div>
+          <div class="between" style="font-size:13px;"><span class="muted" style="display:flex;align-items:center;gap:7px;"><i data-lucide="circle-dollar-sign" style="width:14px;height:14px;color:var(--muted);"></i> Fee &amp; spread</span><span class="pos" style="font-family:var(--font-mono);font-weight:600;">$0 · 0%</span></div>
+          <div class="between" style="font-size:13px;"><span class="muted" style="display:flex;align-items:center;gap:7px;"><i data-lucide="clock" style="width:14px;height:14px;color:var(--muted);"></i> Arrives</span><span style="font-family:var(--font-mono);font-weight:600;">~15 min</span></div>
+        </div>
+        <a class="btn btn-accent btn-block btn-lg" href="dashboard-v4.html"><i data-lucide="send-horizontal"></i> Send this home</a>
+      </div>
+    </div>
+    <div class="floatchip fc-landed">
+      <span class="ic"><i data-lucide="check" style="width:18px;height:18px;"></i></span>
+      <div><div class="amt">₹95,382 received</div><div class="mt">Mom · 14 minutes ago</div></div>
+    </div>
+    <div class="floatchip fc-rate"><span class="livedot"></span> Locked: <b>95.3820</b></div>
+  </div>
+</div></div></header>
+
+<div class="wrap">
+  <div class="strip rv">
+    <span class="pill"><i data-lucide="shield-check"></i> FinCEN-registered MSB</span>
+    <span class="pill"><i data-lucide="landmark"></i> FIU-IND partners</span>
+    <span class="pill"><i data-lucide="lock"></i> MPC + MultiSig custody</span>
+    <span class="pill"><i data-lucide="rotate-ccw"></i> Money-back guarantee</span>
+  </div>
+</div>
+
+<!-- ===== CALCULATOR ===== -->
+<section id="calc"><div class="wrap"><div class="calc-grid">
+  <div class="rv">
+    <span class="eyebrow">The honest calculator</span>
+    <h2 class="stitle">What you see is what they get.</h2>
+    <ul class="calc-points" style="padding:0;">
+      <li><span class="ck"><i data-lucide="check"></i></span><span><b>The Google rate, for real.</b> Live mid-market rate with zero spread added on top.</span></li>
+      <li><span class="ck"><i data-lucide="check"></i></span><span><b>No fee, no asterisk.</b> $0 to send, every day of the year, holidays included.</span></li>
+      <li><span class="ck"><i data-lucide="check"></i></span><span><b>Locked when you send.</b> The INR your family receives is fixed the moment you confirm.</span></li>
+    </ul>
+  </div>
+
+  <div class="card rv" style="--d:.1s;overflow:hidden;">
+    <div class="card-head">
+      <span class="ct"><i data-lucide="calculator"></i> Live transfer estimate</span>
+      <div class="ratepill" style="border:none;box-shadow:none;padding:4px 0;">
+        <span class="livedot"></span> <b id="rate-now2">95.3820</b>
+        <div class="ring"><svg width="30" height="30"><circle class="bgc" cx="15" cy="15" r="12" fill="none" stroke-width="3"></circle><circle class="fgc" id="ring-fg" cx="15" cy="15" r="12" fill="none" stroke-width="3"></circle></svg><span class="cd" id="ring-cd">30</span></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="field"><span class="fl">You send</span><div class="fr"><input id="send2" class="num" inputmode="decimal" value="1,000" aria-label="USD" style="font-size:30px;font-weight:700;border:none;background:transparent;outline:none;width:100%;color:var(--fg);" /><span class="ccy"><span class="fl-us"></span> USD</span></div></div>
+      <div style="display:grid;place-items:center;margin:9px 0;"><span style="width:34px;height:34px;border-radius:10px;background:var(--surface);border:1px solid var(--border-strong);display:grid;place-items:center;color:var(--primary);"><i data-lucide="arrow-down" style="width:16px;height:16px;"></i></span></div>
+      <div class="field"><span class="fl">They receive</span><div class="fr"><span id="receive2" class="num" style="font-size:30px;font-weight:700;color:var(--fg);transition:color .5s;">95,382.41</span><span class="ccy"><span class="fl-in"></span> INR</span></div></div>
+      <div class="breakdown" style="display:grid;gap:9px;margin:16px 0 4px;">
+        <div class="between" style="font-size:13.5px;"><span class="muted">Exchange rate</span><span class="num" style="font-weight:600;" id="rate-cell2">95.3820</span></div>
+        <div class="between" style="font-size:13.5px;"><span class="muted">Our fee</span><span class="pos" style="font-family:var(--font-mono);font-weight:600;">$0.00</span></div>
+        <div class="between" style="font-size:13.5px;"><span class="muted">Arrives in</span><span style="font-family:var(--font-mono);font-weight:600;">~15 min</span></div>
+      </div>
+    </div>
+    <div class="card-foot" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <a class="btn btn-accent btn-block btn-lg" href="dashboard-v4.html"><i data-lucide="send-horizontal"></i> Send ₹<span id="cta-amt">95,382</span> home</a>
+      <p class="muted" style="text-align:center;font-size:11.5px;margin:0;font-family:var(--font-mono);">Rates refresh every 30s · no account needed to preview</p>
+    </div>
+  </div>
+</div></div></section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features"><div class="wrap">
+  <div class="center rv">
+    <span class="eyebrow">Built for sending it home</span>
+    <h2 class="stitle">A remittance app that respects your money.</h2>
+    <p class="ssub">Every feature exists to get more of your dollars into your family's account, faster.</p>
+  </div>
+  <div class="feats">
+    <div class="feat rv"><div class="fi"><i data-lucide="zap"></i></div><h3>Lands in 15 minutes</h3><p>Real funds in a real Indian bank account the same evening you send, any day of the year.</p></div>
+    <div class="feat rv" style="--d:.06s"><div class="fi pos"><i data-lucide="badge-percent"></i></div><h3>The honest rate</h3><p>The mid-market rate you see on Google, applied for real. Zero spread, zero markup, $0 fee.</p></div>
+    <div class="feat rv" style="--d:.12s"><div class="fi warm"><i data-lucide="route"></i></div><h3>Tracked on-chain</h3><p>Watch every step from USD to INR with a live tracker and a receipt you both can see.</p></div>
+    <div class="feat rv" style="--d:.18s"><div class="fi gold"><i data-lucide="fingerprint"></i></div><h3>Safe by design</h3><p>MPC and MultiSig custody, passwordless sign-in, and real-time fraud screening on every transfer.</p></div>
+    <div class="feat rv" style="--d:.24s"><div class="fi"><i data-lucide="rotate-ccw"></i></div><h3>Money-back guarantee</h3><p>If a transfer cannot complete, the full amount comes straight back to you. Always.</p></div>
+    <div class="feat rv" style="--d:.3s"><div class="fi warm"><i data-lucide="users-round"></i></div><h3>Send again in a tap</h3><p>Saved recipients and locked bank details mean the next transfer home takes seconds.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== COMPARE ===== -->
+<section id="compare"><div class="wrap">
+  <div class="center rv" style="margin-bottom:10px;">
+    <span class="eyebrow">The $1,000 test</span>
+    <h2 class="stitle">More of your money actually arrives.</h2>
+    <p class="ssub">Same $1,000 sent three ways. The longer the bar, the more lands in your family's account.</p>
+  </div>
+  <div class="cmp">
+    <div class="crow rv"><div class="name">Traditional bank <small>Correspondent wire</small></div><div class="ctrack"><div class="cfill f1" data-w="89.7"><span class="cbval">₹89,743</span></div></div><div class="cmeta">2 to 5 days · ~2.5% spread<br>$25 to $45 fee</div></div>
+    <div class="crow rv" style="--d:.1s"><div class="name">Banking-rail MSB <small>Money service business</small></div><div class="ctrack"><div class="cfill f2" data-w="93.7"><span class="cbval">₹93,673</span></div></div><div class="cmeta">1 to 2 days · ~1.0% spread<br>$5 to $12 fee</div></div>
+    <div class="crow win rv" style="--d:.2s"><div class="name">AtomX Pay <small>Blockchain rails</small></div><div class="ctrack"><div class="cfill f3" data-w="100"><span class="cbval">₹95,382</span></div></div><div class="cmeta">~15 min · 0% spread<br>$0 fee · always on</div></div>
+  </div>
+</div></section>
+
+<!-- ===== HOW ===== -->
+<section id="how"><div class="wrap">
+  <div class="center rv"><span class="eyebrow">How it works</span><h2 class="stitle">Three steps, then it is home.</h2></div>
+  <div class="how">
+    <div class="hc rv"><span class="hn">1</span><h3>Verify once</h3><p>A photo ID and a quick selfie, screened against AML and CFT lists. Most people clear in about two minutes.</p><span class="tm"><i data-lucide="clock"></i> ~2 min</span></div>
+    <div class="hc rv" style="--d:.1s"><span class="hn">2</span><h3>Lock the real rate</h3><p>See the true mid-market rate with no spread. Lock it, and the amount your family receives is fixed.</p><span class="tm"><i data-lucide="clock"></i> ~30 sec</span></div>
+    <div class="hc rv" style="--d:.2s"><span class="hn">3</span><h3>It lands in INR</h3><p>Money settles straight to their Indian bank, tracked on-chain the whole way, with a shared receipt.</p><span class="tm"><i data-lucide="clock"></i> ~15 min</span></div>
+  </div>
+</div></section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq"><div class="wrap">
+  <div class="rv"><span class="eyebrow">Good questions</span><h2 class="stitle">Everything you might ask.</h2></div>
+  <div class="faq-wrap rv">
+    <div class="faq-item"><button class="faq-q">How long does a transfer really take?<span class="pm"><i data-lucide="plus"></i></span></button><div class="faq-a"><p>Most transfers land in the recipient's Indian bank in about 15 minutes, any day of the year. No business-day waiting.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What rate and fees do you use?<span class="pm"><i data-lucide="plus"></i></span></button><div class="faq-a"><p>The live mid-market rate, with no spread added and a $0 transfer fee. What the calculator shows is what your family receives.</p></div></div>
+    <div class="faq-item"><button class="faq-q">Are you regulated?<span class="pm"><i data-lucide="plus"></i></span></button><div class="faq-a"><p>Yes. A FinCEN-registered MSB in the US and FIU-IND registered partners in India, with AML and CFT screening on every transfer.</p></div></div>
+    <div class="faq-item"><button class="faq-q">What if a transfer fails?<span class="pm"><i data-lucide="plus"></i></span></button><div class="faq-a"><p>Your money is never lost. It comes straight back to you, and our money-back guarantee covers you either way.</p></div></div>
+  </div>
+</div></section>
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final"><div class="wrap"><div class="card rv">
+  <h2>Someone is waiting.<br>Send it home.</h2>
+  <p class="ssub" style="margin-inline:auto;color:rgba(255,255,255,.85);">No account needed to preview your live rate.</p>
+  <div class="actions">
+    <a class="btn btn-accent btn-lg" href="dashboard-v4.html"><i data-lucide="send-horizontal"></i> Start a transfer</a>
+    <a class="btn btn-soft btn-lg" href="#how">See how it works</a>
+  </div>
+</div></div></section>
+
+<!-- ===== FOOTER ===== -->
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div>
+      <img src="assets/atomx-logo-horizontal-color.png" alt="AtomX Pay" />
+      <p class="blurb">Send USD to India on blockchain rails: the real rate, zero spread, $0 fee, landing in about 15 minutes. Built for the people sending it home.</p>
+    </div>
+    <div class="col"><h5>Product</h5><a href="#calc">Calculator</a><a href="#how">How it works</a><a href="#compare">Compare</a><a href="dashboard-v4.html">Dashboard</a></div>
+    <div class="col"><h5>Company</h5><a href="#features">Features</a><a href="#faq">FAQ</a><a href="#">Our story</a></div>
+    <div class="col"><h5>Trust</h5><a href="#">FinCEN MSB</a><a href="#">FIU-IND</a><a href="#">AML / CFT</a><a href="#">SOC 2</a></div>
+  </div>
+  <div class="leg">
+    <span>© 2026 AtomX Pay · FinCEN MSB · FIU-IND</span>
+    <span>1 USD = <span id="foot-rate">95.3820</span> INR · live</span>
+  </div>
+</div></footer>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="assets/atomx.js"></script>
+<script>
+  if (window.lucide) lucide.createIcons();
+  AtomX.startEngine();
+
+  /* two synced calculators: hero (#send/#receive) + section (#send2/#receive2) */
+  function wireCalc(inId, outId, ctaId){
+    var inEl=document.getElementById(inId), outEl=document.getElementById(outId);
+    var last=95382.41;
+    function parse(){ var v=parseFloat(inEl.value.replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; }
+    function recompute(animate){
+      var out=parse()*AtomX.getRate();
+      if(animate) AtomX.countUp(outEl,last,out,600,AtomX.fmtINR); else outEl.textContent=AtomX.fmtINR(out);
+      if(ctaId){ var c=document.getElementById(ctaId); if(c) c.textContent=AtomX.fmtINR0(out); }
+      last=out;
+    }
+    inEl.addEventListener('input', function(){
+      var raw=inEl.value.replace(/[^0-9.]/g,''); var p=raw.split('.');
+      var f=p[0]?Number(p[0]).toLocaleString('en-US'):''; if(p.length>1) f+='.'+p[1].slice(0,2);
+      var pos=inEl.selectionStart+(f.length-inEl.value.length); inEl.value=f;
+      try{inEl.setSelectionRange(pos,pos);}catch(e){} recompute(false);
+    });
+    return { recompute: recompute, outEl: outEl };
+  }
+  var calcA=wireCalc('send','receive',null);
+  var calcB=wireCalc('send2','receive2','cta-amt');
+
+  var CIRC=2*Math.PI*12;
+  document.getElementById('ring-fg').setAttribute('stroke-dasharray', CIRC.toFixed(1));
+  AtomX.onCountdown(function(n){
+    document.getElementById('ring-cd').textContent=n;
+    document.getElementById('ring-fg').setAttribute('stroke-dashoffset',(CIRC*(1-n/30)).toFixed(1));
+  });
+
+  AtomX.onRate(function(r,delta,dir,kind){
+    ['rate-hero','rate-now2','rate-cell','rate-cell2','foot-rate'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=AtomX.fmtRate(r); });
+    var animate = kind==='refresh';
+    calcA.recompute(animate); calcB.recompute(animate);
+    if(dir==='up'||dir==='down'){ [calcA.outEl,calcB.outEl].forEach(function(o){ o.classList.remove('flash-up','flash-down'); void o.offsetWidth; o.classList.add(dir==='up'?'flash-up':'flash-down'); }); }
+  });
+
+  /* faq accordion */
+  document.querySelectorAll('.faq-q').forEach(function(q){
+    q.addEventListener('click', function(){
+      var it=q.parentElement, a=it.querySelector('.faq-a');
+      var open=it.classList.toggle('open'); a.style.maxHeight=open?a.scrollHeight+'px':0;
+    });
+  });
+
+  /* reveal + compare bars */
+  AtomX.onReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });
+  AtomX.onReveal(document.querySelectorAll('.cfill'), function(el){ setTimeout(function(){ el.style.width=el.getAttribute('data-w')+'%'; },120); });
+</script>
+</body>
+</html>

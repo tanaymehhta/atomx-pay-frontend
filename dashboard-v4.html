@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AtomX Pay · Dashboard (V4)</title>
+<link rel="stylesheet" href="assets/atomx.css" />
+<link rel="stylesheet" href="assets/atomx-v4.css" />
+<style>
+  /* ===== app shell ===== */
+  body.v4 { overflow-x: hidden; }
+  .app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+  /* ===== sidebar ===== */
+  .side { position: sticky; top: 0; align-self: start; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 18px 14px; gap: 6px; }
+  .side .brand { display: flex; align-items: center; gap: 10px; padding: 8px 10px 16px; }
+  .side .brand img { height: 30px; }
+  .side .navlabel { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--subtle); padding: 14px 12px 6px; }
+  .nav a { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: var(--r-xs); font-size: 14px; font-weight: 500; color: var(--fg-2); transition: background .18s, color .18s; }
+  .nav a [data-lucide] { color: var(--subtle); width: 17px; height: 17px; transition: color .18s; }
+  .nav a:hover { background: var(--surface-2); color: var(--fg); }
+  .nav a.on { background: var(--primary-tint); color: var(--primary); font-weight: 600; }
+  .nav a.on [data-lucide] { color: var(--primary); }
+  .nav a .tail { margin-left: auto; }
+  .side .spacer { flex: 1; }
+  .usercard { display: flex; align-items: center; gap: 11px; padding: 10px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface-2); }
+  .usercard .av { width: 34px; height: 34px; border-radius: 9px; background: var(--joy); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 14px; flex: none; }
+  .usercard .nm { font-weight: 600; font-size: 13px; color: var(--fg); }
+  .usercard .em { font-size: 11.5px; color: var(--muted); }
+
+  /* ===== topbar ===== */
+  .main { min-width: 0; display: flex; flex-direction: column; }
+  .topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 16px; padding: 14px 30px; background: rgba(253,248,242,.82); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+  .topbar h1 { font-size: 19px; font-weight: 700; color: var(--fg); }
+  .topbar .grow { flex: 1; }
+  .search { display: flex; align-items: center; gap: 9px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xs); padding: 0 12px; height: 38px; width: 260px; color: var(--muted); }
+  .search input { border: none; background: none; outline: none; font-family: var(--font-ui); font-size: 13.5px; color: var(--fg); width: 100%; }
+  .search [data-lucide] { width: 16px; height: 16px; }
+  .iconbtn { width: 38px; height: 38px; border-radius: var(--r-xs); border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; color: var(--fg-2); cursor: pointer; position: relative; }
+  .iconbtn:hover { border-color: var(--border-strong); color: var(--primary); }
+  .iconbtn .dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid var(--surface); }
+
+  /* ===== content ===== */
+  .content { padding: 26px 30px 48px; max-width: 1320px; width: 100%; }
+  .greet { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+  .greet h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--fg); }
+  .greet h2 .wave { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--accent-deep); }
+  .greet p { margin: 5px 0 0; font-size: 14px; color: var(--muted); }
+
+  .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 18px; }
+  .grid2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; align-items: start; }
+
+  /* in-flight tracker */
+  .flight .fhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .flight .amount { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: -0.03em; color: var(--fg); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .flight .amount small { font-family: var(--font-mono); font-weight: 500; font-size: 14px; color: var(--muted); letter-spacing: 0; }
+  .flight .toarrow { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .flight .toarrow [data-lucide] { color: var(--pos); width: 15px; height: 15px; }
+  .countbox { text-align: right; }
+  .countbox .cv { font-family: var(--font-mono); font-weight: 700; font-size: 26px; color: var(--primary); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .countbox .ck { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+  /* send composer */
+  .composer .swap { display: grid; gap: 9px; position: relative; }
+  .swap .swapbtn { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 34px; height: 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border-strong); display: grid; place-items: center; color: var(--primary); z-index: 2; }
+  .composer .bigin { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 30px; letter-spacing: -0.02em; color: var(--fg); background: transparent; border: none; outline: none; width: 100%; min-width: 0; }
+  .composer .bigout { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 30px; letter-spacing: -0.02em; color: var(--fg); transition: color .5s; }
+  .breakdown { display: grid; gap: 9px; margin: 16px 0; }
+  .breakdown .br { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+  .breakdown .br .k { color: var(--muted); display: flex; align-items: center; gap: 7px; }
+  .breakdown .br .v { font-family: var(--font-mono); font-weight: 600; color: var(--fg); }
+  .breakdown .br .v.g { color: var(--pos); }
+
+  /* recipients chips */
+  .recips { display: flex; flex-direction: column; gap: 2px; }
+
+  /* rate chart */
+  .chartwrap { position: relative; }
+  .chartwrap svg { display: block; width: 100%; height: 96px; }
+  .chartmeta { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+  .chartmeta .now { font-family: var(--font-display); font-weight: 800; font-size: 24px; color: var(--fg); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+  /* recent activity table */
+  .tbl { width: 100%; }
+  .tbl thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--subtle); font-weight: 600; text-align: left; padding: 0 0 12px; }
+  .tbl thead th.r { text-align: right; }
+  .tbl tbody td { padding: 12px 0; border-top: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+  .tbl td.r { text-align: right; }
+  .tbl .who { display: flex; align-items: center; gap: 11px; }
+  .tbl .who .av { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; flex: none; }
+  .tbl .who .nm { font-weight: 600; color: var(--fg); }
+  .tbl .who .ci { font-size: 11.5px; color: var(--muted); }
+  .tbl .amt { font-family: var(--font-mono); font-weight: 600; color: var(--fg); }
+  .tbl .amt .usd { display: block; font-weight: 400; font-size: 11.5px; color: var(--muted); }
+
+  @media (max-width: 1100px) {
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 820px) {
+    .app { grid-template-columns: 1fr; }
+    .side { display: none; }
+    .search { display: none; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .content { padding: 20px 18px 40px; }
+  }
+</style>
+</head>
+<body class="v4">
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="side">
+    <div class="brand"><img src="assets/atomx-logo-horizontal-color.png" alt="AtomX Pay" /></div>
+    <nav class="nav">
+      <a class="on" href="#"><i data-lucide="layout-dashboard"></i> Overview</a>
+      <a href="#"><i data-lucide="send"></i> Send money</a>
+      <a href="#"><i data-lucide="users-round"></i> Recipients</a>
+      <a href="#"><i data-lucide="receipt-text"></i> Activity</a>
+    </nav>
+    <div class="navlabel">Account</div>
+    <nav class="nav">
+      <a href="#"><i data-lucide="shield-check"></i> Verification <span class="tail badge badge-pos"><span class="badge-dot"></span>Verified</span></a>
+      <a href="#"><i data-lucide="bell"></i> Notifications</a>
+      <a href="#"><i data-lucide="settings"></i> Settings</a>
+      <a href="#"><i data-lucide="life-buoy"></i> Help</a>
+    </nav>
+    <div class="spacer"></div>
+    <div class="usercard">
+      <div class="av">AR</div>
+      <div class="grow" style="min-width:0;">
+        <div class="nm">Aarav Sharma</div>
+        <div class="em">aarav@gmail.com</div>
+      </div>
+      <i data-lucide="chevrons-up-down" style="color:var(--subtle);"></i>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main">
+    <header class="topbar">
+      <h1>Overview</h1>
+      <div class="search"><i data-lucide="search"></i><input placeholder="Search transfers, recipients..." /></div>
+      <div class="grow"></div>
+      <div class="ratepill">
+        <span class="livedot"></span> 1 USD = <b id="rate-now">95.3820</b>
+        <div class="ring"><svg width="30" height="30"><circle class="bgc" cx="15" cy="15" r="12" fill="none" stroke-width="3"></circle><circle class="fgc" id="ring-fg" cx="15" cy="15" r="12" fill="none" stroke-width="3"></circle></svg><span class="cd" id="ring-cd">30</span></div>
+      </div>
+      <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+      <a class="btn btn-accent" href="#send"><i data-lucide="plus"></i> New transfer</a>
+    </header>
+
+    <div class="content">
+      <div class="greet">
+        <div>
+          <h2>Welcome back, <span class="wave">Aarav</span></h2>
+          <p>Your money is moving. Here is everything in flight and everything that landed.</p>
+        </div>
+        <div class="seg" id="rangeseg">
+          <button class="on">30 days</button>
+          <button>90 days</button>
+          <button>Year</button>
+        </div>
+      </div>
+
+      <!-- METRIC CARDS -->
+      <div class="metrics">
+        <div class="card card-pad stat">
+          <div class="stat-top">
+            <div class="stat-ic"><i data-lucide="banknote"></i></div>
+            <span class="badge badge-pos"><i data-lucide="trending-up"></i> 12.4%</span>
+          </div>
+          <div class="stat-v" data-count="48250" data-prefix="$">$48,250</div>
+          <div class="stat-k">Sent home this year</div>
+          <div class="stat-foot"><span class="spark" data-spark="6,18 16,12 26,15 36,7 46,10 56,4 66,8 76,3"></span> across 38 transfers</div>
+        </div>
+        <div class="card card-pad stat">
+          <div class="stat-top">
+            <div class="stat-ic pos"><i data-lucide="piggy-bank"></i></div>
+            <span class="badge badge-pos"><i data-lucide="trending-up"></i> vs banks</span>
+          </div>
+          <div class="stat-v" data-count="2174" data-prefix="$">$2,174</div>
+          <div class="stat-k">Saved on fees &amp; spread</div>
+          <div class="stat-foot"><span class="spark pos" data-spark="6,16 16,14 26,12 36,11 46,8 56,7 66,5 76,3"></span> 0% spread, always</div>
+        </div>
+        <div class="card card-pad stat">
+          <div class="stat-top">
+            <div class="stat-ic warm"><i data-lucide="plane"></i></div>
+            <span class="badge badge-warm"><span class="livedot"></span> Live</span>
+          </div>
+          <div class="stat-v"><span id="m-inflight">1</span></div>
+          <div class="stat-k">Transfer in flight now</div>
+          <div class="stat-foot"><i data-lucide="clock" style="width:13px;height:13px;"></i> lands in ~<span id="m-eta">11</span> min</div>
+        </div>
+        <div class="card card-pad stat">
+          <div class="stat-top">
+            <div class="stat-ic gold"><i data-lucide="users-round"></i></div>
+            <span class="badge badge-muted">5 saved</span>
+          </div>
+          <div class="stat-v">5</div>
+          <div class="stat-k">Recipients in India</div>
+          <div class="stat-foot">
+            <span style="display:inline-flex;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--v-400);border:2px solid var(--surface);"></span>
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);margin-left:-7px;"></span>
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--gold);border:2px solid var(--surface);margin-left:-7px;"></span>
+            </span> Mom, Dad, +3
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <!-- ===== LEFT COLUMN ===== -->
+        <div class="stack">
+
+          <!-- IN-FLIGHT TRACKER -->
+          <div class="card flight">
+            <div class="card-head">
+              <span class="ct"><i data-lucide="radio-tower"></i> Transfer in flight</span>
+              <span class="badge badge-warm"><span class="livedot"></span> Settling on-chain</span>
+            </div>
+            <div class="card-body">
+              <div class="fhead">
+                <div>
+                  <div class="amount">₹<span id="flight-inr">95,382</span> <small>to Mom</small></div>
+                  <div class="toarrow"><span>$1,000.00 sent</span> <i data-lucide="move-right"></i> <span>HDFC Bank ••4471</span></div>
+                </div>
+                <div class="countbox">
+                  <div class="cv" id="flight-cd">11:23</div>
+                  <div class="ck">Est. to land</div>
+                </div>
+              </div>
+
+              <div style="margin-top:22px;">
+                <div class="track"><div class="bar" id="flight-bar" style="width:42%;"></div></div>
+                <div class="steps">
+                  <div class="step done"><span class="dot"></span><div class="sl">Initiated</div><div class="st">9:14 PM</div></div>
+                  <div class="step done"><span class="dot"></span><div class="sl">USD → INR locked</div><div class="st">9:14 PM</div></div>
+                  <div class="step active"><span class="dot"></span><div class="sl">On-chain settlement</div><div class="st">in progress</div></div>
+                  <div class="step pending"><span class="dot"></span><div class="sl">Lands in bank</div><div class="st">~11 min</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card-foot">
+              <span class="muted" style="font-family:var(--font-mono);font-size:11.5px;display:flex;align-items:center;gap:7px;"><i data-lucide="link" style="width:13px;height:13px;"></i> Tracked on-chain · txn 0x9f…a31c</span>
+              <a class="btn btn-outline btn-sm" href="#"><i data-lucide="external-link"></i> View receipt</a>
+            </div>
+          </div>
+
+          <!-- RECENT ACTIVITY -->
+          <div class="card">
+            <div class="card-head">
+              <span class="ct"><i data-lucide="receipt-text"></i> Recent activity</span>
+              <a class="btn btn-ghost btn-sm" href="#">View all <i data-lucide="arrow-right"></i></a>
+            </div>
+            <div class="card-body" style="padding-top:8px;">
+              <table class="tbl">
+                <thead><tr><th>Recipient</th><th>Date</th><th>Status</th><th class="r">Amount</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><div class="who"><span class="av" style="background:var(--v-50);color:var(--primary);">M</span><div><div class="nm">Mom · HDFC ••4471</div><div class="ci">Mumbai · The rent</div></div></div></td>
+                    <td class="muted num">Today, 9:14 PM</td>
+                    <td><span class="badge badge-warm"><span class="livedot"></span> In flight</span></td>
+                    <td class="r"><div class="amt">₹95,382<span class="usd">$1,000.00</span></div></td>
+                  </tr>
+                  <tr>
+                    <td><div class="who"><span class="av" style="background:var(--tint-peach);color:var(--accent-deep);">D</span><div><div class="nm">Dad · SBI ••8829</div><div class="ci">Pune · Festival</div></div></div></td>
+                    <td class="muted num">Oct 28, 8:02 PM</td>
+                    <td><span class="badge badge-pos"><i data-lucide="check"></i> Landed · 12m</span></td>
+                    <td class="r"><div class="amt">₹47,612<span class="usd">$500.00</span></div></td>
+                  </tr>
+                  <tr>
+                    <td><div class="who"><span class="av" style="background:var(--tint-sun);color:var(--sun-deep);">R</span><div><div class="nm">Rohan · ICICI ••1102</div><div class="ci">Bengaluru · School fees</div></div></div></td>
+                    <td class="muted num">Oct 21, 7:40 PM</td>
+                    <td><span class="badge badge-pos"><i data-lucide="check"></i> Landed · 14m</span></td>
+                    <td class="r"><div class="amt">₹1,43,073<span class="usd">$1,500.00</span></div></td>
+                  </tr>
+                  <tr>
+                    <td><div class="who"><span class="av" style="background:var(--v-50);color:var(--primary);">P</span><div><div class="nm">Priya · Axis ••5567</div><div class="ci">Kochi · Just because</div></div></div></td>
+                    <td class="muted num">Oct 14, 10:11 PM</td>
+                    <td><span class="badge badge-pos"><i data-lucide="check"></i> Landed · 11m</span></td>
+                    <td class="r"><div class="amt">₹28,614<span class="usd">$300.00</span></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ===== RIGHT COLUMN ===== -->
+        <div class="stack" id="send">
+
+          <!-- SEND COMPOSER -->
+          <div class="card composer">
+            <div class="card-head">
+              <span class="ct"><i data-lucide="send"></i> Send money</span>
+              <span class="badge badge-violet"><i data-lucide="zap"></i> ~15 min</span>
+            </div>
+            <div class="card-body">
+              <div class="swap">
+                <div class="field">
+                  <span class="fl">You send</span>
+                  <div class="fr"><input id="send-amt" class="bigin" inputmode="decimal" value="1,000" aria-label="USD amount" /><span class="ccy"><span class="fl-us"></span> USD</span></div>
+                </div>
+                <button class="swapbtn" aria-label="swap"><i data-lucide="arrow-up-down" style="width:16px;height:16px;"></i></button>
+                <div class="field">
+                  <span class="fl">They receive</span>
+                  <div class="fr"><span id="send-out" class="bigout">95,382.41</span><span class="ccy"><span class="fl-in"></span> INR</span></div>
+                </div>
+              </div>
+
+              <div class="breakdown">
+                <div class="br"><span class="k"><i data-lucide="repeat" style="width:14px;height:14px;"></i> Rate (mid-market)</span><span class="v num" id="bd-rate">95.3820</span></div>
+                <div class="br"><span class="k"><i data-lucide="badge-percent" style="width:14px;height:14px;"></i> Spread</span><span class="v g">0%</span></div>
+                <div class="br"><span class="k"><i data-lucide="circle-dollar-sign" style="width:14px;height:14px;"></i> Transfer fee</span><span class="v g">$0.00</span></div>
+                <div class="br"><span class="k"><i data-lucide="clock" style="width:14px;height:14px;"></i> Arrives in</span><span class="v">~15 min</span></div>
+              </div>
+
+              <div class="field" style="background:var(--surface);">
+                <span class="fl">Recipient</span>
+                <div class="fr between" style="width:100%;">
+                  <span style="display:flex;align-items:center;gap:10px;"><span class="av" style="width:30px;height:30px;border-radius:9px;background:var(--v-50);color:var(--primary);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:13px;">M</span><span><span style="font-weight:600;font-size:13.5px;">Mom</span><br><span class="muted" style="font-size:11.5px;">HDFC Bank ••4471</span></span></span>
+                  <i data-lucide="chevron-down" style="color:var(--muted);"></i>
+                </div>
+              </div>
+
+              <a class="btn btn-accent btn-block btn-lg" href="#" style="margin-top:16px;"><i data-lucide="send-horizontal"></i> Send ₹<span id="send-cta">95,382</span> home</a>
+              <p class="muted" style="text-align:center;font-size:11.5px;margin:11px 0 0;font-family:var(--font-mono);">Rate locks the moment you confirm</p>
+            </div>
+          </div>
+
+          <!-- SEND AGAIN -->
+          <div class="card">
+            <div class="card-head"><span class="ct"><i data-lucide="rotate-ccw"></i> Send again</span></div>
+            <div class="card-body recips" style="padding-top:6px;padding-bottom:8px;">
+              <div class="row">
+                <span class="av violet">M</span>
+                <div class="grow"><div class="nm">Mom</div><div class="mt">HDFC ••4471 · last $1,000</div></div>
+                <button class="btn btn-outline btn-sm"><i data-lucide="send"></i> Send</button>
+              </div>
+              <div class="row">
+                <span class="av warm">D</span>
+                <div class="grow"><div class="nm">Dad</div><div class="mt">SBI ••8829 · last $500</div></div>
+                <button class="btn btn-outline btn-sm"><i data-lucide="send"></i> Send</button>
+              </div>
+              <div class="row">
+                <span class="av gold">R</span>
+                <div class="grow"><div class="nm">Rohan</div><div class="mt">ICICI ••1102 · last $1,500</div></div>
+                <button class="btn btn-outline btn-sm"><i data-lucide="send"></i> Send</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RATE TREND -->
+          <div class="card">
+            <div class="card-head">
+              <span class="ct"><i data-lucide="activity"></i> USD / INR · 24h</span>
+              <span class="badge badge-pos" id="trend-badge"><i data-lucide="trending-up"></i> +0.21%</span>
+            </div>
+            <div class="card-body chartwrap">
+              <svg id="ratechart" viewBox="0 0 320 96" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path id="rc-area" fill="url(#rg)" d=""></path>
+                <path id="rc-line" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""></path>
+                <circle id="rc-dot" r="3.2" fill="var(--accent)" stroke="#fff" stroke-width="1.6"></circle>
+              </svg>
+              <div class="chartmeta">
+                <div><div class="now"><span id="trend-now">95.38</span></div><div class="muted" style="font-size:11.5px;">mid-market now</div></div>
+                <div style="text-align:right;"><div class="num" style="font-weight:600;font-size:13px;">H 95.49 · L 95.21</div><div class="muted" style="font-size:11.5px;font-family:var(--font-mono);">refreshes every 30s</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="assets/atomx.js"></script>
+<script>
+  if (window.lucide) lucide.createIcons();
+  AtomX.startEngine();
+
+  /* ---- sparklines: build polyline paths from data-spark="x,y ..." (88x20 box) ---- */
+  document.querySelectorAll('[data-spark]').forEach(function(el){
+    var pts = el.getAttribute('data-spark');
+    el.innerHTML = '<svg width="80" height="20" viewBox="0 0 82 22" fill="none" style="display:block;">' +
+      '<polyline points="'+pts+'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  });
+
+  /* ---- live rate wiring (composer + pill + breakdown) ---- */
+  var sendEl = document.getElementById('send-amt'), outEl = document.getElementById('send-out'), ctaEl = document.getElementById('send-cta');
+  function parseAmt(){ var v = parseFloat(sendEl.value.replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; }
+  var lastOut = 95382.41;
+  function recompute(animate){
+    var out = parseAmt()*AtomX.getRate();
+    if(animate) AtomX.countUp(outEl,lastOut,out,600,AtomX.fmtINR); else outEl.textContent = AtomX.fmtINR(out);
+    ctaEl.textContent = AtomX.fmtINR0(out);
+    lastOut = out;
+  }
+  sendEl.addEventListener('input', function(){
+    var raw = sendEl.value.replace(/[^0-9.]/g,''); var p = raw.split('.');
+    var f = p[0]?Number(p[0]).toLocaleString('en-US'):''; if(p.length>1) f += '.'+p[1].slice(0,2);
+    var pos = sendEl.selectionStart + (f.length - sendEl.value.length); sendEl.value = f;
+    try{sendEl.setSelectionRange(pos,pos);}catch(e){} recompute(false);
+  });
+
+  var CIRC = 2*Math.PI*12;
+  document.getElementById('ring-fg').setAttribute('stroke-dasharray', CIRC.toFixed(1));
+  AtomX.onCountdown(function(n){
+    document.getElementById('ring-cd').textContent = n;
+    document.getElementById('ring-fg').setAttribute('stroke-dashoffset',(CIRC*(1-n/30)).toFixed(1));
+  });
+
+  AtomX.onRate(function(r,delta,dir,kind){
+    document.getElementById('rate-now').textContent = AtomX.fmtRate(r);
+    document.getElementById('bd-rate').textContent = AtomX.fmtRate(r);
+    document.getElementById('trend-now').textContent = r.toFixed(2);
+    if(kind==='refresh') recompute(true); else recompute(false);
+    if(dir==='up'||dir==='down'){ outEl.classList.remove('flash-up','flash-down'); void outEl.offsetWidth; outEl.classList.add(dir==='up'?'flash-up':'flash-down'); }
+    pushTrend(r);
+  });
+
+  /* ---- rate trend chart (rolling window) ---- */
+  var W=320,H=96,PAD=8, series=[];
+  for(var i=0;i<40;i++) series.push(95.382 + (Math.sin(i/3)*0.06) + (i%5-2)*0.01);
+  function pushTrend(r){ series.push(r); if(series.length>40) series.shift(); drawTrend(); }
+  function drawTrend(){
+    var min=Math.min.apply(null,series), max=Math.max.apply(null,series), rng=(max-min)||1;
+    var step=(W)/(series.length-1);
+    var pts=series.map(function(v,i){ var x=i*step; var y=PAD+(H-2*PAD)*(1-(v-min)/rng); return [x,y]; });
+    var line=pts.map(function(p,i){ return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+    document.getElementById('rc-line').setAttribute('d', line);
+    document.getElementById('rc-area').setAttribute('d', line+' L'+W+' '+H+' L0 '+H+' Z');
+    var last=pts[pts.length-1];
+    var dot=document.getElementById('rc-dot'); dot.setAttribute('cx',last[0].toFixed(1)); dot.setAttribute('cy',last[1].toFixed(1));
+    var chg=((series[series.length-1]-series[0])/series[0]*100);
+    var tb=document.getElementById('trend-badge');
+    tb.className='badge '+(chg>=0?'badge-pos':'badge-warm');
+    tb.innerHTML='<i data-lucide="'+(chg>=0?'trending-up':'trending-down')+'"></i> '+(chg>=0?'+':'')+chg.toFixed(2)+'%';
+    if(window.lucide) lucide.createIcons();
+  }
+  drawTrend();
+
+  /* ---- in-flight countdown simulation (cosmetic) ---- */
+  var secs = 11*60+23;
+  var bar=document.getElementById('flight-bar'), cd=document.getElementById('flight-cd'), eta=document.getElementById('m-eta');
+  setInterval(function(){
+    if(secs<=0) return;
+    secs--;
+    var m=Math.floor(secs/60), s=secs%60;
+    cd.textContent = m+':'+(s<10?'0':'')+s;
+    eta.textContent = Math.max(1,Math.ceil(secs/60));
+    bar.style.width = (42 + (1-secs/(11*60+23))*46).toFixed(1)+'%';
+  },1000);
+
+  /* ---- range segmented control ---- */
+  document.querySelectorAll('#rangeseg button, #rangeseg').forEach(function(){});
+  var seg=document.getElementById('rangeseg');
+  seg.querySelectorAll('button').forEach(function(b){ b.addEventListener('click',function(){ seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); }); });
+
+  /* ---- count-up the metric values on load ---- */
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    var to=+el.getAttribute('data-count'); var pre=el.getAttribute('data-prefix')||'';
+    AtomX.countUp(el,0,to,1100,function(v){ return pre+Math.round(v).toLocaleString('en-US'); });
+  });
+</script>
+</body>
+</html>

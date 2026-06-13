@@ -1,0 +1,185 @@
+/* ============================================================
+   AtomX Pay · V4 primitive layer
+   "shadcn-fintech structure, AtomX warmth."
+   Load AFTER atomx.css (consumes its brand tokens + fonts).
+   A small set of finance UI primitives: cards, buttons, badges,
+   stats, sparklines, table rows, segmented controls, sidebar.
+   ============================================================ */
+
+:root {
+  /* ---- semantic surface map (shadcn naming over warm AtomX palette) ---- */
+  --bg:            var(--paper);
+  --surface:       #ffffff;
+  --surface-2:     var(--n-25);
+  --surface-3:     var(--n-50);
+  --inset:         #fbf6ef;
+
+  --border:        var(--hair-light);
+  --border-strong: var(--hair-mid);
+
+  --fg:            var(--n-900);
+  --fg-2:          var(--n-700);
+  --muted:         var(--n-500);
+  --subtle:        var(--n-400);
+
+  --primary:       var(--v-700);
+  --primary-bright:var(--v-500);
+  --primary-fg:    #ffffff;
+  --primary-tint:  var(--v-50);
+  --ring:          var(--v-400);
+
+  --accent:        var(--warm);        /* coral, the "human" action accent */
+  --accent-deep:   var(--warm-deep);
+  --gold:          var(--sun);
+
+  --pos:           var(--positive);
+  --pos-bright:    var(--positive-bright);
+  --neg:           var(--warm-deep);
+
+  /* shadcn-ish radii (tighter than v1's 48px brand cards) */
+  --r-xs: 8px;
+  --r-sm: 10px;
+  --r:    14px;
+  --r-lg: 18px;
+  --r-xl: 22px;
+}
+
+/* ---------- base ---------- */
+.v4 { background: var(--bg); color: var(--fg); font-family: var(--font-ui); }
+.v4 *, .v4 *::before, .v4 *::after { box-sizing: border-box; }
+.v4 a { color: inherit; text-decoration: none; }
+.v4 h1,.v4 h2,.v4 h3,.v4 h4 { font-family: var(--font-display); letter-spacing: -0.025em; margin: 0; }
+.v4 img { display: block; max-width: 100%; }
+
+/* lucide icons render as <i data-lucide>; normalize size + stroke */
+.v4 [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; vertical-align: middle; }
+.v4 .i-14 [data-lucide], .v4 [data-lucide].i-14 { width: 14px; height: 14px; }
+.v4 .i-16 [data-lucide] { width: 16px; height: 16px; }
+.v4 .i-20 [data-lucide] { width: 20px; height: 20px; }
+
+/* numbers */
+.v4 .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-feature-settings: 'tnum','zero'; letter-spacing: -0.01em; }
+.v4 .lbl { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- card ---------- */
+.v4 .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+.v4 .card-pad { padding: 20px; }
+.v4 .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.v4 .card-head .ct { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--fg); letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
+.v4 .card-head .ct [data-lucide] { color: var(--muted); }
+.v4 .card-body { padding: 20px; }
+.v4 .card-foot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+/* ---------- buttons ---------- */
+.v4 .btn {
+  font-family: var(--font-ui); font-weight: 600; font-size: 14px; line-height: 1;
+  border-radius: var(--r-xs); padding: 0 15px; height: 38px; cursor: pointer; border: 1px solid transparent;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+  transition: transform .25s var(--ease-spring), background .2s, box-shadow .2s, border-color .2s, color .2s;
+}
+.v4 .btn [data-lucide] { width: 16px; height: 16px; }
+.v4 .btn:active { transform: scale(.975); }
+.v4 .btn-primary { background: var(--primary); color: var(--primary-fg); box-shadow: 0 8px 18px -10px rgba(94,41,163,.6); }
+.v4 .btn-primary:hover { background: var(--v-600); box-shadow: 0 12px 24px -10px rgba(94,41,163,.7); }
+.v4 .btn-accent { background: var(--accent); color: #fff; box-shadow: var(--shadow-warm); }
+.v4 .btn-accent:hover { filter: brightness(1.04); }
+.v4 .btn-outline { background: var(--surface); color: var(--fg-2); border-color: var(--border-strong); }
+.v4 .btn-outline:hover { border-color: var(--v-300); color: var(--primary); }
+.v4 .btn-ghost { background: transparent; color: var(--muted); }
+.v4 .btn-ghost:hover { background: var(--surface-2); color: var(--fg); }
+.v4 .btn-sm { height: 32px; font-size: 13px; padding: 0 11px; border-radius: var(--r-xs); }
+.v4 .btn-icon { width: 38px; height: 38px; padding: 0; }
+.v4 .btn-block { width: 100%; }
+.v4 .btn-lg { height: 46px; font-size: 15px; padding: 0 20px; }
+
+/* ---------- badges ---------- */
+.v4 .badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 100px; line-height: 1; border: 1px solid transparent; }
+.v4 .badge [data-lucide] { width: 12px; height: 12px; }
+.v4 .badge-pos { background: rgba(31,157,107,.10); color: var(--pos); }
+.v4 .badge-warm { background: var(--tint-peach); color: var(--accent-deep); }
+.v4 .badge-violet { background: var(--v-50); color: var(--primary); }
+.v4 .badge-gold { background: var(--tint-sun); color: var(--sun-deep); }
+.v4 .badge-muted { background: var(--surface-2); color: var(--muted); border-color: var(--border); }
+.v4 .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ---------- stat / metric card ---------- */
+.v4 .stat .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.v4 .stat .stat-ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--primary-tint); color: var(--primary); }
+.v4 .stat .stat-ic.warm { background: var(--tint-peach); color: var(--accent-deep); }
+.v4 .stat .stat-ic.gold { background: var(--tint-sun); color: var(--sun-deep); }
+.v4 .stat .stat-ic.pos  { background: rgba(31,157,107,.12); color: var(--pos); }
+.v4 .stat .stat-v { font-family: var(--font-display); font-weight: 800; font-size: 27px; letter-spacing: -0.03em; color: var(--fg); margin-top: 14px; font-variant-numeric: tabular-nums; }
+.v4 .stat .stat-k { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.v4 .stat .stat-foot { display: flex; align-items: center; gap: 8px; margin-top: 13px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+
+/* sparkline + ring helpers (inline svg colored via currentColor) */
+.v4 .spark { color: var(--primary); }
+.v4 .spark.warm { color: var(--accent); }
+.v4 .spark.pos { color: var(--pos); }
+
+/* ---------- segmented control ---------- */
+.v4 .seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-xs); padding: 3px; gap: 2px; }
+.v4 .seg button { font-family: var(--font-ui); font-weight: 600; font-size: 12.5px; color: var(--muted); background: transparent; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: .2s; }
+.v4 .seg button.on { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
+
+/* ---------- transaction / list rows ---------- */
+.v4 .row { display: flex; align-items: center; gap: 13px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.v4 .row:last-child { border-bottom: none; }
+.v4 .row .av { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; flex: none; font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+.v4 .row .av.violet { background: var(--v-50); color: var(--primary); }
+.v4 .row .av.warm { background: var(--tint-peach); color: var(--accent-deep); }
+.v4 .row .av.gold { background: var(--tint-sun); color: var(--sun-deep); }
+.v4 .row .grow { flex: 1; min-width: 0; }
+.v4 .row .nm { font-weight: 600; font-size: 14px; color: var(--fg); }
+.v4 .row .mt { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.v4 .row .amt { font-family: var(--font-mono); font-weight: 600; font-size: 14px; color: var(--fg); text-align: right; }
+.v4 .row .amt .sub { display: block; font-weight: 400; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+/* ---------- field ---------- */
+.v4 .field { background: var(--inset); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 12px 14px; transition: border-color .2s, box-shadow .2s; }
+.v4 .field:focus-within { border-color: var(--ring); box-shadow: 0 0 0 4px var(--v-50); }
+.v4 .field .fl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.v4 .field .fr { display: flex; align-items: center; gap: 10px; margin-top: 7px; }
+.v4 .ccy { display: inline-flex; align-items: center; gap: 7px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 100px; padding: 6px 11px; font-family: var(--font-mono); font-weight: 700; font-size: 12.5px; flex: none; }
+.v4 .fl-us { width: 18px; height: 13px; border-radius: 3px; background: linear-gradient(180deg,#b22234 0 33%,#fff 33% 66%,#3c3b6e 66%); }
+.v4 .fl-in { width: 18px; height: 13px; border-radius: 3px; background: linear-gradient(180deg,#ff9933 0 33%,#fff 33% 66%,#138808 66%); }
+
+/* ---------- live rate pill + countdown ring ---------- */
+.v4 .ratepill { display: inline-flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 8px 6px 14px; box-shadow: var(--shadow-sm); font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.v4 .ratepill b { color: var(--fg); }
+.v4 .ring { position: relative; width: 30px; height: 30px; flex: none; }
+.v4 .ring svg { transform: rotate(-90deg); }
+.v4 .ring .bgc { stroke: var(--v-100); }
+.v4 .ring .fgc { stroke: var(--pos); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.v4 .ring .cd { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; color: var(--primary); }
+
+/* ---------- progress / pipe steps ---------- */
+.v4 .track { height: 8px; border-radius: 100px; background: var(--surface-3); overflow: hidden; }
+.v4 .track .bar { height: 100%; border-radius: 100px; background: var(--joy); transition: width 1s var(--ease-out); }
+.v4 .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 18px; }
+.v4 .step { position: relative; padding-top: 22px; }
+.v4 .step::before { content: ""; position: absolute; top: 6px; left: 0; right: 0; height: 2px; background: var(--border-strong); }
+.v4 .step:first-child::before { left: 50%; }
+.v4 .step:last-child::before { right: 50%; }
+.v4 .step .dot { position: absolute; top: 0; left: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border-strong); }
+.v4 .step.done::before { background: var(--pos); }
+.v4 .step.done .dot { background: var(--pos); border-color: var(--pos); }
+.v4 .step.active .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px var(--tint-peach); }
+.v4 .step .sl { font-size: 12px; font-weight: 600; color: var(--fg-2); text-align: center; }
+.v4 .step .st { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); text-align: center; margin-top: 2px; }
+.v4 .step.pending .sl { color: var(--subtle); }
+
+/* live dot reuse from atomx.css (.livedot) */
+
+/* ---------- divider, util ---------- */
+.v4 .hr { height: 1px; background: var(--border); border: 0; margin: 0; }
+.v4 .muted { color: var(--muted); }
+.v4 .pos { color: var(--pos); }
+.v4 .neg { color: var(--neg); }
+.v4 .stack { display: grid; gap: 16px; }
+.v4 .between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

@@ -1,6 +1,4 @@
 design/
 node_modules/
-.vercel/
-.DS_Store
+.git/
 *.log
-.vercel

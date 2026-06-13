@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AtomX Pay — Send money home</title>
+<title>AtomX Pay — Send money home (V6d · Kinetic)</title>
 <link rel="stylesheet" href="assets/atomx.css" />
 <style>
   body { background: var(--paper); color: var(--n-800); overflow-x: hidden; }
@@ -261,6 +261,30 @@
   .rv { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease-out), transform .85s var(--ease-spring); transition-delay: var(--d, 0s); }
   .rv.in { opacity: 1; transform: none; }
 
+  /* ====== V6d: kinetic scroll + spotlight ====== */
+  /* scroll-velocity ticker: base marquee keeps running on the track; the kinetic
+     skew/offset is layered on an inner .kin wrapper so the keyframe transform survives */
+  #ticker.ticker-track { animation-duration: var(--tick-dur, 38s); }
+  .ticker-track > .kin { display: inline-flex; align-items: center; will-change: transform;
+    transform: skewX(var(--kx, 0deg)) translateX(var(--ko, 0px));
+    transition: transform .14s linear; }
+
+  /* cursor spotlight overlay on dark bands */
+  .spot { position: relative; isolation: isolate; }
+  .spot > .spot-glow { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .4s var(--ease-out);
+    background: radial-gradient(240px 240px at var(--mx, 50%) var(--my, 50%),
+      rgba(255,196,120,.22), rgba(157,107,255,.12) 45%, transparent 72%);
+    mix-blend-mode: screen; }
+  .spot.lit > .spot-glow { opacity: 1; }
+  .spot > *:not(.spot-glow) { position: relative; z-index: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #ticker.ticker-track { animation-duration: 38s; }
+    .ticker-track > .kin { transform: none; }
+    .spot > .spot-glow { display: none; }
+  }
+
   @media (max-width: 980px) {
     .links, .navside .signin { display: none; }
     .hero-grid { grid-template-columns: 1fr; gap: 46px; }
@@ -327,7 +351,7 @@
       <div class="cap">Sunday in Jaipur, right after it landed.</div>
     </div>
     <div class="pcard pc-side" data-depth="16">
-      <img src="https://images.unsplash.com/photo-1704088030734-96769c4593a2?q=80&w=700&auto=format&fit=crop" alt="Indian mother in a saree smiling at the money that just landed on her phone" loading="eager" />
+      <img src="https://images.unsplash.com/photo-1758686254023-09e191043c88?q=80&w=700&auto=format&fit=crop" alt="Grandparents waving happily at a smartphone on a video call" loading="eager" />
       <div class="cap">“It's here, beta!”</div>
     </div>
     <div class="chip chip-delivered">
@@ -337,7 +361,7 @@
   </div>
 </div></div></header>
 
-<div class="tickerband"><div class="ticker"><div class="ticker-track" id="ticker">
+<div class="tickerband spot"><span class="spot-glow"></span><div class="ticker"><div class="ticker-track" id="ticker">
   <span class="tick"><span class="star">✦</span> ₹95,382 landed in <b>Mumbai</b> · 14 min</span>
   <span class="tick"><span class="star">🪔</span> Diwali gift landed in <b>Delhi</b> · 12 min</span>
   <span class="tick"><span class="g">$0 fee</span> · <span class="g">0% spread</span> · always</span>
@@ -504,7 +528,7 @@
   </div>
 </div></section>
 
-<section class="final"><div class="wrap"><div class="card rv">
+<section class="final"><div class="wrap"><div class="card rv spot"><span class="spot-glow"></span>
   <h2>Someone is waiting<br>for this. Send it home.</h2>
   <p class="ssub" style="margin-inline:auto;color:rgba(255,255,255,.85);">No account needed to preview your live rate.</p>
   <div class="actions"><a class="btn btn-warm" href="dashboard.html">Start a Transfer <span class="arr">→</span></a><a class="btn btn-soft" href="#how">See how it works</a></div>
@@ -548,24 +572,38 @@
     if(dir==='up'||dir==='down'){ recvEl.classList.remove('flash-up','flash-down'); void recvEl.offsetWidth; recvEl.classList.add(dir==='up'?'flash-up':'flash-down'); }
   });
 
-  // duplicate ticker content so the marquee loops seamlessly
+  // duplicate ticker content so the marquee loops seamlessly,
+  // then wrap it in a .kin span that carries the scroll-velocity skew/offset
   var tk = document.getElementById('ticker');
   tk.innerHTML += tk.innerHTML;
+  var tkKin = document.createElement('span');
+  tkKin.className = 'kin';
+  while (tk.firstChild) { tkKin.appendChild(tk.firstChild); }
+  tk.appendChild(tkKin);
 
-  // gentle pointer parallax on the hero collage (desktop, motion-allowed only)
+  // gentle pointer parallax on the hero collage (desktop, motion-allowed only).
+  // Pointer offset is stored per-card; the shared kinetic loop below adds a scroll-scrub
+  // drift on top and writes the combined transform, so the two effects compose cleanly.
   var stage = document.getElementById('stage');
   if (stage && window.matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').matches) {
     var cards = stage.querySelectorAll('.pcard');
+    var applyCard = function(c){
+      var base = c.classList.contains('pc-main') ? -2.4 : 3.2;
+      var px = +c.getAttribute('data-px') || 0, py = +c.getAttribute('data-py') || 0;
+      var sy = +c.getAttribute('data-sy') || 0;
+      c.style.transform = 'rotate('+base+'deg) translate('+px+'px,'+(py+sy)+'px)';
+    };
+    stage._applyCard = applyCard;
     stage.addEventListener('pointermove', function(e){
       var r = stage.getBoundingClientRect();
       var nx = (e.clientX - r.left)/r.width - .5, ny = (e.clientY - r.top)/r.height - .5;
       cards.forEach(function(c){
         var d = +c.getAttribute('data-depth') || 10;
-        var base = c.classList.contains('pc-main') ? -2.4 : 3.2;
-        c.style.transform = 'rotate('+base+'deg) translate('+(nx*d)+'px,'+(ny*d)+'px)';
+        c.setAttribute('data-px', nx*d); c.setAttribute('data-py', ny*d);
+        applyCard(c);
       });
     });
-    stage.addEventListener('pointerleave', function(){ cards.forEach(function(c){ c.style.transform = ''; }); });
+    stage.addEventListener('pointerleave', function(){ cards.forEach(function(c){ c.setAttribute('data-px',0); c.setAttribute('data-py',0); applyCard(c); }); });
   }
 
   AtomX.onReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });
@@ -573,6 +611,85 @@
   AtomX.onReveal(document.querySelectorAll('.fill'), function(el){ setTimeout(function(){ el.style.width = el.getAttribute('data-w')+'%'; },120); });
 
   document.querySelectorAll('.faq-q').forEach(function(q){ q.addEventListener('click', function(){ var it=q.parentElement, a=it.querySelector('.faq-a'); var open=it.classList.toggle('open'); a.style.maxHeight = open?a.scrollHeight+'px':0; }); });
+
+  /* ====== V6d kinetic engine: one shared rAF loop ====== */
+  (function(){
+    var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    var hoverOK  = window.matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').matches;
+
+    // --- cursor spotlight on dark bands (desktop + motion only) ---
+    if (hoverOK) {
+      var spots = document.querySelectorAll('.spot');
+      spots.forEach(function(band){
+        var glow = band.querySelector('.spot-glow');
+        if (!glow) return;
+        band.addEventListener('pointermove', function(e){
+          var r = band.getBoundingClientRect();
+          glow.style.setProperty('--mx', ((e.clientX - r.left) / r.width  * 100) + '%');
+          glow.style.setProperty('--my', ((e.clientY - r.top ) / r.height * 100) + '%');
+        });
+        band.addEventListener('pointerenter', function(){ band.classList.add('lit'); });
+        band.addEventListener('pointerleave', function(){ band.classList.remove('lit'); });
+      });
+    }
+
+    if (!motionOK) return; // reduced motion: ticker/parallax stay at rest
+
+    // --- scroll-velocity tracking, smoothed, in one rAF loop ---
+    var tickRoot = document.getElementById('ticker');           // gets --tick-dur
+    var kin      = tickRoot ? tickRoot.querySelector('.kin') : null;
+    var stageEl  = document.getElementById('stage');
+    // scroll-scrub only where the pointer-parallax apply hook exists (desktop + motion)
+    var stageCards = (stageEl && stageEl._applyCard) ? stageEl.querySelectorAll('.pcard') : [];
+
+    var lastY = window.pageYOffset || 0;
+    var rawV  = 0;     // instantaneous px/frame delta
+    var vel   = 0;     // smoothed signed velocity
+    var SMOOTH = 0.12; // velocity easing toward raw, then toward 0 when idle
+
+    window.addEventListener('scroll', function(){
+      var y = window.pageYOffset || 0;
+      rawV = y - lastY;
+      lastY = y;
+    }, { passive: true });
+
+    function frame(){
+      // ease smoothed velocity toward the latest raw delta, then decay raw to 0
+      vel += (rawV - vel) * SMOOTH;
+      rawV *= 0.80;                 // raw bleeds off so motion settles when scrolling stops
+      if (Math.abs(vel) < 0.01) vel = 0;
+
+      var av = Math.abs(vel);
+
+      if (kin) {
+        // skew opposite to scroll direction, capped at ~6deg; ~0.42deg per px/frame
+        var skew = Math.max(-6, Math.min(6, -vel * 0.42));
+        // small horizontal nudge in the scroll direction, capped ~28px
+        var off  = Math.max(-28, Math.min(28, -vel * 1.6));
+        kin.style.setProperty('--kx', skew.toFixed(2) + 'deg');
+        kin.style.setProperty('--ko', off.toFixed(1) + 'px');
+      }
+      if (tickRoot) {
+        // speed the marquee up with velocity: 38s at rest down toward ~16s when fast
+        var dur = Math.max(16, 38 - av * 1.3);
+        tickRoot.style.setProperty('--tick-dur', dur.toFixed(1) + 's');
+      }
+      // subtle scroll-scrub depth on the hero collage; stored as data-sy so the
+      // pointer-parallax apply hook composes it with the pointer offset, capped ~14px
+      if (stageCards.length) {
+        for (var i = 0; i < stageCards.length; i++) {
+          var c = stageCards[i];
+          var d = (+c.getAttribute('data-depth') || 10);
+          var sy = Math.max(-14, Math.min(14, vel * d * 0.05));
+          c.setAttribute('data-sy', sy.toFixed(2));
+          stageEl._applyCard(c);
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
 </script>
 </body>
 </html>

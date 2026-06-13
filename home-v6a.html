@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AtomX Pay — Send money home</title>
+<title>AtomX Pay — Send money home (V6a · Magnetic)</title>
 <link rel="stylesheet" href="assets/atomx.css" />
 <style>
   body { background: var(--paper); color: var(--n-800); overflow-x: hidden; }
@@ -82,9 +82,9 @@
   .tickerband { margin: 56px 0 0; transform: rotate(-1.4deg) scale(1.03); background: var(--v-950); color: #fff; box-shadow: var(--shadow-lg); }
   .ticker { overflow: hidden; padding: 15px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
   .ticker-track { display: flex; gap: 0; width: max-content; animation: marquee 38s linear infinite; }
-  .ticker:hover .ticker-track { animation-play-state: paused; }
+  /* V6a magnetic: keep the marquee flowing under the cursor (no hover pause) */
   @keyframes marquee { to { transform: translateX(-50%); } }
-  .tick { display: inline-flex; align-items: center; gap: 10px; padding: 0 26px; font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap; color: rgba(255,255,255,.92); }
+  .tick { display: inline-flex; align-items: center; gap: 10px; padding: 0 26px; font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap; color: rgba(255,255,255,.92); transform-origin: center; will-change: transform; }
   .tick .star { color: var(--sun); }
   .tick b { color: #fff; font-weight: 700; }
   .tick .g { color: var(--positive-bright); }
@@ -257,6 +257,17 @@
   .fgrid .col a:hover { color: var(--v-700); }
   footer .leg { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-family: var(--font-mono); font-size: 12px; color: var(--n-500); border-top: 1px solid var(--hair-light); margin-top: 40px; padding-top: 24px; }
 
+  /* ====== V6a · MAGNETIC interaction theme ====== */
+  /* Elements pulled toward the cursor via inline transforms (set in JS).
+     While engaged we want a snappy follow; on release a spring ease-back. */
+  .btn.mag, .links a.mag, .chip.mag { transition: transform .12s linear; }
+  .btn.mag .arr { transition: transform .12s linear; }
+  .btn.mag-rest, .links a.mag-rest, .chip.mag-rest { transition: transform .55s var(--ease-spring); }
+  .btn.mag-rest .arr { transition: transform .55s var(--ease-spring); }
+  .links a.mag, .links a.mag-rest { display: inline-block; will-change: transform; }
+  .chip.mag, .chip.mag-rest { will-change: transform; }
+  .tick { transition: filter .18s linear, opacity .18s linear; }
+
   /* reveal */
   .rv { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease-out), transform .85s var(--ease-spring); transition-delay: var(--d, 0s); }
   .rv.in { opacity: 1; transform: none; }
@@ -327,7 +338,7 @@
       <div class="cap">Sunday in Jaipur, right after it landed.</div>
     </div>
     <div class="pcard pc-side" data-depth="16">
-      <img src="https://images.unsplash.com/photo-1704088030734-96769c4593a2?q=80&w=700&auto=format&fit=crop" alt="Indian mother in a saree smiling at the money that just landed on her phone" loading="eager" />
+      <img src="https://images.unsplash.com/photo-1758686254023-09e191043c88?q=80&w=700&auto=format&fit=crop" alt="Grandparents waving happily at a smartphone on a video call" loading="eager" />
       <div class="cap">“It's here, beta!”</div>
     </div>
     <div class="chip chip-delivered">
@@ -566,6 +577,104 @@
       });
     });
     stage.addEventListener('pointerleave', function(){ cards.forEach(function(c){ c.style.transform = ''; }); });
+  }
+
+  /* ===================== V6a · MAGNETIC interactions ===================== */
+  /* Every cursor-driven effect is gated behind the same hover + reduced-motion
+     check the base file uses, so touch and reduced-motion users get nothing. */
+  var MAG_OK = window.matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').matches;
+  if (MAG_OK) {
+    /* --- 1 + 2 + 4: magnetic pull on buttons, nav links, hero chips --- */
+    function makeMagnetic(el, radius, strength, max, arrStrength, arrMax){
+      var arr = el.querySelector ? el.querySelector('.arr') : null;
+      function pull(e){
+        var r = el.getBoundingClientRect();
+        var cx = r.left + r.width/2, cy = r.top + r.height/2;
+        var dx = e.clientX - cx, dy = e.clientY - cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist > radius){ rest(); return; }
+        el.classList.add('mag'); el.classList.remove('mag-rest');
+        var tx = dx * strength, ty = dy * strength;
+        var m = max;
+        var mag = Math.sqrt(tx*tx + ty*ty);
+        if (mag > m){ tx = tx/mag*m; ty = ty/mag*m; }
+        el.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px)';
+        if (arr){
+          var ax = dx * arrStrength, ay = dy * arrStrength;
+          var amag = Math.sqrt(ax*ax + ay*ay);
+          if (amag > arrMax){ ax = ax/amag*arrMax; ay = ay/amag*arrMax; }
+          arr.style.transform = 'translate(' + ax.toFixed(2) + 'px,' + ay.toFixed(2) + 'px)';
+        }
+      }
+      function rest(){
+        if (!el.classList.contains('mag')) return;
+        el.classList.remove('mag'); el.classList.add('mag-rest');
+        el.style.transform = '';
+        if (arr) arr.style.transform = '';
+      }
+      el.addEventListener('pointermove', pull);
+      el.addEventListener('pointerleave', rest);
+    }
+
+    /* buttons: ~80px reach, 0.3x body pull (cap 13px), 0.5x arrow pull (cap 9px) */
+    var mbtns = document.querySelectorAll('.btn');
+    for (var i=0;i<mbtns.length;i++){ makeMagnetic(mbtns[i], 80, 0.3, 13, 0.5, 9); }
+
+    /* nav links: smaller radius + strength, no arrow */
+    var mlinks = document.querySelectorAll('.links a');
+    for (var j=0;j<mlinks.length;j++){ makeMagnetic(mlinks[j], 56, 0.22, 8, 0, 0); }
+
+    /* hero chips: subtle flourish (pull pauses the float while engaged) */
+    var mchips = document.querySelectorAll('#stage .chip');
+    for (var k=0;k<mchips.length;k++){ makeMagnetic(mchips[k], 70, 0.18, 9, 0, 0); }
+
+    /* --- 3: magnetic ticker swell -------------------------------------- */
+    /* Marquee keeps flowing. While the pointer is over the band we run a rAF
+       loop, read each tick's live center X, and lerp its scale + glow toward a
+       falloff peak near the cursor. Self-idles once everyone eases back to 1. */
+    (function(){
+      var band = document.querySelector('.tickerband');
+      if (!band) return;
+      var ticks = band.querySelectorAll('.tick');
+      var RADIUS = 240, LIFT = 0.35, EASE = 0.18;
+      var px = -1, over = false, raf = 0;
+      var scales = [];
+      for (var t=0;t<ticks.length;t++){ scales[t] = 1; }
+
+      function frame(){
+        var settled = true;
+        for (var n=0;n<ticks.length;n++){
+          var tk2 = ticks[n];
+          var target = 1;
+          var glow = 0;
+          if (over && px >= 0){
+            var r = tk2.getBoundingClientRect();
+            var cx = r.left + r.width/2;
+            var d = Math.abs(px - cx);
+            var f = Math.max(0, 1 - d/RADIUS);
+            target = 1 + LIFT * f;
+            glow = f;
+          }
+          var s = scales[n] + (target - scales[n]) * EASE;
+          scales[n] = s;
+          tk2.style.transform = 'scale(' + s.toFixed(3) + ')';
+          tk2.style.filter = 'brightness(' + (1 + 0.5*glow).toFixed(3) + ')';
+          tk2.style.opacity = (0.92 + 0.08*glow).toFixed(3);
+          if (Math.abs(s - target) > 0.001 || target !== 1) settled = false;
+        }
+        if (!over && settled){
+          raf = 0;
+          for (var z=0;z<ticks.length;z++){ ticks[z].style.transform = ''; ticks[z].style.filter = ''; ticks[z].style.opacity = ''; scales[z] = 1; }
+          return;
+        }
+        raf = requestAnimationFrame(frame);
+      }
+      function kick(){ if (!raf) raf = requestAnimationFrame(frame); }
+
+      band.addEventListener('pointerenter', function(){ over = true; kick(); });
+      band.addEventListener('pointermove', function(e){ px = e.clientX; over = true; kick(); });
+      band.addEventListener('pointerleave', function(){ over = false; px = -1; kick(); });
+    })();
   }
 
   AtomX.onReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });

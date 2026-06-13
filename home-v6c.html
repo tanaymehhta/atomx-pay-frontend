@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AtomX Pay — Send money home</title>
+<title>AtomX Pay — Send money home (V6c · Festival particles)</title>
 <link rel="stylesheet" href="assets/atomx.css" />
 <style>
   body { background: var(--paper); color: var(--n-800); overflow-x: hidden; }
@@ -257,6 +257,16 @@
   .fgrid .col a:hover { color: var(--v-700); }
   footer .leg { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-family: var(--font-mono); font-size: 12px; color: var(--n-500); border-top: 1px solid var(--hair-light); margin-top: 40px; padding-top: 24px; }
 
+  /* ====== festival particles (V6c) ====== */
+  /* burst canvas: fixed full-viewport overlay, above content, never intercepts pointer */
+  #fx-burst { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 55; }
+  /* ambient petals: sits behind the hero collage, very subtle */
+  #fx-ambient { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .stage { z-index: 1; } /* ensure collage cards stack above ambient petals */
+  /* ticker star twinkle */
+  .tick .star { transition: opacity .5s ease, text-shadow .5s ease; }
+  .tick .star.twinkle { opacity: 1; text-shadow: 0 0 8px var(--sun), 0 0 14px rgba(255,178,62,.55); }
+
   /* reveal */
   .rv { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease-out), transform .85s var(--ease-spring); transition-delay: var(--d, 0s); }
   .rv.in { opacity: 1; transform: none; }
@@ -289,6 +299,7 @@
 </head>
 <body>
 <div class="sky"></div>
+<canvas id="fx-burst" aria-hidden="true"></canvas>
 
 <nav class="bar"><div class="wrap">
   <a href="#" id="logo"><img src="assets/atomx-logo-horizontal-color.png" alt="AtomX Pay" height="36" style="display:block;" /></a>
@@ -320,6 +331,7 @@
     </div>
   </div>
   <div class="stage" id="stage">
+    <canvas id="fx-ambient" aria-hidden="true"></canvas>
     <span class="chip chip-rate"><span class="livedot"></span> 1 USD = <b id="rate-hero">95.3820</b> INR</span>
     <span class="chip chip-diwali"><span class="em">🪔</span><span class="t">Diwali sorted<small>Sent in 12 min</small></span></span>
     <div class="pcard pc-main" data-depth="8">
@@ -327,7 +339,7 @@
       <div class="cap">Sunday in Jaipur, right after it landed.</div>
     </div>
     <div class="pcard pc-side" data-depth="16">
-      <img src="https://images.unsplash.com/photo-1704088030734-96769c4593a2?q=80&w=700&auto=format&fit=crop" alt="Indian mother in a saree smiling at the money that just landed on her phone" loading="eager" />
+      <img src="https://images.unsplash.com/photo-1758686254023-09e191043c88?q=80&w=700&auto=format&fit=crop" alt="Grandparents waving happily at a smartphone on a video call" loading="eager" />
       <div class="cap">“It's here, beta!”</div>
     </div>
     <div class="chip chip-delivered">
@@ -533,7 +545,7 @@
   var sendEl = document.getElementById('send'), recvEl = document.getElementById('receive');
   function parseAmt(){ var v = parseFloat(sendEl.value.replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; }
   var lastRecv = 95382.41;
-  function recompute(animate){ var out = parseAmt()*AtomX.getRate(); if(animate) AtomX.countUp(recvEl,lastRecv,out,600,AtomX.fmtINR); else recvEl.textContent = AtomX.fmtINR(out); recvEl.classList.add('bump'); setTimeout(function(){recvEl.classList.remove('bump');},260); lastRecv = out; }
+  function recompute(animate){ var out = parseAmt()*AtomX.getRate(); if(out > lastRecv + 0.005 && typeof window.fxCelebrate === 'function') window.fxCelebrate(); if(animate) AtomX.countUp(recvEl,lastRecv,out,600,AtomX.fmtINR); else recvEl.textContent = AtomX.fmtINR(out); recvEl.classList.add('bump'); setTimeout(function(){recvEl.classList.remove('bump');},260); lastRecv = out; }
   sendEl.addEventListener('input', function(){ var raw = sendEl.value.replace(/[^0-9.]/g,''); var p = raw.split('.'); var f = p[0]?Number(p[0]).toLocaleString('en-US'):''; if(p.length>1) f += '.'+p[1].slice(0,2); var pos = sendEl.selectionStart + (f.length - sendEl.value.length); sendEl.value = f; try{sendEl.setSelectionRange(pos,pos);}catch(e){} recompute(false); });
 
   var CIRC = 2*Math.PI*13;
@@ -546,6 +558,7 @@
     var fr = document.getElementById('foot-rate'); if(fr) fr.textContent = AtomX.fmtRate(r);
     if(kind==='refresh') recompute(true); else recompute(false);
     if(dir==='up'||dir==='down'){ recvEl.classList.remove('flash-up','flash-down'); void recvEl.offsetWidth; recvEl.classList.add(dir==='up'?'flash-up':'flash-down'); }
+    if(kind==='refresh' && typeof window.fxTwinkle === 'function') window.fxTwinkle();
   });
 
   // duplicate ticker content so the marquee loops seamlessly
@@ -573,6 +586,245 @@
   AtomX.onReveal(document.querySelectorAll('.fill'), function(el){ setTimeout(function(){ el.style.width = el.getAttribute('data-w')+'%'; },120); });
 
   document.querySelectorAll('.faq-q').forEach(function(q){ q.addEventListener('click', function(){ var it=q.parentElement, a=it.querySelector('.faq-a'); var open=it.classList.toggle('open'); a.style.maxHeight = open?a.scrollHeight+'px':0; }); });
+
+  /* ============================================================
+     FESTIVAL PARTICLES (V6c) — canvas, dependency-free, ES5.
+     Two canvases: #fx-burst (celebration sparkles, full viewport)
+     and #fx-ambient (slow drifting marigold petals behind hero).
+     One shared requestAnimationFrame loop drives both; the loop
+     sleeps when there is nothing alive and nothing to draw, and
+     restarts on a trigger. Fully disabled under reduced motion.
+     ============================================================ */
+  (function(){
+    var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    if (!motionOK) return; // no canvas work at all under reduced motion
+
+    var TAU = Math.PI * 2;
+    // marigold / coral / gold festival palette
+    var PETAL_COLORS = ['#ffb23e','#f59415','#ff7a5c','#f0593a','#ff8fb1'];
+    var SPARK_COLORS = ['#ffb23e','#ffcf6e','#ff7a5c','#fff1cf'];
+
+    var burst = document.getElementById('fx-burst');
+    var ambient = document.getElementById('fx-ambient');
+    var bctx = burst ? burst.getContext('2d') : null;
+    var actx = ambient ? ambient.getContext('2d') : null;
+    if (!bctx) return;
+
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+    var sparks = [];          // celebration burst particles (live, capped)
+    var petals = [];          // ambient hero petals (steady, capped)
+    var SPARK_CAP = 90;       // hard cap on simultaneous burst particles
+    var PETAL_CAP = 7;        // hero ambient petals — kept very low/subtle
+    var running = false;
+    var lastT = 0;
+
+    function sizeCanvas(cv, ctx){
+      if (!cv || !ctx) return;
+      var r = cv.getBoundingClientRect();
+      cv.width = Math.max(1, Math.round(r.width * DPR));
+      cv.height = Math.max(1, Math.round(r.height * DPR));
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    function sizeAll(){ sizeCanvas(burst, bctx); sizeCanvas(ambient, actx); }
+    sizeAll();
+    var rsz; window.addEventListener('resize', function(){ clearTimeout(rsz); rsz = setTimeout(sizeAll, 150); }, { passive:true });
+
+    function rnd(a,b){ return a + Math.random()*(b-a); }
+    function pick(arr){ return arr[(Math.random()*arr.length)|0]; }
+
+    // ---- ambient hero petals (slow translucent drift) ----
+    function seedPetal(initial){
+      var r = ambient.getBoundingClientRect();
+      var w = r.width || 400, h = r.height || 400;
+      return {
+        x: rnd(0, w),
+        y: initial ? rnd(0, h) : rnd(-30, -8),
+        r: rnd(5, 11),
+        vx: rnd(-6, 6) / 60,     // px per frame-ish, scaled by dt below
+        vy: rnd(9, 20) / 60,
+        rot: rnd(0, TAU),
+        vr: rnd(-0.4, 0.4),
+        col: pick(PETAL_COLORS),
+        a: rnd(0.05, 0.16)       // low opacity — must not distract
+      };
+    }
+    function ambientActive(){
+      return actx && !document.hidden && ambient.getBoundingClientRect().width > 0;
+    }
+    function ensurePetals(){
+      if (!ambientActive()) return;
+      while (petals.length < PETAL_CAP) petals.push(seedPetal(petals.length < PETAL_CAP/2));
+    }
+
+    function drawPetal(ctx, p){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.a;
+      ctx.fillStyle = p.col;
+      // soft marigold petal: an ellipse
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.r, p.r * 0.6, 0, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ---- celebration burst (sparkle petals with gravity, ~900ms life) ----
+    function emitBurst(cx, cy){
+      var n = 15 + ((Math.random()*11)|0); // 15..25, restrained
+      for (var i=0; i<n && sparks.length < SPARK_CAP; i++){
+        var ang = rnd(-Math.PI, 0) + rnd(-0.5, 0.5); // bias upward
+        var spd = rnd(60, 220);
+        sparks.push({
+          x: cx, y: cy,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - rnd(40, 120),
+          g: rnd(360, 540),       // gravity px/s^2
+          life: 0,
+          ttl: rnd(0.7, 0.95),    // ~900ms
+          r: rnd(2.5, 5.5),
+          rot: rnd(0, TAU),
+          vr: rnd(-6, 6),
+          col: pick(SPARK_COLORS),
+          petal: Math.random() < 0.6
+        });
+      }
+      ensureRunning();
+    }
+
+    function drawSpark(ctx, s){
+      var t = s.life / s.ttl;
+      var a = t < 0.15 ? (t/0.15) : (1 - (t-0.15)/0.85); // quick in, fade out
+      if (a < 0) a = 0;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.rot);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = s.col;
+      if (s.petal){
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s.r, s.r * 0.55, 0, 0, TAU);
+        ctx.fill();
+      } else {
+        // tiny 4-point sparkle
+        ctx.beginPath();
+        for (var k=0; k<4; k++){
+          var aa = k * (Math.PI/2);
+          ctx.lineTo(Math.cos(aa) * s.r, Math.sin(aa) * s.r);
+          ctx.lineTo(Math.cos(aa + Math.PI/4) * s.r * 0.4, Math.sin(aa + Math.PI/4) * s.r * 0.4);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // ---- shared loop ----
+    function frame(now){
+      var dt = lastT ? (now - lastT) / 1000 : 0.016;
+      if (dt > 0.05) dt = 0.05; // clamp after tab-switch
+      lastT = now;
+
+      // burst layer
+      bctx.clearRect(0, 0, burst.width, burst.height);
+      for (var i = sparks.length - 1; i >= 0; i--){
+        var s = sparks[i];
+        s.life += dt;
+        if (s.life >= s.ttl){ sparks.splice(i, 1); continue; }
+        s.vy += s.g * dt;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        s.rot += s.vr * dt;
+        drawSpark(bctx, s);
+      }
+
+      // ambient layer (only when visible)
+      if (actx){
+        actx.clearRect(0, 0, ambient.width, ambient.height);
+        if (ambientActive()){
+          ensurePetals();
+          var r = ambient.getBoundingClientRect();
+          var w = r.width, h = r.height;
+          for (var j = 0; j < petals.length; j++){
+            var p = petals[j];
+            p.x += p.vx * dt * 60;
+            p.y += p.vy * dt * 60;
+            p.rot += p.vr * dt;
+            if (p.y - p.r > h || p.x < -20 || p.x > w + 20){
+              petals[j] = seedPetal(false);
+            }
+            drawPetal(actx, petals[j]);
+          }
+        }
+      }
+
+      // keep running while there is work; otherwise sleep to save CPU
+      var moreWork = sparks.length > 0 || ambientActive();
+      if (moreWork){
+        requestAnimationFrame(frame);
+      } else {
+        running = false;
+        lastT = 0;
+      }
+    }
+    function ensureRunning(){
+      if (running) return;
+      running = true;
+      lastT = 0;
+      requestAnimationFrame(frame);
+    }
+
+    // pause/resume cleanly with tab visibility
+    document.addEventListener('visibilitychange', function(){
+      if (document.hidden){
+        bctx.clearRect(0, 0, burst.width, burst.height);
+        if (actx) actx.clearRect(0, 0, ambient.width, ambient.height);
+      } else {
+        lastT = 0;
+        ensureRunning();
+      }
+    });
+
+    // ---- public trigger: celebration from near the received amount ----
+    window.fxCelebrate = function(){
+      if (document.hidden) return;
+      var target = document.getElementById('receive') || document.querySelector('.calc');
+      if (!target) return;
+      var rect = target.getBoundingClientRect();
+      // ignore if the calculator is well off-screen
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      var cx = rect.left + rect.width * 0.5;
+      var cy = rect.top + rect.height * 0.5;
+      emitBurst(cx, cy);
+    };
+
+    // ---- public trigger: gentle ticker star twinkle ----
+    var stars = [];
+    function collectStars(){ stars = [].slice.call(document.querySelectorAll('.tick .star')); }
+    collectStars();
+    window.fxTwinkle = function(){
+      if (document.hidden) return;
+      if (!stars.length) collectStars();
+      if (!stars.length) return;
+      // twinkle a small random subset
+      var count = Math.min(3, stars.length);
+      for (var i = 0; i < count; i++){
+        var el = stars[(Math.random()*stars.length)|0];
+        (function(node){
+          node.classList.add('twinkle');
+          setTimeout(function(){ node.classList.remove('twinkle'); }, 650);
+        })(el);
+      }
+    };
+    // occasional autonomous twinkle so the ticker feels alive
+    setInterval(function(){ if (!document.hidden) window.fxTwinkle(); }, 4200);
+
+    // re-collect stars after the marquee content is duplicated on load
+    setTimeout(collectStars, 800);
+
+    // start the ambient drift on load
+    ensureRunning();
+  })();
 </script>
 </body>
 </html>
