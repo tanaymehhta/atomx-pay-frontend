@@ -262,28 +262,47 @@
   .cmp-note { text-align: center; font-size: 14.5px; color: var(--slate); line-height: 1.6; margin: 0 auto 36px; max-width: 46em; }
   .cmp-note b { color: var(--obsidian); font-weight: 600; }
 
+  /* editable send amount in the conversion line — looks like plain text; editable only after the story finishes */
+  .cmp-amt { display: inline-flex; align-items: baseline; }
+  .cmp-amt .dollar { color: var(--royal-violet); font-weight: 700; }
+  .amt-edit { font: inherit; font-weight: 700; letter-spacing: -0.03em; color: var(--royal-violet); background: transparent;
+    border: none; outline: none; padding: 0; width: 4ch; text-align: left; cursor: text; -moz-appearance: textfield;
+    text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 5px;
+    transition: text-decoration-color .2s; }
+  .amt-edit::-webkit-inner-spin-button, .amt-edit::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .amt-edit.locked { pointer-events: none; }                                  /* inert during the animation */
+  .amt-edit:not(.locked):hover { text-decoration-color: rgba(84,35,231,.4); } /* subtle hint once editable */
+  .amt-edit:focus { text-decoration-color: var(--royal-violet); }
+
   .cmp { display: grid; gap: 14px; }
-  .crow { display: grid; grid-template-columns: 1.15fr 2.4fr auto; gap: 24px; align-items: center; background: #fff;
+  /* narrower track + wider right column keeps the bars off the right edge */
+  .crow { display: grid; grid-template-columns: 1.15fr 1.6fr 210px; gap: 24px; align-items: center; background: #fff;
     border: 1px solid var(--ash); border-radius: 24px; padding: 22px 28px; transition: box-shadow .3s var(--ease); }
   .crow:hover { box-shadow: 0 10px 30px -18px rgba(18,18,23,.22); }
-  .crow.win { border: 2px solid var(--royal-violet); box-shadow: 0 14px 40px -22px rgba(84,35,231,.55); }
+  /* the winner — taller, brighter, lifted, the loud one */
+  .crow.win { border: 2px solid var(--royal-violet); background: rgba(84,35,231,.05);
+    box-shadow: 0 20px 54px -18px rgba(84,35,231,.6); padding: 28px; }
   .crow .name { font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--obsidian);
     display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .crow.win .name { font-size: 22px; }
   .crow .name small { display: block; width: 100%; font-weight: 400; font-size: 12px; color: var(--slate); margin-top: 4px; font-family: var(--font-body); }
-  .tagbest { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  .tagbest { font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
     background: var(--lemon-zest); color: var(--obsidian); border-radius: var(--radius-pill); padding: 3px 10px; }
-  .track { position: relative; height: 46px; border-radius: 10px; overflow: hidden; background: rgba(213,11,62,.07); }
-  .crow.win .track { background: rgba(30,135,76,.10); }
+  .crow.win .tagbest { font-size: 12px; padding: 4px 13px; box-shadow: 0 4px 12px -3px rgba(255,194,51,.7); }
+  .track { position: relative; height: 44px; border-radius: 10px; overflow: hidden; background: rgba(213,11,62,.07); }
+  .crow.win .track { height: 60px; border-radius: 13px; background: rgba(30,135,76,.10); }
   .track .goal { position: absolute; right: 0; top: 0; bottom: 0; width: 2px; z-index: 2;
     background: repeating-linear-gradient(180deg, var(--ash) 0 5px, transparent 5px 10px); }
   .fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 10px; transition: width 1.9s var(--ease); }
-  .fill.f1 { background: #b7b7c5; } .fill.f2 { background: var(--electric-iris); } .fill.f3 { background: var(--royal-violet); }
+  .fill.f1 { background: #b7b7c5; } .fill.f2 { background: var(--electric-iris); }
+  .fill.f3 { background: var(--royal-violet); border-radius: 13px; box-shadow: 0 0 28px rgba(84,35,231,.55), inset 0 0 0 1px rgba(255,255,255,.14); }
   .bval { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); font-family: var(--font-display);
     font-weight: 700; font-size: 16px; color: #fff; white-space: nowrap; }
   .fill.f1 .bval { color: var(--obsidian); }
-  .cmeta { font-size: 12px; color: var(--slate); text-align: right; line-height: 1.7; white-space: nowrap; }
-  .cmeta .lost { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #d50b3e; }
-  .cmeta .kept { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--emerald); }
+  .crow.win .bval { font-size: 21px; right: 16px; }
+  .cmeta { font-size: 12px; color: var(--slate); text-align: right; line-height: 1.6; white-space: normal; }
+  .cmeta .lost { display: inline-block; margin-bottom: 4px; font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #d50b3e; }
+  .cmeta .kept { display: inline-block; margin-bottom: 4px; font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--emerald); }
 
   /* staged reveal — driven only by the on-view orchestrator (no preload) */
   .staged { opacity: 0; transform: translateY(16px); transition: opacity .75s var(--ease), transform .75s var(--ease); }
@@ -630,27 +649,27 @@
   <div class="cmp-intro" aria-label="Imagine you're sending $1,000 home. There are three ways it can travel. $1,000 is ₹95,382 at today's rate.">
     <span class="ci-line ci-1">Imagine you're sending <b>$1,000</b> home.</span>
     <span class="ci-line ci-2">There are <b>three ways</b> it can travel.</span>
-    <span class="ci-line ci-3"><b>$1,000</b> = <b>₹<span id="cmp-live">95,382</span></b> at today's rate.</span>
+    <span class="ci-line ci-3"><span class="cmp-amt"><span class="dollar">$</span><input id="cmp-usd" class="amt-edit locked" type="text" inputmode="numeric" value="1,000" tabindex="-1" readonly aria-label="Amount you send in USD" /></span> = <b>₹<span id="cmp-live">95,382</span></b> at today's rate.</span>
   </div>
-  <p class="cmp-note staged">Each bar shows how much of that <b>₹95,382</b> actually lands in your family's account.</p>
+  <p class="cmp-note staged">Each bar shows how much of that <b>₹<span id="cmp-note-val">95,382</span></b> actually lands in your family's account.</p>
   <div class="cmp">
-    <div class="crow staged" data-arrive="94.09">
+    <div class="crow staged" data-spread="0.025" data-fee="34">
       <div class="name">Traditional bank <small>Correspondent wire</small></div>
       <div class="track"><span class="goal"></span><div class="fill f1"><span class="bval">₹89,743</span></div></div>
       <div class="cmeta"><span class="lost">−₹5,639 lost</span><br>2 to 5 days · ~2.5% spread · $25 to $45 fee</div>
     </div>
-    <div class="crow staged" data-arrive="98.21">
+    <div class="crow staged" data-spread="0.01" data-fee="8">
       <div class="name">Banking-rail MSB <small>Money service business</small></div>
       <div class="track"><span class="goal"></span><div class="fill f2"><span class="bval">₹93,673</span></div></div>
       <div class="cmeta"><span class="lost">−₹1,709 lost</span><br>1 to 2 days · ~1.0% spread · $5 to $12 fee</div>
     </div>
-    <div class="crow win staged" data-arrive="100">
+    <div class="crow win staged" data-spread="0" data-fee="0">
       <div class="name">AtomX Pay <span class="tagbest">Best value</span> <small>Blockchain rails</small></div>
       <div class="track"><span class="goal"></span><div class="fill f3"><span class="bval">₹95,382</span></div></div>
       <div class="cmeta"><span class="kept">Full value kept</span><br>~15 min · 0% spread · $0 fee · always on</div>
     </div>
   </div>
-  <div class="save staged"><div class="sv">Save up to ₹5,639</div><div class="sk">per $1,000, versus a traditional bank wire. That stays with your family.</div></div>
+  <div class="save staged"><div class="sv">Save up to ₹5,639</div><div class="sk">on every <b>$<span id="save-usd">1,000</span></b> you send, versus a traditional bank wire. That stays with your family.</div></div>
 </div></section>
 
 <!-- how -->
@@ -804,7 +823,7 @@
   amxReveal(document.querySelectorAll('.rv'), function(el){ el.classList.add('in'); });
   amxReveal(document.querySelectorAll('[data-count]'), function(el){ var to=+el.getAttribute('data-count'); var suf=el.getAttribute('data-suffix')||''; var pre=el.getAttribute('data-prefix')||''; AtomX.countUp(el,0,to,1100,function(v){ return pre+Math.round(v).toLocaleString('en-IN')+suf; }); });
 
-  // ===== compare: staged story — "send $1,000" -> "three ways" -> bars -> savings. Plays once, on view. =====
+  // ===== compare: staged story + editable amount. "send $X" -> "three ways" -> "$X = ₹.." -> bars -> savings =====
   (function(){
     var sec = document.getElementById('compare'); if(!sec) return;
     var cmp  = sec.querySelector('.cmp');
@@ -815,25 +834,67 @@
     var rows = sec.querySelectorAll('.crow');
     var save = sec.querySelector('.save');
     var saveSv = save ? save.querySelector('.sv') : null;
+    var usdEl = document.getElementById('cmp-usd');
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var lockedRate = AtomX.getRate();   // snapshot taken once when the line is revealed
+    var revealed = false;               // bars on screen yet? gate live recompute
 
-    function fillRow(r){ var f = r.querySelector('.fill'); if(f) f.style.width = r.getAttribute('data-arrive')+'%'; }
+    function amt(){ var v = parseFloat((usdEl ? usdEl.value : '1000').replace(/[^0-9.]/g,'')); return (isNaN(v)||v<0)?0:v; }
+    function delivered(a, sp, fe){ return Math.max(0, a*(1-sp) - fe) * lockedRate; }   // spread + flat fee model
     function reveal(el){ if(el) el.classList.add('show'); }
-    function snapLive(){ var le = document.getElementById('cmp-live'); if(le) le.textContent = AtomX.fmtINR0(1000*AtomX.getRate()); }  // capture rate once, then freeze
-    function showSave(){ if(!save) return; reveal(save);
-      if(saveSv) AtomX.countUp(saveSv, 0, 5639, 1700, function(v){ return 'Save up to ₹'+Math.round(v).toLocaleString('en-IN'); }); }
+
+    function fillRow(r){
+      var a = amt(), real = a*lockedRate;
+      var sp = parseFloat(r.getAttribute('data-spread'))||0, fe = parseFloat(r.getAttribute('data-fee'))||0;
+      var del = delivered(a, sp, fe);
+      var arrive = real>0 ? del/real*100 : 0; arrive = Math.max(1.5, Math.min(100, arrive));
+      var f = r.querySelector('.fill'); if(f) f.style.width = arrive.toFixed(2)+'%';
+      var bv = r.querySelector('.bval'); if(bv) bv.textContent = '₹'+AtomX.fmtINR0(del);
+      var lost = r.querySelector('.lost'); if(lost) lost.textContent = '−₹'+AtomX.fmtINR0(Math.max(0, real-del))+' lost';
+    }
+    function savings(){ var a = amt(); var t = rows[0];
+      return Math.max(0, a*lockedRate - delivered(a, parseFloat(t.getAttribute('data-spread'))||0, parseFloat(t.getAttribute('data-fee'))||0)); }
+    function syncText(){ var a = amt(), real = a*lockedRate;
+      setText('cmp-live', AtomX.fmtINR0(real)); setText('cmp-note-val', AtomX.fmtINR0(real));
+      setText('save-usd', a.toLocaleString('en-US')); }
+    function recomputeAll(){ syncText(); for(var i=0;i<rows.length;i++) fillRow(rows[i]);
+      if(saveSv) saveSv.textContent = 'Save up to ₹'+AtomX.fmtINR0(savings()); }
+
+    function snapLive(){ lockedRate = AtomX.getRate(); syncText(); }   // freeze the rate, then math is amount-driven
+    function unlock(){ revealed = true; if(usdEl){ usdEl.classList.remove('locked'); usdEl.removeAttribute('readonly'); usdEl.tabIndex = 0; } }  // editable only now
+    function showSave(){ if(!save) return; reveal(save); setText('save-usd', amt().toLocaleString('en-US'));
+      if(saveSv) AtomX.countUp(saveSv, 0, savings(), 1700, function(v){ return 'Save up to ₹'+Math.round(v).toLocaleString('en-IN'); });
+      unlock(); }
+
+    // auto-size the editable field to its content
+    var sizer = document.createElement('span');
+    sizer.style.cssText = 'position:absolute;left:-9999px;top:-9999px;white-space:pre;font:inherit;font-weight:700;letter-spacing:-0.03em;';
+    if(usdEl){ usdEl.parentNode.appendChild(sizer); }
+    function sizeInput(){ if(!usdEl) return; sizer.textContent = usdEl.value || '0'; usdEl.style.width = (sizer.offsetWidth + 4) + 'px'; }
+    if(usdEl){
+      usdEl.addEventListener('input', function(){
+        var raw = usdEl.value.replace(/[^0-9]/g,'').slice(0,9);
+        var f = raw ? Number(raw).toLocaleString('en-US') : '';
+        var pos = usdEl.selectionStart + (f.length - usdEl.value.length);
+        usdEl.value = f; try{ usdEl.setSelectionRange(pos,pos); }catch(e){}
+        sizeInput(); if(revealed) recomputeAll();
+      });
+      usdEl.addEventListener('focus', function(){ usdEl.select(); });
+      usdEl.addEventListener('blur', function(){ if(!amt()){ usdEl.value='1,000'; sizeInput(); if(revealed) recomputeAll(); } });
+      sizeInput();
+    }
 
     function run(){
       reveal(ci1);                                                                                  // "Imagine you're sending $1,000 home."
       setTimeout(function(){ if(ci1) ci1.classList.add('hide'); reveal(ci2); }, 1800);               // "There are three ways it can travel."
-      setTimeout(function(){ if(ci2) ci2.classList.add('hide'); snapLive(); reveal(ci3); }, 3600);    // "$1,000 = ₹95,382 at today's rate." (frozen snapshot)
+      setTimeout(function(){ if(ci2) ci2.classList.add('hide'); snapLive(); reveal(ci3); }, 3600);    // "$1,000 = ₹95,38x at today's rate."
       setTimeout(function(){ reveal(note); reveal(rows[0]); fillRow(rows[0]); }, 5400);              // way 1
       setTimeout(function(){ reveal(rows[1]); fillRow(rows[1]); }, 7500);                            // way 2
-      setTimeout(function(){ reveal(rows[2]); fillRow(rows[2]); }, 9600);                            // way 3 (AtomX)
+      setTimeout(function(){ reveal(rows[2]); fillRow(rows[2]); revealed = true; }, 9600);           // way 3 (AtomX), edits live from here
       setTimeout(showSave, 11700);                                                                    // ends here
     }
     function finalState(){ if(ci1) ci1.classList.add('hide'); if(ci2) ci2.classList.add('hide'); snapLive(); reveal(ci3); reveal(note);
-      for(var i=0;i<rows.length;i++){ reveal(rows[i]); fillRow(rows[i]); } showSave(); }
+      for(var i=0;i<rows.length;i++){ reveal(rows[i]); fillRow(rows[i]); } showSave(); revealed = true; }
 
     if(reduce){ finalState(); return; }
     if(!('IntersectionObserver' in window)){ run(); return; }
