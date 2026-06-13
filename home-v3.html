@@ -627,11 +627,12 @@
     <span class="eyebrow">The $1,000 test</span>
     <h2 class="h2">More of your money, actually arrives.</h2>
   </div>
-  <div class="cmp-intro" aria-label="Imagine you're sending $1,000 home. There are three ways it can travel.">
+  <div class="cmp-intro" aria-label="Imagine you're sending $1,000 home. There are three ways it can travel. $1,000 is ₹95,382 at today's rate.">
     <span class="ci-line ci-1">Imagine you're sending <b>$1,000</b> home.</span>
     <span class="ci-line ci-2">There are <b>three ways</b> it can travel.</span>
+    <span class="ci-line ci-3"><b>$1,000</b> = <b>₹<span id="cmp-live">95,382</span></b> at today's rate.</span>
   </div>
-  <p class="cmp-note staged">Each bar is what actually lands, measured against the real <b>₹95,382</b> your $1,000 is worth at today's mid-market rate.</p>
+  <p class="cmp-note staged">Each bar shows how much of that <b>₹95,382</b> actually lands in your family's account.</p>
   <div class="cmp">
     <div class="crow staged" data-arrive="94.09">
       <div class="name">Traditional bank <small>Correspondent wire</small></div>
@@ -809,6 +810,7 @@
     var cmp  = sec.querySelector('.cmp');
     var ci1  = sec.querySelector('.ci-1');
     var ci2  = sec.querySelector('.ci-2');
+    var ci3  = sec.querySelector('.ci-3');
     var note = sec.querySelector('.cmp-note');
     var rows = sec.querySelectorAll('.crow');
     var save = sec.querySelector('.save');
@@ -817,18 +819,20 @@
 
     function fillRow(r){ var f = r.querySelector('.fill'); if(f) f.style.width = r.getAttribute('data-arrive')+'%'; }
     function reveal(el){ if(el) el.classList.add('show'); }
+    function snapLive(){ var le = document.getElementById('cmp-live'); if(le) le.textContent = AtomX.fmtINR0(1000*AtomX.getRate()); }  // capture rate once, then freeze
     function showSave(){ if(!save) return; reveal(save);
       if(saveSv) AtomX.countUp(saveSv, 0, 5639, 1700, function(v){ return 'Save up to ₹'+Math.round(v).toLocaleString('en-IN'); }); }
 
     function run(){
-      reveal(ci1);                                                                 // "Imagine you're sending $1,000 home."
-      setTimeout(function(){ if(ci1) ci1.classList.add('hide'); reveal(ci2); }, 1900);  // "There are three ways it can travel."
-      setTimeout(function(){ reveal(note); reveal(rows[0]); fillRow(rows[0]); }, 3700);  // way 1
-      setTimeout(function(){ reveal(rows[1]); fillRow(rows[1]); }, 5900);               // way 2
-      setTimeout(function(){ reveal(rows[2]); fillRow(rows[2]); }, 8100);               // way 3 (AtomX)
-      setTimeout(showSave, 10300);                                                       // ends here
+      reveal(ci1);                                                                                  // "Imagine you're sending $1,000 home."
+      setTimeout(function(){ if(ci1) ci1.classList.add('hide'); reveal(ci2); }, 1800);               // "There are three ways it can travel."
+      setTimeout(function(){ if(ci2) ci2.classList.add('hide'); snapLive(); reveal(ci3); }, 3600);    // "$1,000 = ₹95,382 at today's rate." (frozen snapshot)
+      setTimeout(function(){ reveal(note); reveal(rows[0]); fillRow(rows[0]); }, 5400);              // way 1
+      setTimeout(function(){ reveal(rows[1]); fillRow(rows[1]); }, 7500);                            // way 2
+      setTimeout(function(){ reveal(rows[2]); fillRow(rows[2]); }, 9600);                            // way 3 (AtomX)
+      setTimeout(showSave, 11700);                                                                    // ends here
     }
-    function finalState(){ if(ci1) ci1.classList.add('hide'); reveal(ci2); reveal(note);
+    function finalState(){ if(ci1) ci1.classList.add('hide'); if(ci2) ci2.classList.add('hide'); snapLive(); reveal(ci3); reveal(note);
       for(var i=0;i<rows.length;i++){ reveal(rows[i]); fillRow(rows[i]); } showSave(); }
 
     if(reduce){ finalState(); return; }
