@@ -4,3 +4,6 @@ node_modules/
 .DS_Store
 *.log
 .vercel
+
+# local design reference, not for the repo
+DESIGN*.md
