@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AtomX Pay — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --rv: #5423e7; --lemon: #ffc233; --obs: #121217; --emerald: #1e874c; --fog: #f7f7f8; --slate: #6c6c89; }
+    .font-display { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
+    .font-body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+    .card { background: white; border-radius: 20px; box-shadow: 0 4px 24px -8px rgb(0 0 0 / 0.06); }
+    .btn { font-weight: 600; transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s; border-radius: 9999px; }
+    .btn:active { transform: scale(.985); }
+    .btn-primary { background: #121217; color: white; }
+    .rate { font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+    .nav-item { transition: all .15s ease; }
+    .nav-item.active, .nav-item:hover { background: rgba(255,255,255,.12); color: white; }
+    .metric { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="font-body bg-[#f7f7f8] text-[#121217]">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-[#5423e7] text-white flex-shrink-0 flex flex-col">
+      <div class="px-6 pt-8 pb-6">
+        <img src="assets/atomx-logo-horizontal-white.png" alt="AtomX Pay" class="h-7" />
+      </div>
+      
+      <div class="px-3 flex-1">
+        <div class="text-[10px] uppercase tracking-[2px] text-white/40 px-3 mb-1.5">Menu</div>
+        <a href="#" class="nav-item active flex items-center gap-3 px-3 py-[9px] rounded-xl mb-0.5 text-sm font-medium">
+          <span>📍</span> Dashboard
+        </a>
+        <a href="home-v11.html" class="nav-item flex items-center gap-3 px-3 py-[9px] rounded-xl mb-0.5 text-sm font-medium text-white/80">
+          <span>↗︎</span> Send money
+        </a>
+        <a href="#" class="nav-item flex items-center gap-3 px-3 py-[9px] rounded-xl mb-0.5 text-sm font-medium text-white/80">
+          <span>👥</span> Recipients
+        </a>
+        <a href="#" class="nav-item flex items-center gap-3 px-3 py-[9px] rounded-xl mb-0.5 text-sm font-medium text-white/80">
+          <span>📋</span> Transactions
+        </a>
+        <a href="#" class="nav-item flex items-center gap-3 px-3 py-[9px] rounded-xl mb-0.5 text-sm font-medium text-white/80">
+          <span>⚙︎</span> Profile
+        </a>
+      </div>
+      
+      <div class="p-4 border-t border-white/10 mt-auto">
+        <div class="flex items-center gap-3 px-2">
+          <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">AR</div>
+          <div class="text-sm">
+            <div class="font-semibold">Aarav R.</div>
+            <div class="text-white/50 text-xs">New York, NY</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main -->
+    <div class="flex-1 p-8 max-w-[1180px]">
+      <div class="flex items-start justify-between mb-8">
+        <div>
+          <div class="text-4xl font-semibold tracking-tight">Welcome back, Aarav.</div>
+          <div class="text-[#6c6c89] mt-1">Your last transfer landed 2 days ago.</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-white rounded-full px-4 py-1.5 text-sm font-medium flex items-center gap-2 border">
+            <span class="text-[#1e874c]">●</span> 
+            <span>1 USD = <span class="font-mono rate" id="dash-rate">95.3820</span> INR</span>
+          </div>
+          <a href="home-v11.html" class="btn btn-primary px-6 py-2 text-sm inline-flex items-center gap-2">Send money <span>→</span></a>
+        </div>
+      </div>
+      
+      <!-- In-flight transfer (the pipe, not a wallet) -->
+      <div class="card p-8 mb-8">
+        <div class="uppercase text-xs tracking-[2px] text-[#5423e7] font-semibold">ACTIVE TRANSFER</div>
+        
+        <div class="flex items-start justify-between mt-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <div class="font-display text-3xl font-semibold">₹95,382</div>
+              <div class="px-3 py-0.5 text-xs rounded-full bg-[#1e874c] text-white font-medium">IN PROGRESS</div>
+            </div>
+            <div class="text-[#6c6c89] mt-0.5">To Priya Sharma • UPI • ID: AX-884291</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-[#6c6c89]">ESTIMATED ARRIVAL</div>
+            <div class="font-display text-4xl font-semibold tracking-tight text-[#1e874c]">9 min</div>
+          </div>
+        </div>
+        
+        <div class="mt-5 h-1.5 bg-[#f1f1f3] rounded-full overflow-hidden">
+          <div class="h-1.5 bg-[#5423e7] w-[68%] rounded-full relative">
+            <div class="absolute right-0 top-1/2 -mt-1 w-3 h-3 bg-white border-2 border-[#5423e7] rounded-full"></div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between text-xs text-[#6c6c89] mt-4 font-medium">
+          <div class="flex items-center gap-2"><span class="text-[#1e874c]">●</span> Funded • 14:22 EST</div>
+          <div>In settlement</div>
+          <div>Delivered to UPI</div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Quick stats -->
+        <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="card p-6">
+            <div class="text-xs text-[#6c6c89]">THIS MONTH</div>
+            <div class="font-display text-4xl font-semibold mt-2 tracking-tighter">$18,400</div>
+            <div class="text-sm text-[#1e874c] mt-1">+4 transfers</div>
+          </div>
+          <div class="card p-6">
+            <div class="text-xs text-[#6c6c89]">VERIFIED RECIPIENTS</div>
+            <div class="font-display text-4xl font-semibold mt-2 tracking-tighter">7</div>
+            <div class="text-sm mt-1">All active</div>
+          </div>
+          <div class="card p-6">
+            <div class="text-xs text-[#6c6c89]">AVG DELIVERY</div>
+            <div class="font-display text-4xl font-semibold mt-2 tracking-tighter">14 <span class="text-2xl align-super">min</span></div>
+            <div class="text-sm text-[#1e874c] mt-1">Last 30 days</div>
+          </div>
+        </div>
+        
+        <!-- Recent -->
+        <div class="card p-6 lg:col-span-1">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-sm font-semibold">Recent transfers</div>
+            <a href="#" class="text-xs text-[#5423e7]">View all →</a>
+          </div>
+          
+          <div class="space-y-4 text-sm">
+            <div class="flex justify-between">
+              <div>₹48,100 • Priya S.</div>
+              <div class="text-[#6c6c89] text-xs">2d ago</div>
+            </div>
+            <div class="flex justify-between">
+              <div>₹22,500 • Mom</div>
+              <div class="text-[#6c6c89] text-xs">Mar 28</div>
+            </div>
+            <div class="flex justify-between">
+              <div>₹95,000 • School fees</div>
+              <div class="text-[#6c6c89] text-xs">Mar 19</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8 text-xs text-[#6c6c89]">
+        All times shown in EST. Blockchain confirmations are final.
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Tiny live rate for the dashboard header
+    (function() {
+      let r = 95.3820;
+      const el = document.getElementById('dash-rate');
+      function tick() {
+        r += (Math.random() - 0.5) * 0.01;
+        r = Math.max(94.8, Math.min(95.9, Math.round(r * 10000) / 10000));
+        if (el) el.textContent = r.toFixed(4);
+      }
+      setInterval(tick, 2800);
+    })();
+  </script>
+</body>
+</html>
