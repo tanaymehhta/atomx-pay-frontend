@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AtomX Pay — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* AtomX Pay — dashboard design system (continuous with marketing v11b) */
+:root{
+  --rv:#5423e7; --rv-dark:#4a1fd6; --lemon:#ffc233; --obs:#121217;
+  --slate:#6c6c89; --fog:#f7f7f8; --paper:#fff; --emerald:#1e874c;
+  --ash:#d1d1db; --hair:#ececf1; --violet-soft:#f4f0ff; --violet-2:#ede6ff;
+  --amber:#b06a00; --amber-bg:#fff5e0; --emerald-bg:#e6f3ec;
+  --shadow-sm:0 1px 2px rgba(18,18,23,.04);
+  --shadow-card:0 4px 24px -8px rgba(0,0,0,.06), 0 2px 4px -2px rgba(0,0,0,.04);
+  --shadow-lift:0 24px 60px -28px rgba(18,18,23,.22);
+  --r-card:22px; --r-lg:26px;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; background:var(--fog); }
+.font-display{ font-family:'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
+.ax, .dash{ font-family:'Inter', ui-sans-serif, system-ui, sans-serif; color:var(--obs);
+  background:var(--fog); -webkit-font-smoothing:antialiased; }
+.num{ font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1; letter-spacing:-.01em; }
+.muted{ color:var(--slate); }
+.ink{ color:var(--obs); }
+.accent{ color:var(--rv); }
+.eyebrow{ font-size:11px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; }
+
+/* ---- buttons / pills ---- */
+.btn{ display:inline-flex; align-items:center; gap:8px; font-weight:600; letter-spacing:-.01em;
+  border:0; border-radius:999px; cursor:pointer; transition:transform .18s cubic-bezier(.22,1,.36,1), box-shadow .2s, filter .2s, background .2s; font-size:15px; }
+.btn:active{ transform:scale(.985); }
+.btn svg{ font-size:18px; }
+.btn-violet{ background:var(--rv); color:#fff; padding:13px 22px; box-shadow:0 12px 26px -12px rgba(84,35,231,.6); }
+.btn-violet:hover{ filter:brightness(1.06); }
+.btn-lemon{ background:var(--lemon); color:#3a2c00; padding:14px 24px; box-shadow:0 12px 26px -12px rgba(255,194,51,.7); }
+.btn-lemon:hover{ filter:brightness(1.03); }
+.btn-ghost{ background:#fff; border:1px solid var(--ash); color:var(--obs); padding:8px 14px; font-size:13px; }
+.btn-ghost:hover{ border-color:var(--slate); }
+
+/* ---- cards ---- */
+.card{ background:var(--paper); border-radius:var(--r-card); box-shadow:var(--shadow-card); border:1px solid rgba(18,18,23,.04); }
+.card-violet{ background:var(--rv); border-radius:var(--r-card); color:#fff; position:relative; overflow:hidden; box-shadow:0 24px 50px -24px rgba(84,35,231,.5); }
+.hero-wash{ position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(120% 90% at 12% 0%, rgba(255,255,255,.22), transparent 55%),
+    radial-gradient(90% 80% at 100% 100%, rgba(255,194,51,.18), transparent 60%); }
+
+/* ============ layout shells ============ */
+.dash{ width:100%; }
+.dash-main{ max-width:1240px; margin:0 auto; padding:28px 36px 40px; display:flex; flex-direction:column; gap:24px; }
+
+/* ---- top nav ---- */
+.topnav{ background:rgba(255,255,255,.86); backdrop-filter:blur(12px); border-bottom:1px solid var(--hair); position:sticky; top:0; z-index:20; }
+.topnav-inner{ max-width:1240px; margin:0 auto; padding:0 36px; height:72px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.topnav-left{ display:flex; align-items:center; gap:34px; }
+.navlinks{ display:flex; align-items:center; gap:4px; }
+.navlink{ display:inline-flex; align-items:center; gap:7px; padding:8px 14px; border-radius:999px; font-size:14.5px; font-weight:500; color:var(--slate); cursor:pointer; transition:color .15s, background .15s; white-space:nowrap; }
+.navlink svg{ font-size:15px; opacity:.8; }
+.navlink:hover{ color:var(--obs); }
+.navlink.active{ color:var(--rv); background:var(--violet-soft); font-weight:600; }
+.topnav-right{ display:flex; align-items:center; gap:14px; }
+.nav-rate{ display:flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; }
+.livedot{ width:8px; height:8px; border-radius:50%; background:var(--emerald); box-shadow:0 0 0 3px rgba(30,135,76,.16); animation:pulse 2s infinite; }
+@keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+.iconbtn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--hair); background:#fff; color:var(--slate); display:grid; place-items:center; cursor:pointer; transition:color .15s, border-color .15s; }
+.iconbtn:hover{ color:var(--obs); border-color:var(--ash); }
+.userchip{ display:flex; align-items:center; gap:10px; padding:5px 12px 5px 5px; border-radius:999px; border:1px solid var(--hair); background:#fff; cursor:pointer; }
+.userchip:hover{ border-color:var(--ash); }
+.userchip-name{ font-size:13.5px; font-weight:600; line-height:1.1; }
+.userchip-city{ font-size:11.5px; color:var(--slate); line-height:1.2; }
+
+/* ---- logo ---- */
+.ax-logo{ display:inline-flex; align-items:center; gap:9px; color:var(--obs); }
+.ax-logo-mark{ color:var(--rv); display:inline-flex; }
+.ax-logo-word{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:20px; letter-spacing:-.02em; }
+.ax-logo-pay{ color:var(--rv); }
+.ax-logo.is-light, .ax-logo.is-light .ax-logo-mark{ color:#fff; }
+.ax-logo.is-light .ax-logo-pay{ color:var(--lemon); }
+
+/* ---- avatar ---- */
+.avatar{ display:inline-grid; place-items:center; border-radius:50%; color:#fff; font-weight:700; font-family:'Plus Jakarta Sans'; flex:none; letter-spacing:-.02em; }
+
+/* ---- method tag ---- */
+.methodtag{ display:inline-flex; align-items:center; font-size:10.5px; font-weight:700; letter-spacing:.02em; padding:2px 7px; border-radius:6px; }
+.methodtag.is-upi{ background:var(--violet-soft); color:var(--rv); }
+.methodtag.is-bank{ background:#eef1f6; color:#3a557e; }
+
+/* ---- status pill ---- */
+.status{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; padding:5px 11px 5px 9px; border-radius:999px; white-space:nowrap; }
+.status svg{ font-size:13px; }
+.status-lg{ font-size:14px; padding:8px 15px 8px 12px; }
+.status.is-delivered{ background:var(--emerald-bg); color:var(--emerald); }
+.status.is-progress{ background:var(--amber-bg); color:var(--amber); }
+.status.is-failed{ background:#fdeaea; color:#c0392b; }
+.status.is-progress svg{ animation:spin-soft 8s linear infinite; }
+@keyframes spin-soft{ to{ transform:rotate(360deg); } }
+
+/* ---- greeting ---- */
+.greet-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
+.greet-h{ font-size:30px; font-weight:700; letter-spacing:-.025em; margin:4px 0 6px; line-height:1.05; }
+.greet-sub{ font-size:15.5px; color:var(--slate); margin:0; max-width:52ch; line-height:1.45; }
+.greet-sub strong{ font-weight:600; }
+.kyc-chip{ display:flex; align-items:center; gap:11px; padding:11px 16px; background:#fff; border:1px solid var(--hair); border-radius:16px; box-shadow:var(--shadow-sm); flex:none; }
+.kyc-badge{ width:34px; height:34px; border-radius:10px; background:var(--emerald-bg); color:var(--emerald); display:grid; place-items:center; font-size:17px; flex:none; }
+.kyc-badge.lg{ width:42px; height:42px; border-radius:13px; font-size:20px; }
+.kyc-chip-t{ font-size:13.5px; font-weight:600; line-height:1.1; }
+.kyc-chip-s{ font-size:11.5px; line-height:1.3; }
+
+/* ---- grids ---- */
+.grid-split{ display:grid; grid-template-columns:1.62fr 1fr; gap:24px; align-items:start; }
+.split-rail{ display:flex; flex-direction:column; gap:24px; }
+.grid-bottom{ display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start; }
+.bottom-rail{ display:flex; flex-direction:column; gap:24px; }
+.grid-command{ display:grid; grid-template-columns:1fr 372px; gap:24px; align-items:start; }
+.cmd-main{ display:flex; flex-direction:column; gap:24px; }
+.cmd-rail{ display:flex; flex-direction:column; gap:20px; }
+.grid-funnel{ display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:stretch; }
+
+/* ---- KPI ---- */
+.kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.kpi{ padding:20px 22px; display:flex; flex-direction:column; gap:5px; }
+.kpi-num{ font-size:34px; font-weight:700; letter-spacing:-.03em; line-height:1; }
+.kpi-num.is-accent{ color:var(--rv); }
+.kpi-label{ order:-1; }
+.kpi-ctx{ font-size:12.5px; }
+.kpi-inline{ display:flex; gap:26px; }
+.kpi-inline-item{ text-align:right; }
+.kpi-inline-num{ font-size:23px; font-weight:700; letter-spacing:-.02em; line-height:1; }
+.kpi-inline-num.is-accent{ color:var(--rv); }
+.kpi-inline-label{ font-size:11px; font-weight:600; margin-top:3px; }
+
+/* ============ active transfer hero ============ */
+.at-hero{ padding:26px 28px; display:flex; flex-direction:column; gap:22px;
+  background:
+    radial-gradient(130% 120% at 100% 0%, #faf8ff 0%, #fff 46%); }
+.at-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.at-flag{ font-size:10.5px; font-weight:800; letter-spacing:.16em; color:var(--rv); background:var(--violet-soft); padding:4px 10px; border-radius:999px; display:inline-block; }
+.at-head{ display:flex; flex-direction:column; gap:13px; }
+.at-recipient{ display:flex; align-items:center; gap:13px; }
+.at-to{ font-size:17px; font-weight:600; letter-spacing:-.01em; }
+.at-method{ font-size:13px; display:flex; align-items:center; gap:7px; margin-top:3px; }
+
+.at-mid{ display:flex; align-items:center; justify-content:space-between; gap:28px; }
+.at-amount-block{ flex:1; min-width:0; }
+.at-amount{ font-size:52px; font-weight:700; letter-spacing:-.035em; line-height:1; display:block; margin:6px 0 8px; }
+.at-amount-sub{ font-size:13.5px; }
+.at-progressbar{ height:9px; border-radius:999px; background:var(--hair); overflow:hidden; margin:16px 0 9px; }
+.at-progressbar>span{ display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#7a52ee,var(--rv)); transition:width 1s linear; position:relative; }
+.at-progress-cap{ font-size:12.5px; display:flex; align-items:center; gap:6px; }
+.at-progress-cap svg{ color:var(--lemon); font-size:14px; }
+
+/* ring */
+.ring{ position:relative; flex:none; display:grid; place-items:center; }
+.ring-svg{ display:block; }
+.ring-prog{ transition:stroke-dashoffset 1s linear; }
+.ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-eyebrow{ font-size:10px; color:var(--slate); letter-spacing:.12em; }
+.ring-time{ font-size:34px; font-weight:700; letter-spacing:-.02em; line-height:1.05; color:var(--obs); }
+.ring-min{ font-size:11px; margin-top:1px; }
+
+/* step tracker — horizontal */
+.track{ list-style:none; margin:0; padding:0; }
+.track-horizontal{ display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--hair); padding-top:20px; gap:8px; }
+.track-horizontal .step{ position:relative; display:flex; flex-direction:column; gap:8px; padding-right:8px; }
+.track-horizontal .step-rail{ position:absolute; top:11px; left:24px; right:-8px; height:2px; background:var(--hair); }
+.track-horizontal .step:last-child .step-rail{ display:none; }
+.track-horizontal .step.is-done .step-rail{ background:var(--rv); }
+.track-horizontal .step-dot{ position:relative; z-index:1; }
+
+.step-dot{ width:23px; height:23px; border-radius:50%; display:grid; place-items:center; background:#fff; border:2px solid var(--ash); color:#fff; font-size:12px; flex:none; }
+.step.is-done .step-dot{ background:var(--rv); border-color:var(--rv); }
+.step.is-active .step-dot{ border-color:var(--rv); background:#fff; }
+.step-pulse{ width:9px; height:9px; border-radius:50%; background:var(--rv); animation:pulse 1.4s infinite; }
+.step-label{ font-size:13.5px; font-weight:600; }
+.step.is-pending .step-label{ color:var(--slate); }
+.step-sub{ font-size:11.5px; line-height:1.3; display:block; margin-top:1px; }
+.step-time{ font-size:12px; font-weight:600; color:var(--slate); }
+.step-time.is-live{ color:var(--rv); }
+
+/* step tracker — vertical (variation B) */
+.at-timeline-wrap{ border-top:1px solid var(--hair); padding-top:18px; }
+.at-timeline-eta{ display:flex; align-items:center; gap:8px; font-size:13.5px; margin-bottom:16px; }
+.at-timeline-eta svg{ color:var(--rv); font-size:16px; }
+.at-eta-inline{ font-size:18px; font-weight:700; color:var(--obs); }
+.track-vertical{ display:flex; flex-direction:column; }
+.track-vertical .step{ position:relative; display:grid; grid-template-columns:23px 1fr auto; gap:13px; align-items:start; padding-bottom:18px; }
+.track-vertical .step:last-child{ padding-bottom:0; }
+.track-vertical .step-rail{ position:absolute; left:11px; top:23px; bottom:-2px; width:2px; background:var(--hair); }
+.track-vertical .step:last-child .step-rail{ display:none; }
+.track-vertical .step.is-done .step-rail{ background:var(--rv); }
+.track-vertical .step-body{ display:flex; flex-direction:column; }
+.track-vertical .step-time{ text-align:right; }
+
+/* meta strip */
+.at-meta{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; border-top:1px solid var(--hair); padding-top:18px; }
+.at-meta .meta-k{ margin-bottom:5px; }
+.meta-v{ font-size:14.5px; font-weight:600; }
+
+/* ============ send panel ============ */
+.send-cta{ padding:0; }
+.send-cta-body{ position:relative; z-index:1; padding:26px 26px 24px; display:flex; flex-direction:column; }
+.send-eyebrow{ color:rgba(255,255,255,.7); }
+.send-h{ font-size:25px; font-weight:700; letter-spacing:-.02em; line-height:1.12; margin:9px 0 10px; color:#fff; }
+.send-sub{ font-size:13.5px; color:rgba(255,255,255,.82); margin:0 0 20px; line-height:1.45; max-width:34ch; }
+.send-btn{ align-self:flex-start; }
+.send-quick{ margin-top:22px; padding-top:18px; border-top:1px solid rgba(255,255,255,.18); }
+.send-quick-label{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.7) !important; }
+.send-quick-avatars{ display:flex; align-items:center; gap:10px; margin-top:12px; }
+.quick-av{ border:0; background:none; padding:0; cursor:pointer; border-radius:50%; transition:transform .15s; }
+.quick-av:hover{ transform:translateY(-3px); }
+.quick-add{ width:38px; height:38px; border-radius:50%; border:1.5px dashed rgba(255,255,255,.5); color:#fff; display:grid; place-items:center; }
+.send-cta.is-compact .send-h{ font-size:21px; }
+.send-cta.is-compact .send-cta-body{ padding:22px; }
+
+/* ============ send composer (variation C) ============ */
+.composer{ padding:24px 26px; display:flex; flex-direction:column; gap:18px; }
+.composer-head{ display:flex; align-items:center; justify-content:space-between; }
+.composer-title{ font-size:20px; font-weight:700; letter-spacing:-.02em; }
+.composer-legs{ display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; }
+.leg{ border:1.5px solid var(--hair); border-radius:18px; background:#fcfcff; padding:16px 18px; }
+.leg-receive{ border-color:var(--violet-2); background:var(--violet-soft); }
+.leg-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+.leg-cur{ font-size:12.5px; font-weight:700; }
+.leg-amt{ font-size:30px; font-weight:700; letter-spacing:-.03em; line-height:1; display:block; }
+.composer-arrow{ width:42px; height:42px; border-radius:50%; background:var(--rv); color:#fff; display:grid; place-items:center; font-size:20px; flex:none; box-shadow:0 10px 22px -10px rgba(84,35,231,.6); }
+.composer-presets{ display:flex; gap:9px; }
+.chip{ border:1.5px solid var(--hair); background:#fff; color:var(--slate); border-radius:11px; padding:8px 14px; font-size:13.5px; font-weight:600; cursor:pointer; transition:.15s; }
+.chip:hover{ border-color:var(--rv); color:var(--rv); }
+.chip.on{ border-color:var(--rv); background:var(--violet-soft); color:var(--rv); }
+.composer-break{ display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--hair); border-radius:14px; overflow:hidden; }
+.composer-break>div{ display:flex; flex-direction:column; gap:3px; padding:12px 14px; font-size:14px; font-weight:600; }
+.composer-break>div+div{ border-left:1px solid var(--hair); }
+.composer-break .muted{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
+.composer-btn{ justify-content:center; height:50px; font-size:15.5px; }
+
+/* ============ panels (recipients / recents / fx / kyc) ============ */
+.panel{ padding:22px 24px; }
+.panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.panel-title{ font-size:17px; font-weight:700; letter-spacing:-.015em; }
+.panel-action{ display:inline-flex; align-items:center; gap:3px; border:0; background:none; color:var(--rv); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+.panel-action svg{ font-size:14px; }
+
+/* recipients list */
+.recip-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; }
+.recip{ display:flex; align-items:center; gap:13px; padding:12px 0; border-top:1px solid var(--hair); }
+.recip:first-child{ border-top:0; }
+.recip-main{ flex:1; min-width:0; }
+.recip-name{ font-size:14.5px; font-weight:600; }
+.recip-live{ font-size:11px; color:var(--emerald); font-weight:600; }
+.recip-method{ font-size:12px; display:flex; align-items:center; gap:7px; margin-top:2px; }
+.recip-again{ flex:none; }
+
+/* recipients row (variation C) */
+.recip-row-scroll{ display:flex; gap:14px; overflow-x:auto; padding:4px 2px 6px; }
+.recip-card{ flex:none; width:128px; background:#fff; border:1px solid var(--hair); border-radius:18px; padding:18px 12px 14px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:transform .18s, box-shadow .18s, border-color .18s; }
+.recip-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow-lift); border-color:var(--violet-2); }
+.recip-card-name{ font-size:14px; font-weight:600; margin-top:4px; }
+.recip-card-rel{ font-size:12px; }
+.recip-send{ margin-top:6px; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--rv); }
+.recip-send svg{ font-size:13px; }
+.recip-card-add{ justify-content:center; border-style:dashed; }
+.recip-add-circle{ width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--ash); color:var(--slate); display:grid; place-items:center; font-size:18px; }
+
+/* recents */
+.recent{ list-style:none; margin:0; padding:0; }
+.rrow{ display:flex; align-items:center; gap:13px; padding:13px 0; border-top:1px solid var(--hair); }
+.rrow:first-child{ border-top:0; }
+.rrow-main{ flex:1; min-width:0; }
+.rrow-name{ font-size:14.5px; font-weight:600; }
+.rrow-meta{ font-size:12px; display:flex; align-items:center; gap:7px; margin-top:2px; }
+.rrow-right{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+.rrow-inr{ font-size:16px; font-weight:700; letter-spacing:-.02em; }
+
+/* fx widget */
+.fx-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:6px; }
+.fx-rate-row{ display:flex; align-items:baseline; gap:9px; margin-top:5px; }
+.fx-pair{ font-size:12px; font-weight:600; }
+.fx-rate{ font-size:27px; font-weight:700; letter-spacing:-.02em; transition:color .4s; }
+.fx-rate.dir-up{ color:var(--emerald); }
+.fx-rate.dir-down{ color:#c0392b; }
+.fx-pause{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--hair); background:#fff; border-radius:999px; padding:5px 12px; font-size:12px; font-weight:600; color:var(--slate); cursor:pointer; font-family:inherit; }
+.fx-pause svg{ font-size:12px; color:var(--rv); }
+.fx-pause:hover{ border-color:var(--ash); }
+.spark{ display:block; margin:4px 0 12px; }
+.fx-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:12px; border-top:1px solid var(--hair); }
+.fx-badge{ display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--emerald); }
+.fx-badge svg{ font-size:13px; }
+
+/* kyc */
+.kyc-top{ display:flex; align-items:center; gap:13px; margin-bottom:16px; }
+.kyc-title{ font-size:15px; font-weight:600; display:flex; align-items:center; gap:7px; }
+.kyc-ok{ width:18px; height:18px; border-radius:50%; background:var(--emerald); color:#fff; display:grid; place-items:center; font-size:11px; }
+.kyc-sub{ font-size:12.5px; margin-top:2px; }
+.limitbar-wrap{ display:flex; flex-direction:column; gap:8px; }
+.limitbar-row{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; }
+.limitbar{ height:8px; border-radius:999px; background:var(--hair); overflow:hidden; }
+.limitbar>span{ display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--rv),#7a52ee); }
+
+/* trust footer */
+.trust{ padding:22px 4px 8px; }
+.trust-badges{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.trust-badge{ display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; color:var(--obs); }
+.trust-badge svg{ color:var(--emerald); font-size:15px; }
+.trust-dot{ color:var(--ash); }
+.trust-note{ font-size:12.5px; margin:9px 0 0; max-width:74ch; line-height:1.5; }
+
+/* ============ variation C hero band ============ */
+.c-hero{ position:relative; isolation:isolate; background:linear-gradient(180deg,#efeaff 0%, #f7f5ff 50%, var(--fog) 100%); border-bottom:1px solid var(--hair); }
+.c-hero-wash{ z-index:-1; background:
+  radial-gradient(70% 90% at 85% 0%, rgba(255,194,51,.16), transparent 60%),
+  radial-gradient(80% 100% at 8% 0%, rgba(84,35,231,.12), transparent 55%); }
+.c-hero-main{ padding-top:24px; padding-bottom:30px; }
+.c-body{ padding-top:26px; }
+
+/* at-compact (variation C) */
+.at-compact{ padding:22px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:13px; }
+.at-compact-head{ width:100%; display:flex; align-items:center; justify-content:space-between; }
+.at-compact-recipient{ display:flex; align-items:center; gap:11px; width:100%; }
+.at-compact-recipient .at-to{ font-size:15px; }
+.at-compact-amt{ width:100%; }
+.at-compact-inr{ font-size:30px; font-weight:700; letter-spacing:-.03em; display:block; margin-top:3px; }
+.at-compact-bar{ width:100%; height:7px; border-radius:999px; background:var(--hair); overflow:hidden; }
+.at-compact-bar>span{ display:block; height:100%; background:linear-gradient(90deg,#7a52ee,var(--rv)); transition:width 1s linear; }
+.at-compact-meta{ width:100%; display:flex; justify-content:space-between; font-size:12px; font-weight:600; }
+.at-compact-link{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; color:var(--rv); cursor:pointer; }
+.at-compact-link svg{ font-size:14px; }
+
+/* ============ rolling number (NumberFlow-style reels) ============ */
+.nf-root{ --nf-spring:linear(0, 0.0033 0.8%, 0.0263 2.39%, 0.0896 4.77%, 0.4676 15.12%, 0.5688, 0.6553, 0.7274, 0.7862, 0.8336 31.04%, 0.8793, 0.9132 38.99%, 0.9421 43.77%, 0.9642 49.34%, 0.9796 55.71%, 0.9893 62.87%, 0.9952 71.62%, 0.9983 82.76%, 0.9996 99.47%);
+  --nf-tdur:520ms; display:inline-flex; align-items:baseline; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.nf-root::before{ content:"0"; display:inline-block; width:0; overflow:hidden; visibility:hidden; }
+.nf-slot{ display:inline-block; height:1em; line-height:1; overflow:hidden; vertical-align:baseline; }
+.nf-reel{ display:flex; flex-direction:column; will-change:transform; transition:transform var(--nf-tdur) var(--nf-spring); }
+.nf-reel>span{ display:block; height:1em; line-height:1; text-align:center; }
+.nf-sep{ display:inline-block; height:1em; line-height:1; vertical-align:baseline; }
+@media (prefers-reduced-motion:reduce){
+  .nf-reel{ transition:none; }
+  .livedot, .step-pulse, .status.is-progress svg{ animation:none; }
+}
+
+/* ============ variation D — adaptive first row ============ */
+.adapt-row{ display:grid; gap:24px; align-items:stretch; min-height:529px;
+  grid-template-columns:minmax(0,1fr) 92px;
+  transition:grid-template-columns .55s cubic-bezier(.45,.05,.2,1); }
+.adapt-row.is-transfer{ grid-template-columns:92px minmax(0,1fr); }
+.adapt-pane{ position:relative; overflow:hidden; min-width:0; display:flex; }
+.adapt-full{ flex:1; min-width:640px; display:flex; }
+.adapt-full>section, .adapt-full>.adapt-composer-wrap{ width:100%; height:100%; }
+@keyframes adapt-fade{ from{ opacity:0; } to{ opacity:1; } }
+@media (prefers-reduced-motion:reduce){ .adapt-row{ transition:none; } .adapt-full{ animation:none; } }
+
+.adapt-composer-wrap{ position:relative; display:flex; }
+.adapt-composer-wrap .composer{ flex:1; justify-content:center; }
+.adapt-collapse-btn{ display:inline-flex; align-items:center; gap:4px; border:1px solid var(--hair);
+  background:#fff; color:var(--slate); border-radius:999px; padding:5px 12px 5px 9px; font-size:12px;
+  font-weight:600; cursor:pointer; font-family:inherit; transition:border-color .15s, color .15s; white-space:nowrap; }
+.adapt-collapse-btn:hover{ border-color:var(--ash); color:var(--obs); }
+.adapt-collapse-btn svg{ font-size:13px; transform:rotate(180deg); }
+.adapt-composer-wrap > .adapt-collapse-btn{ position:absolute; top:18px; right:18px; z-index:2; }
+.at-top-right{ display:flex; align-items:center; gap:12px; }
+
+/* slim collapsed tab */
+.adapt-tab{ width:100%; height:100%; border:1px solid var(--hair); border-radius:var(--r-card);
+  background:#fff; cursor:pointer; display:flex; flex-direction:column; align-items:center;
+  justify-content:space-between; padding:20px 0; gap:14px; font-family:inherit;
+  transition:transform .2s, box-shadow .2s, border-color .2s; }
+.adapt-tab:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lift); }
+.adapt-tab--live{ background:linear-gradient(180deg,#f1ecff 0%, #fbfaff 70%); border-color:var(--violet-2); }
+.adapt-tab--live:hover{ border-color:var(--rv); }
+.adapt-tab-icon{ width:42px; height:42px; border-radius:13px; display:grid; place-items:center; font-size:19px; flex:none; }
+.adapt-tab-icon.send{ background:var(--rv); color:#fff; box-shadow:0 8px 18px -8px rgba(84,35,231,.6); }
+.adapt-tab-icon.live{ background:#fff; border:1px solid var(--violet-2); }
+.adapt-tab-icon.live .livedot{ width:12px; height:12px; }
+.adapt-tab-label{ writing-mode:vertical-rl; transform:rotate(180deg); font-family:'Plus Jakarta Sans';
+  font-weight:700; font-size:15.5px; letter-spacing:.01em; color:var(--obs); white-space:nowrap; }
+.adapt-tab--live .adapt-tab-label{ color:var(--rv); }
+.adapt-tab-foot{ display:flex; flex-direction:column; align-items:center; gap:11px; }
+.adapt-tab-eta{ writing-mode:vertical-rl; transform:rotate(180deg); font-family:'Plus Jakarta Sans';
+  font-weight:700; font-size:13px; color:var(--rv); letter-spacing:.05em; }
+.adapt-tab-chev{ width:28px; height:28px; border-radius:50%; background:var(--fog); color:var(--slate);
+  display:grid; place-items:center; font-size:13px; }
+.adapt-tab-chev.rot{ background:var(--rv); color:#fff; transform:rotate(180deg); }
+
+/* ============ left sidebar (collapsible, dark) ============ */
+.dash-d.has-sidenav{ display:flex; align-items:flex-start; }
+.sidenav{ position:sticky; top:0; height:100vh; width:264px; flex:none; overflow:hidden;
+  background:#15151c; color:#fff; display:flex; flex-direction:column; z-index:30;
+  transition:width .34s cubic-bezier(.4,0,.2,1); }
+.sidenav-logo{ padding:26px 22px 20px; white-space:nowrap; }
+.sidenav-menu{ flex:1; padding:4px 16px; }
+.sidenav-eyebrow{ font-size:10.5px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:rgba(255,255,255,.4); padding:0 12px; margin-bottom:10px; white-space:nowrap; }
+.sidenav-item{ display:flex; align-items:center; gap:13px; padding:11px 14px; border-radius:14px;
+  font-size:15px; font-weight:500; color:rgba(255,255,255,.78); cursor:pointer; margin-bottom:3px;
+  transition:background .15s, color .15s; white-space:nowrap; }
+.sidenav-item:hover{ background:rgba(255,255,255,.07); color:#fff; }
+.sidenav-item.active{ background:var(--rv); color:#fff; font-weight:600;
+  box-shadow:0 10px 22px -12px rgba(84,35,231,.9); }
+.sidenav-ico{ width:20px; display:inline-grid; place-items:center; font-size:15px; flex:none; }
+.sidenav-lbl{ transition:opacity .2s ease; }
+.sidenav-user{ display:flex; align-items:center; gap:12px; padding:16px 20px;
+  border-top:1px solid rgba(255,255,255,.1); margin-top:auto; white-space:nowrap; }
+.sidenav-user-name{ font-size:14px; font-weight:600; line-height:1.15; }
+.sidenav-user-city{ font-size:12px; color:rgba(255,255,255,.55); line-height:1.2; }
+.dash-content{ flex:1; min-width:0; }
+
+/* collapsed rail (manual toggle OR small screens) */
+.sidenav.is-collapsed{ width:74px; }
+.sidenav.is-collapsed .sidenav-item{ justify-content:center; gap:0; padding:11px 0; }
+.sidenav.is-collapsed .sidenav-lbl,
+.sidenav.is-collapsed .sidenav-eyebrow,
+.sidenav.is-collapsed .sidenav-user-txt,
+.sidenav.is-collapsed .ax-logo-word{ display:none; }
+.sidenav.is-collapsed .sidenav-logo{ padding:24px 0 18px; display:flex; justify-content:center; }
+.sidenav.is-collapsed .sidenav-user{ justify-content:center; padding:16px 0; }
+
+/* slim top bar */
+.dash-topbar{ height:64px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:0 28px; background:rgba(255,255,255,.78); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--hair); position:sticky; top:0; z-index:20; }
+.topbar-right{ display:flex; align-items:center; gap:14px; }
+.nav-toggle{ width:40px; height:40px; border-radius:12px; border:1px solid var(--hair); background:#fff;
+  color:var(--slate); display:grid; place-items:center; cursor:pointer; transition:color .15s, border-color .15s; }
+.nav-toggle:hover{ color:var(--obs); border-color:var(--ash); }
+.nav-toggle svg{ transition:transform .34s cubic-bezier(.4,0,.2,1); }
+
+/* ============ responsive ============ */
+@media (max-width:1080px){
+  .grid-split, .grid-bottom, .grid-command, .grid-funnel{ grid-template-columns:1fr; }
+  .at-amount{ font-size:44px; }
+  .navlinks{ display:none; }
+}
+@media (max-width:980px){
+  .sidenav{ width:74px; }
+  .sidenav-item{ justify-content:center; gap:0; padding:11px 0; }
+  .sidenav-lbl, .sidenav-eyebrow, .sidenav-user-txt, .ax-logo-word{ display:none; }
+  .sidenav-logo{ padding:24px 0 18px; display:flex; justify-content:center; }
+  .sidenav-user{ justify-content:center; padding:16px 0; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- ============================ engine ============================ -->
+<script type="text/babel" data-presets="react">
+/* AtomX Pay — shared live engine + formatting + rolling-digit number. */
+
+// ---------- formatting ----------
+const USD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+const USD0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const INR = new Intl.NumberFormat('en-IN'); // lakh/crore grouping
+function fmtUSD(n) { return USD.format(n); }
+function fmtUSD0(n) { return USD0.format(n); }
+function fmtINR(n) { return '₹' + INR.format(Math.round(n)); }
+function fmtRate(n) { return n.toFixed(4); }
+function pad2(n) { return String(n).padStart(2, '0'); }
+function mmss(total) { const m = Math.floor(total / 60); const s = total % 60; return m + ':' + pad2(s); }
+
+// ---------- rolling-digit number (vanilla port of @number-flow, in React) ----------
+function RollingNumber({ value, className, style }) {
+  const chars = String(value).split('');
+  return (
+    <span className={'nf-root ' + (className || '')} style={style}>
+      {chars.map((ch, i) => {
+        const offset = chars.length - 1 - i;
+        const isDigit = ch >= '0' && ch <= '9';
+        return isDigit
+          ? <DigitReel key={'d' + offset} digit={+ch} />
+          : <span key={'s' + offset + ch} className="nf-sep">{ch}</span>;
+      })}
+    </span>
+  );
+}
+function DigitReel({ digit }) {
+  return (
+    <span className="nf-slot">
+      <span className="nf-reel" style={{ transform: 'translateY(' + (-digit) + 'em)' }}>
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => <span key={d}>{d}</span>)}
+      </span>
+    </span>
+  );
+}
+
+// ---------- live engine context ----------
+const AtomXCtx = React.createContext(null);
+const useAtomX = () => React.useContext(AtomXCtx);
+
+const BASE_RATE = 95.3820;
+const LOCKED_RATE = 95.3820;       // rate locked on the active transfer
+const ACTIVE_USD = 1200;            // amount sent on the active transfer
+const TOTAL_ETA = 15 * 60;          // 15-minute promise, in seconds
+const START_ETA = 9 * 60;           // active transfer currently ~9 min out
+
+function AtomXProvider({ children }) {
+  const [rate, setRate] = React.useState(BASE_RATE);
+  const [paused, setPaused] = React.useState(false);
+  const [dir, setDir] = React.useState('flat');
+  const [eta, setEta] = React.useState(START_ETA);
+  const [history, setHistory] = React.useState(() => {
+    const arr = []; let r = BASE_RATE - 0.18;
+    for (let i = 0; i < 32; i++) { r += (Math.random() - 0.45) * 0.05; arr.push(r); }
+    arr.push(BASE_RATE);
+    return arr;
+  });
+  const pausedRef = React.useRef(paused);
+  pausedRef.current = paused;
+
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      if (pausedRef.current) return;
+      setRate((prev) => {
+        let next = prev + (Math.random() - 0.5) * 0.05;
+        next += (BASE_RATE - next) * 0.06;
+        next = Math.round(next * 10000) / 10000;
+        setDir(next > prev ? 'up' : next < prev ? 'down' : 'flat');
+        setHistory((h) => [...h.slice(-39), next]);
+        return next;
+      });
+    }, 3200);
+    return () => clearInterval(id);
+  }, []);
+
+  React.useEffect(() => {
+    const id = setInterval(() => setEta((e) => (e > 0 ? e - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const elapsed = TOTAL_ETA - eta;
+  const progress = Math.min(1, Math.max(0, elapsed / TOTAL_ETA));
+  let stage = 2;
+  if (eta <= 0) stage = 3;
+
+  const receiveINR = Math.round(ACTIVE_USD * LOCKED_RATE);
+
+  const value = {
+    rate, dir, paused, setPaused, history,
+    eta, etaText: mmss(eta), progress, stage, delivered: stage === 3,
+    lockedRate: LOCKED_RATE, activeUSD: ACTIVE_USD, receiveINR,
+    fee: 4, minFee: 2,
+  };
+  return <AtomXCtx.Provider value={value}>{children}</AtomXCtx.Provider>;
+}
+
+Object.assign(window, {
+  fmtUSD, fmtUSD0, fmtINR, fmtRate, mmss, pad2,
+  RollingNumber, DigitReel,
+  AtomXCtx, useAtomX, AtomXProvider,
+  BASE_RATE, LOCKED_RATE,
+});
+</script>
+
+<!-- ============================ parts ============================ -->
+<script type="text/babel" data-presets="react">
+/* AtomX Pay — shared dashboard parts. */
+
+// ---------------- data ----------------
+const RECIPIENTS = [
+  { name: 'Priya Sharma',  rel: 'Sister',  method: 'UPI',         handle: 'priya@okhdfc',  color: '#5423e7', active: true },
+  { name: 'Sunita Kumar',  rel: 'Mother',  method: 'UPI',         handle: 'sunita@okaxis',  color: '#1e874c' },
+  { name: 'Aarav Mehta',   rel: 'Brother', method: 'Bank · HDFC', handle: '•••• 4821',      color: '#d9772e' },
+  { name: 'Lakshmi Iyer',  rel: 'Aunt',    method: 'Bank · ICICI',handle: '•••• 7720',      color: '#c0398a' },
+  { name: 'Vikram Rao',    rel: 'Father',  method: 'UPI',         handle: 'vikram@oksbi',   color: '#2563c9' },
+];
+const RECENTS = [
+  { name: 'Priya Sharma', inr: 114456, usd: 1200, status: 'progress',  date: 'Today · 7:33 PM', method: 'UPI' },
+  { name: 'Aarav Mehta',  inr: 46500,  usd: 488,  status: 'delivered', date: 'Jun 12',          method: 'HDFC' },
+  { name: 'Lakshmi Iyer', inr: 78900,  usd: 828,  status: 'delivered', date: 'Jun 8',           method: 'ICICI' },
+  { name: 'Sunita Kumar', inr: 23850,  usd: 250,  status: 'delivered', date: 'Jun 1',           method: 'UPI' },
+  { name: 'Vikram Rao',   inr: 190760, usd: 2000, status: 'delivered', date: 'May 24',          method: 'UPI' },
+];
+const STEPS = [
+  { label: 'Funded',        sub: 'From Chase ••3401', time: '7:31 PM' },
+  { label: 'Rate locked',   sub: '0% markup, 15-min lock', time: '7:31 PM' },
+  { label: 'Sent to bank',  sub: 'Via FIU-IND partner', time: '7:33 PM' },
+  { label: 'Delivered',     sub: 'To Priya’s UPI', time: null },
+];
+
+function initials(name) { return name.split(' ').map((w) => w[0]).slice(0, 2).join(''); }
+
+// ---------------- icons ----------------
+const I = {
+  check: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  clock: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><circle cx="8" cy="8" r="6.2" stroke="currentColor" strokeWidth="1.6"/><path d="M8 4.6V8l2.4 1.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  x: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  arrow: (p) => <svg viewBox="0 0 20 20" width="1em" height="1em" fill="none" {...p}><path d="M4 10h11M11 5.5l5 4.5-5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  shield: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M8 1.6l5 1.8v4c0 3.2-2.1 5.6-5 6.9-2.9-1.3-5-3.7-5-6.9v-4l5-1.8z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/><path d="M5.6 8l1.7 1.7L10.6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  bolt: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M9 1.5L3.5 9H8l-1 5.5L12.5 7H8l1-5.5z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>,
+  plus: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
+  pause: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" {...p}><rect x="4" y="3.5" width="2.6" height="9" rx="1"/><rect x="9.4" y="3.5" width="2.6" height="9" rx="1"/></svg>,
+  play: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" {...p}><path d="M5 3.6l7 4.4-7 4.4z"/></svg>,
+  chevron: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  grid: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><rect x="2" y="2" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><rect x="9" y="2" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><rect x="2" y="9" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><rect x="9" y="9" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/></svg>,
+};
+
+// ---------------- atoms ----------------
+function Logo({ light }) {
+  return (
+    <span className={'ax-logo' + (light ? ' is-light' : '')}>
+      <span className="ax-logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 28 28" width="28" height="28" fill="none">
+          <circle cx="14" cy="14" r="3.1" fill="currentColor"/>
+          <g stroke="currentColor" strokeWidth="1.5" opacity="0.9">
+            <ellipse cx="14" cy="14" rx="12" ry="5"/>
+            <ellipse cx="14" cy="14" rx="12" ry="5" transform="rotate(60 14 14)"/>
+            <ellipse cx="14" cy="14" rx="12" ry="5" transform="rotate(120 14 14)"/>
+          </g>
+        </svg>
+      </span>
+      <span className="ax-logo-word">AtomX<span className="ax-logo-pay"> Pay</span></span>
+    </span>
+  );
+}
+
+function Avatar({ name, color, size = 40, ring }) {
+  return (
+    <span className="avatar" style={{ width: size, height: size, background: color || '#5423e7', fontSize: size * 0.36, boxShadow: ring ? '0 0 0 3px #fff, 0 0 0 5px ' + (color || '#5423e7') : undefined }}>
+      {initials(name)}
+    </span>
+  );
+}
+
+function MethodTag({ method }) {
+  const bank = method.startsWith('Bank');
+  return <span className={'methodtag ' + (bank ? 'is-bank' : 'is-upi')}>{bank ? method.replace('Bank · ', '') : 'UPI'}</span>;
+}
+
+function StatusPill({ status, size }) {
+  const map = {
+    delivered: { cls: 'is-delivered', icon: <I.check />, label: 'Delivered' },
+    progress:  { cls: 'is-progress',  icon: <I.clock />, label: 'In progress' },
+    failed:    { cls: 'is-failed',    icon: <I.x />,     label: 'Failed' },
+  };
+  const s = map[status] || map.progress;
+  return <span className={'status ' + s.cls + (size === 'lg' ? ' status-lg' : '')}>{s.icon}<span>{s.label}</span></span>;
+}
+
+// ---------------- top nav ----------------
+function TopNav({ active = 'Dashboard' }) {
+  const a = useAtomX();
+  const items = [
+    { name: 'Dashboard', icon: <I.grid /> },
+    { name: 'Send money', icon: <I.arrow /> },
+    { name: 'Recipients' },
+    { name: 'Transactions' },
+  ];
+  return (
+    <header className="topnav">
+      <div className="topnav-inner">
+        <div className="topnav-left">
+          <Logo />
+          <nav className="navlinks">
+            {items.map((it) => (
+              <a key={it.name} className={'navlink' + (it.name === active ? ' active' : '')}>{it.name}</a>
+            ))}
+          </nav>
+        </div>
+        <div className="topnav-right">
+          <div className="nav-rate">
+            <span className="livedot" /> <span className="muted">1 USD =</span>
+            <RollingNumber className="num ink" value={'₹' + fmtRate(a.rate)} />
+          </div>
+          <button className="iconbtn" title="Notifications" aria-label="Notifications">
+            <svg viewBox="0 0 18 18" width="18" height="18" fill="none"><path d="M5 7.5a4 4 0 018 0c0 3 1.2 4 1.2 4H3.8S5 10.5 5 7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7.4 14.4a1.7 1.7 0 003.2 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          </button>
+          <div className="userchip">
+            <Avatar name="Ananya Sharma" color="#121217" size={34} />
+            <div className="userchip-txt">
+              <div className="userchip-name">Ananya Sharma</div>
+              <div className="userchip-city">San Jose, CA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// ---------------- greeting ----------------
+function Greeting({ variant }) {
+  const a = useAtomX();
+  return (
+    <div className={'greet greet-' + (variant || 'default')}>
+      <div className="greet-row">
+        <div>
+          <div className="eyebrow muted">Good evening</div>
+          <h1 className="greet-h font-display">Welcome back, Ananya</h1>
+          <p className="greet-sub">
+            Your transfer to <strong>Priya</strong> is on its way — arriving in about{' '}
+            <strong className="ink">{Math.max(1, Math.ceil(a.eta / 60))} minutes</strong>.
+          </p>
+        </div>
+        {variant === 'kpiline' && <KpiInline />}
+        {variant !== 'kpiline' && (
+          <div className="kyc-chip">
+            <span className="kyc-badge"><I.shield /></span>
+            <div>
+              <div className="kyc-chip-t">Identity verified</div>
+              <div className="kyc-chip-s muted">KYC complete</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------- KPIs ----------------
+const KPIS = [
+  { num: '$4,820', label: 'Sent this month', ctx: 'across 6 transfers', accent: false },
+  { num: '5', label: 'Saved recipients', ctx: '4 on UPI · 1 on bank', accent: false },
+  { num: '14 min', label: 'Avg. delivery time', ctx: 'last 30 days', accent: true },
+];
+function KpiCard({ k }) {
+  return (
+    <div className="kpi card">
+      <div className="kpi-label eyebrow muted">{k.label}</div>
+      <div className={'kpi-num font-display num' + (k.accent ? ' is-accent' : '')}>{k.num}</div>
+      <div className="kpi-ctx muted">{k.ctx}</div>
+    </div>
+  );
+}
+function KpiRow() {
+  return <div className="kpi-row">{KPIS.map((k) => <KpiCard key={k.label} k={k} />)}</div>;
+}
+function KpiInline() {
+  return (
+    <div className="kpi-inline">
+      {KPIS.map((k) => (
+        <div key={k.label} className="kpi-inline-item">
+          <div className={'kpi-inline-num font-display num' + (k.accent ? ' is-accent' : '')}>{k.num}</div>
+          <div className="kpi-inline-label muted">{k.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------- ring countdown ----------------
+function RingCountdown({ size = 168 }) {
+  const a = useAtomX();
+  const stroke = 12;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const off = c * (1 - a.progress);
+  return (
+    <div className="ring" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="ring-svg">
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="#ece9fb" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="#5423e7" strokeWidth={stroke} fill="none"
+          strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`} className="ring-prog" />
+      </svg>
+      <div className="ring-center">
+        <div className="ring-eyebrow eyebrow">Arrives in</div>
+        <RollingNumber className="ring-time font-display num" value={a.etaText} />
+        <div className="ring-min muted">minutes</div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- step tracker ----------------
+function StepTracker({ orientation = 'horizontal' }) {
+  const a = useAtomX();
+  return (
+    <ol className={'track track-' + orientation}>
+      {STEPS.map((s, i) => {
+        const state = i < a.stage ? 'done' : i === a.stage ? 'active' : 'pending';
+        const time = i === 3 && a.stage < 3 ? '~' + Math.max(1, Math.ceil(a.eta / 60)) + ' min' : s.time;
+        return (
+          <li key={s.label} className={'step is-' + state}>
+            <span className="step-rail" aria-hidden="true" />
+            <span className="step-dot">{state === 'done' ? <I.check /> : state === 'active' ? <span className="step-pulse" /> : null}</span>
+            <span className="step-body">
+              <span className="step-label">{s.label}</span>
+              <span className="step-sub muted">{s.sub}</span>
+            </span>
+            <span className={'step-time num' + (state === 'active' ? ' is-live' : '')}>{time || '—'}</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+// ---------------- active transfer hero ----------------
+function MetaStrip() {
+  const a = useAtomX();
+  return (
+    <div className="at-meta">
+      <div className="meta-item">
+        <div className="meta-k eyebrow muted">Locked rate</div>
+        <div className="meta-v num">1 USD = ₹{fmtRate(a.lockedRate)}</div>
+      </div>
+      <div className="meta-item">
+        <div className="meta-k eyebrow muted">Flat fee</div>
+        <div className="meta-v num accent">{fmtUSD(a.fee)}</div>
+      </div>
+      <div className="meta-item">
+        <div className="meta-k eyebrow muted">You sent</div>
+        <div className="meta-v num">{fmtUSD0(a.activeUSD)}</div>
+      </div>
+      <div className="meta-item">
+        <div className="meta-k eyebrow muted">Reference</div>
+        <div className="meta-v num">AXP-7K2M-9QD4</div>
+      </div>
+    </div>
+  );
+}
+
+function ActiveTransferHero({ variant = 'ring', collapsible, onCollapse }) {
+  const a = useAtomX();
+  return (
+    <section className={'at-hero card at-' + variant}>
+      <div className="at-top">
+        <div className="at-head">
+          <span className="at-flag">LIVE TRANSFER</span>
+          <div className="at-recipient">
+            <Avatar name="Priya Sharma" color="#5423e7" size={44} />
+            <div>
+              <div className="at-to">To Priya Sharma <span className="muted">· Sister</span></div>
+              <div className="at-method muted"><MethodTag method="UPI" /> priya@okhdfc</div>
+            </div>
+          </div>
+        </div>
+        <div className="at-top-right">
+          <StatusPill status={a.delivered ? 'delivered' : 'progress'} size="lg" />
+          {collapsible && (
+            <button className="adapt-collapse-btn" onClick={onCollapse} title="Minimize live transfer">
+              <I.chevron /> <span>Minimize</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="at-mid">
+        <div className="at-amount-block">
+          <div className="eyebrow muted">Priya receives</div>
+          <div className="at-amount font-display num">{fmtINR(a.receiveINR)}</div>
+          <div className="at-amount-sub muted">Exactly this — locked the moment you confirmed.</div>
+          <div className="at-progressbar"><span style={{ width: (a.progress * 100).toFixed(2) + '%' }} /></div>
+          <div className="at-progress-cap muted"><I.bolt /> Settling on-chain · {(a.progress * 100).toFixed(0)}% of the way home</div>
+        </div>
+        {variant === 'ring' && <RingCountdown />}
+      </div>
+
+      {variant === 'ring'
+        ? <StepTracker orientation="horizontal" />
+        : (
+          <div className="at-timeline-wrap">
+            <div className="at-timeline-eta">
+              <I.clock /> <span className="muted">Arrives in</span>
+              <RollingNumber className="at-eta-inline font-display num" value={a.etaText} />
+              <span className="muted">min</span>
+            </div>
+            <StepTracker orientation="vertical" />
+          </div>
+        )}
+
+      <MetaStrip />
+    </section>
+  );
+}
+
+// ---------------- send panel / composer ----------------
+function SendPanel({ compact }) {
+  return (
+    <section className={'send-cta card-violet' + (compact ? ' is-compact' : '')}>
+      <div className="hero-wash" aria-hidden="true" />
+      <div className="send-cta-body">
+        <div className="send-eyebrow eyebrow">Send money home</div>
+        <h2 className="send-h font-display">It’s almost home.<br/>Send the next one?</h2>
+        <p className="send-sub">Live mid-market rate · 0% markup · $4 flat fee. Most transfers land in ~15 minutes.</p>
+        <a className="btn btn-lemon send-btn"><span>Send to India</span><I.arrow /></a>
+        <div className="send-quick">
+          <span className="muted send-quick-label">Send again</span>
+          <div className="send-quick-avatars">
+            {RECIPIENTS.slice(0, 4).map((r) => (
+              <button key={r.name} className="quick-av" title={'Send again to ' + r.name}>
+                <Avatar name={r.name} color={r.color} size={38} />
+              </button>
+            ))}
+            <button className="quick-av quick-add" title="Add recipient"><I.plus /></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SendComposer() {
+  const a = useAtomX();
+  const [usd, setUsd] = React.useState(500);
+  const receive = Math.round(usd * a.rate);
+  const presets = [200, 500, 1000, 2500];
+  return (
+    <section className="composer card">
+      <div className="composer-head">
+        <div className="composer-title font-display">Send to India</div>
+        <div className="nav-rate"><span className="livedot" /><span className="muted">Live rate</span></div>
+      </div>
+      <div className="composer-legs">
+        <div className="leg">
+          <div className="leg-top"><span className="eyebrow muted">You send</span><span className="leg-cur">🇺🇸 USD</span></div>
+          <div className="leg-amt num font-display">{fmtUSD0(usd)}</div>
+        </div>
+        <div className="composer-arrow"><I.arrow /></div>
+        <div className="leg leg-receive">
+          <div className="leg-top"><span className="eyebrow muted">They receive</span><span className="leg-cur">🇮🇳 INR</span></div>
+          <RollingNumber className="leg-amt num font-display accent" value={fmtINR(receive)} />
+        </div>
+      </div>
+      <div className="composer-presets">
+        {presets.map((p) => (
+          <button key={p} className={'chip num' + (p === usd ? ' on' : '')} onClick={() => setUsd(p)}>{fmtUSD0(p)}</button>
+        ))}
+      </div>
+      <div className="composer-break">
+        <div><span className="muted">Rate</span><span className="num">₹{fmtRate(a.rate)}</span></div>
+        <div><span className="muted">Flat fee</span><span className="num accent">$4.00</span></div>
+        <div><span className="muted">Arrives</span><span className="num">~15 min</span></div>
+      </div>
+      <a className="btn btn-violet composer-btn"><span>Send to India</span><I.arrow /></a>
+    </section>
+  );
+}
+
+// ---------------- recipients ----------------
+function RecipientList({ variant = 'list', limit }) {
+  const list = limit ? RECIPIENTS.slice(0, limit) : RECIPIENTS;
+  if (variant === 'row') {
+    return (
+      <section className="card panel">
+        <PanelHead title="Saved recipients" action="Manage" />
+        <div className="recip-row-scroll">
+          {list.map((r) => (
+            <button key={r.name} className="recip-card">
+              <Avatar name={r.name} color={r.color} size={52} ring={r.active} />
+              <div className="recip-card-name">{r.name.split(' ')[0]}</div>
+              <div className="recip-card-rel muted">{r.rel}</div>
+              <span className="recip-send"><I.arrow /> Send</span>
+            </button>
+          ))}
+          <button className="recip-card recip-card-add"><span className="recip-add-circle"><I.plus /></span><div className="recip-card-name">Add new</div></button>
+        </div>
+      </section>
+    );
+  }
+  return (
+    <section className="card panel">
+      <PanelHead title="Saved recipients" action="Manage" />
+      <ul className="recip-list">
+        {list.map((r) => (
+          <li key={r.name} className="recip">
+            <Avatar name={r.name} color={r.color} size={42} />
+            <div className="recip-main">
+              <div className="recip-name">{r.name} {r.active && <span className="recip-live">• active</span>}</div>
+              <div className="recip-method muted"><MethodTag method={r.method} /> <span>{r.handle}</span></div>
+            </div>
+            <button className="btn btn-ghost recip-again"><I.arrow /> Send again</button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+// ---------------- recent transfers ----------------
+function RecentTransfers({ rows }) {
+  const data = rows ? RECENTS.slice(0, rows) : RECENTS;
+  return (
+    <section className="card panel">
+      <PanelHead title="Recent transfers" action="View all" />
+      <ul className="recent">
+        {data.map((r, i) => (
+          <li key={i} className="rrow">
+            <Avatar name={r.name} color={RECIPIENTS.find((x) => x.name === r.name)?.color || '#5423e7'} size={40} />
+            <div className="rrow-main">
+              <div className="rrow-name">{r.name}</div>
+              <div className="rrow-meta muted"><MethodTag method={r.method.startsWith('UPI') ? 'UPI' : 'Bank · ' + r.method} /> {r.date}</div>
+            </div>
+            <div className="rrow-right">
+              <div className="rrow-inr num font-display">{fmtINR(r.inr)}</div>
+              <StatusPill status={r.status} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+// ---------------- FX widget ----------------
+function Sparkline({ data, w = 260, h = 56 }) {
+  const min = Math.min(...data), max = Math.max(...data);
+  const rng = max - min || 1;
+  const pts = data.map((v, i) => [(i / (data.length - 1)) * w, h - 6 - ((v - min) / rng) * (h - 12)]);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const area = d + ` L ${w} ${h} L 0 ${h} Z`;
+  const last = pts[pts.length - 1];
+  return (
+    <svg className="spark" viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none">
+      <defs><linearGradient id="spk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#5423e7" stopOpacity="0.18"/><stop offset="1" stopColor="#5423e7" stopOpacity="0"/></linearGradient></defs>
+      <path d={area} fill="url(#spk)" />
+      <path d={d} fill="none" stroke="#5423e7" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx={last[0]} cy={last[1]} r="3.5" fill="#5423e7" stroke="#fff" strokeWidth="1.6" />
+    </svg>
+  );
+}
+function FxWidget() {
+  const a = useAtomX();
+  return (
+    <section className="card panel fx">
+      <div className="fx-head">
+        <div>
+          <div className="eyebrow muted">Live exchange rate</div>
+          <div className="fx-rate-row">
+            <span className="fx-pair muted">USD → INR</span>
+            <RollingNumber className={'fx-rate font-display num dir-' + a.dir} value={'₹' + fmtRate(a.rate)} />
+          </div>
+        </div>
+        <button className="fx-pause" onClick={() => a.setPaused(!a.paused)} title={a.paused ? 'Resume live updates' : 'Pause live updates'}>
+          {a.paused ? <I.play /> : <I.pause />}<span>{a.paused ? 'Paused' : 'Live'}</span>
+        </button>
+      </div>
+      <Sparkline data={a.history} />
+      <div className="fx-foot">
+        <span className="fx-badge"><I.check /> 0% markup</span>
+        <span className="num muted">$4 flat fee · $2 min</span>
+      </div>
+    </section>
+  );
+}
+
+// ---------------- KYC ----------------
+function KycCard({ inline }) {
+  const used = 4820, limit = 10000;
+  const pct = Math.round((used / limit) * 100);
+  return (
+    <section className={'card panel kyc' + (inline ? ' kyc-inline' : '')}>
+      <div className="kyc-top">
+        <span className="kyc-badge lg"><I.shield /></span>
+        <div>
+          <div className="kyc-title">Identity verified <span className="kyc-ok"><I.check /></span></div>
+          <div className="muted kyc-sub">Sender & recipient KYC complete</div>
+        </div>
+      </div>
+      <div className="limitbar-wrap">
+        <div className="limitbar-row"><span className="muted">Monthly limit</span><span className="num"><strong className="ink">{fmtUSD0(used)}</strong> / {fmtUSD0(limit)}</span></div>
+        <div className="limitbar"><span style={{ width: pct + '%' }} /></div>
+      </div>
+    </section>
+  );
+}
+
+// ---------------- panel head + footer ----------------
+function PanelHead({ title, action }) {
+  return (
+    <div className="panel-head">
+      <h3 className="panel-title font-display">{title}</h3>
+      {action && <button className="panel-action">{action} <I.chevron /></button>}
+    </div>
+  );
+}
+function TrustFooter() {
+  return (
+    <footer className="trust">
+      <div className="trust-badges">
+        <span className="trust-badge"><I.shield /> MSB-licensed (US)</span>
+        <span className="trust-dot">·</span>
+        <span className="trust-badge"><I.shield /> FIU-registered (India)</span>
+      </div>
+      <p className="trust-note muted">Your money is safeguarded in segregated accounts with our regulated banking partners and never used for any other purpose. AML / CFT screening on every transfer.</p>
+    </footer>
+  );
+}
+
+Object.assign(window, {
+  RECIPIENTS, RECENTS, STEPS, initials, I,
+  Logo, Avatar, MethodTag, StatusPill, TopNav, Greeting,
+  KpiCard, KpiRow, KpiInline, RingCountdown, StepTracker, MetaStrip,
+  ActiveTransferHero, SendPanel, SendComposer, RecipientList, RecentTransfers,
+  Sparkline, FxWidget, KycCard, PanelHead, TrustFooter,
+});
+</script>
+
+<!-- ============================ variation D ============================ -->
+<script type="text/babel" data-presets="react">
+/* AtomX Pay — VARIATION D "Adaptive" (based on C). First row is a pair of
+   panels that expand/collapse: one is always full, the other a slim clickable
+   tab. No gap — the row always fills. Default: Send composer open, Live
+   transfer tabbed. */
+
+function CollapsedTab({ kind, onClick }) {
+  const a = useAtomX();
+  if (kind === 'transfer') {
+    return (
+      <button className="adapt-tab adapt-tab--live" onClick={onClick} title="Open live transfer" aria-label="Expand live transfer">
+        <span className="adapt-tab-icon live"><span className="livedot" /></span>
+        <span className="adapt-tab-label">Live transfer</span>
+        <span className="adapt-tab-foot">
+          <span className="adapt-tab-eta num">{a.etaText}</span>
+          <span className="adapt-tab-chev rot"><I.chevron /></span>
+        </span>
+      </button>
+    );
+  }
+  return (
+    <button className="adapt-tab adapt-tab--send" onClick={onClick} title="Open send composer" aria-label="Expand send to India">
+      <span className="adapt-tab-icon send"><I.arrow /></span>
+      <span className="adapt-tab-label">Send to India</span>
+      <span className="adapt-tab-foot"><span className="adapt-tab-chev"><I.chevron /></span></span>
+    </button>
+  );
+}
+
+function AdaptiveFirstRow() {
+  const [open, setOpen] = React.useState('send'); // 'send' | 'transfer'
+  return (
+    <div className={'adapt-row is-' + open}>
+      <div className="adapt-pane">
+        {open === 'send'
+          ? <div className="adapt-full" key="send-full"><AdaptiveComposer onCollapse={() => setOpen('transfer')} /></div>
+          : <CollapsedTab kind="send" onClick={() => setOpen('send')} />}
+      </div>
+      <div className="adapt-pane">
+        {open === 'transfer'
+          ? <div className="adapt-full" key="tr-full"><ActiveTransferHero variant="ring" collapsible onCollapse={() => setOpen('send')} /></div>
+          : <CollapsedTab kind="transfer" onClick={() => setOpen('transfer')} />}
+      </div>
+    </div>
+  );
+}
+
+function AdaptiveComposer({ onCollapse }) {
+  return (
+    <div className="adapt-composer-wrap">
+      <button className="adapt-collapse-btn" onClick={onCollapse} title="Minimize">
+        <I.chevron /> <span>Minimize</span>
+      </button>
+      <SendComposer />
+    </div>
+  );
+}
+
+// Left violet sidebar — primary navigation (replaces the top nav links).
+function SideNav({ active = 'Dashboard', collapsed }) {
+  const items = [
+    { name: 'Dashboard',    ico: '📍' },
+    { name: 'Send money',   ico: '↗' },
+    { name: 'Recipients',   ico: '👥' },
+    { name: 'Transactions', ico: '📋' },
+    { name: 'Profile',      ico: '⚙️' },
+  ];
+  return (
+    <aside className={'sidenav' + (collapsed ? ' is-collapsed' : '')}>
+      <div className="sidenav-logo"><Logo light /></div>
+      <nav className="sidenav-menu">
+        <div className="sidenav-eyebrow">Menu</div>
+        {items.map((it) => (
+          <a key={it.name} className={'sidenav-item' + (it.name === active ? ' active' : '')}>
+            <span className="sidenav-ico">{it.ico}</span>
+            <span className="sidenav-lbl">{it.name}</span>
+          </a>
+        ))}
+      </nav>
+      <div className="sidenav-user">
+        <Avatar name="Ananya Sharma" color="rgba(255,255,255,0.2)" size={40} />
+        <div className="sidenav-user-txt">
+          <div className="sidenav-user-name">Ananya Sharma</div>
+          <div className="sidenav-user-city">San Jose, CA</div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// Slim top bar inside the content column — sidebar toggle + live rate + notifications.
+function TopBar({ collapsed, onToggle }) {
+  const a = useAtomX();
+  return (
+    <div className="dash-topbar">
+      <button className="nav-toggle" onClick={onToggle}
+        title={collapsed ? 'Expand menu' : 'Collapse menu'} aria-label="Toggle menu" aria-expanded={!collapsed}>
+        <svg viewBox="0 0 18 18" width="18" height="18" fill="none" style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }}>
+          <path d="M11 4l-5 5 5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M15 4v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+      </button>
+      <div className="topbar-right">
+        <div className="nav-rate">
+          <span className="livedot" /> <span className="muted">1 USD =</span>
+          <RollingNumber className="num ink" value={'₹' + fmtRate(a.rate)} />
+        </div>
+        <button className="iconbtn" title="Notifications" aria-label="Notifications">
+          <svg viewBox="0 0 18 18" width="18" height="18" fill="none"><path d="M5 7.5a4 4 0 018 0c0 3 1.2 4 1.2 4H3.8S5 10.5 5 7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7.4 14.4a1.7 1.7 0 003.2 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function VariationD() {
+  const [collapsed, setCollapsed] = React.useState(false);
+  return (
+    <div className="ax dash dash-c dash-d has-sidenav">
+      <SideNav active="Dashboard" collapsed={collapsed} />
+      <div className="dash-content">
+        <TopBar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
+        <div className="c-hero">
+          <div className="hero-wash c-hero-wash" aria-hidden="true" />
+          <main className="dash-main c-hero-main">
+            <Greeting />
+            <AdaptiveFirstRow />
+          </main>
+        </div>
+        <main className="dash-main c-body">
+          <RecipientList variant="row" />
+          <KpiRow />
+          <div className="grid-bottom">
+            <RecentTransfers rows={4} />
+            <div className="bottom-rail">
+              <FxWidget />
+              <KycCard />
+            </div>
+          </div>
+          <TrustFooter />
+        </main>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { VariationD, AdaptiveFirstRow, CollapsedTab, AdaptiveComposer, SideNav, TopBar });
+</script>
+
+<!-- ============================ app ============================ -->
+<script type="text/babel" data-presets="react">
+  function App() {
+    return (
+      <AtomXProvider>
+        <VariationD />
+      </AtomXProvider>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

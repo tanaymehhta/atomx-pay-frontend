@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AtomX Pay — Blockchain section experiments (v11b)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rv: #5423e7;
+      --lemon: #ffc233;
+      --obs: #121217;
+      --emerald: #1e874c;
+      --paper: #ffffff;
+      --fog: #f7f7f8;
+      --slate: #6c6c89;
+      --ash: #d1d1db;
+      --violet-soft: #f4f0ff;
+      --hair: #ececf1;
+    }
+    .font-display { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    .font-body { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    .section { padding-top: 6rem; padding-bottom: 6rem; }
+    .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: 11px; font-weight: 700; }
+    .num { font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+    .card {
+      background: white; border-radius: 24px;
+      box-shadow: 0 4px 24px -8px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+    }
+
+    /* experiment label chrome (not part of the real design, just for this showcase) */
+    .exp-bar { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--hair); }
+    .exp-tag { background: var(--obs); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
+    .exp-divider { border-top: 1px dashed var(--ash); }
+
+    /* ---------- A: rail diagram ---------- */
+    .rail { position: relative; }
+    .node {
+      display: grid; place-items: center; text-align: center;
+      border-radius: 16px; font-weight: 600; font-size: 12.5px; line-height: 1.15;
+      padding: 10px 8px; min-height: 56px;
+    }
+    .node-bank { background: #fff; border: 1.5px solid var(--ash); color: var(--obs); }
+    .node-hop { background: var(--fog); border: 1.5px dashed var(--ash); color: var(--slate); }
+    .node-chain { background: var(--rv); border: 1.5px solid var(--rv); color: #fff; }
+    .node-payout { background: #fff; border: 1.5px solid var(--emerald); color: var(--emerald); }
+    .wire { height: 2px; background: var(--ash); position: relative; flex: 1; min-width: 14px; }
+    .wire-live { background: linear-gradient(90deg, rgba(84,35,231,.25), rgba(84,35,231,.55)); height: 2.5px; }
+    .pkt { position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; margin-top: -4.5px; }
+    .pkt-slow { background: var(--slate); left: 0; animation: travel 6.5s linear infinite; }
+    .pkt-fast { background: var(--rv); left: 0; box-shadow: 0 0 0 4px rgba(84,35,231,.18); animation: travel 1.6s cubic-bezier(.5,0,.5,1) infinite; }
+    @keyframes travel { 0% { left: 0; opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+    @media (prefers-reduced-motion: reduce){ .pkt { animation: none; opacity: .8; } }
+
+    /* ---------- C: receipt ---------- */
+    .trace-step { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+    .trace-dot { width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center; border: 2px solid var(--ash); color: transparent; font-size: 12px; transition: all .3s ease; }
+    .trace-step.done .trace-dot { background: var(--emerald); border-color: var(--emerald); color: #fff; }
+    .trace-step.active .trace-dot { border-color: var(--rv); box-shadow: 0 0 0 4px rgba(84,35,231,.14); }
+    .trace-line { width: 2px; background: var(--hair); margin-left: 10px; height: 14px; }
+    .trace-step.done + .trace-line { background: var(--emerald); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    /* ---------- D: crypto reassurance ---------- */
+    .reassure-row { display: flex; gap: 14px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--hair); }
+    .reassure-no { color: #b42318; font-weight: 700; flex: none; width: 20px; }
+    .reassure-yes { color: var(--emerald); font-weight: 700; flex: none; width: 20px; }
+  </style>
+</head>
+<body class="font-body bg-[#f7f7f8] text-[#121217]">
+
+<!-- Showcase bar (not part of the real page) -->
+<div class="exp-bar px-6 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <span class="exp-tag">Experiments</span>
+    <span class="text-sm text-[#6c6c89]">Blockchain emphasis for v11b. Four directions. v11b code untouched.</span>
+  </div>
+  <div class="hidden md:flex items-center gap-4 text-sm font-medium">
+    <a href="#a" class="text-[#5423e7]">A · Rail</a>
+    <a href="#b" class="text-[#5423e7]">B · Wrapper</a>
+    <a href="#c" class="text-[#5423e7]">C · Receipt</a>
+    <a href="#d" class="text-[#5423e7]">D · Not crypto</a>
+  </div>
+</div>
+
+<!-- =====================================================================
+     VARIATION A — "How the money actually moves" rail diagram
+     ===================================================================== -->
+<section id="a" class="section bg-white">
+  <div class="max-w-[1080px] mx-auto px-6">
+    <div class="text-center max-w-[640px] mx-auto">
+      <div class="eyebrow text-[#5423e7]">Direction A · The mechanism</div>
+      <h2 class="font-display text-4xl md:text-5xl tracking-[-1.5px] leading-[1] mt-3">See how the money actually moves.</h2>
+      <p class="mt-4 text-[17px] text-[#6c6c89]">Most transfers still crawl through a chain of banks that each take a cut. AtomX settles it in one direct hop on a blockchain rail. Same dollars in, more rupees out, far faster.</p>
+    </div>
+
+    <div class="mt-12 space-y-7">
+      <!-- Old way -->
+      <div class="card p-6 md:p-8" style="box-shadow:none; border:1px solid var(--hair); background:var(--fog);">
+        <div class="flex items-center justify-between mb-5">
+          <div class="font-semibold text-[#6c6c89]">The old way · correspondent banking</div>
+          <div class="num text-sm font-semibold text-[#b42318]">2 to 5 days</div>
+        </div>
+        <div class="rail flex items-center gap-1">
+          <div class="node node-bank w-[88px]">Your US bank</div>
+          <div class="wire"><span class="pkt pkt-slow"></span></div>
+          <div class="node node-hop w-[64px]">SWIFT</div>
+          <div class="wire"></div>
+          <div class="node node-hop w-[78px]">Correspondent bank</div>
+          <div class="wire"></div>
+          <div class="node node-hop w-[78px]">Correspondent bank</div>
+          <div class="wire"></div>
+          <div class="node node-hop w-[78px]">FX desk</div>
+          <div class="wire"></div>
+          <div class="node node-bank w-[84px]">Their bank</div>
+        </div>
+        <div class="mt-4 text-[13px] text-[#6c6c89]">A fee is skimmed at almost every hop, and the exchange rate is marked up where you cannot see it.</div>
+      </div>
+
+      <!-- AtomX way -->
+      <div class="card p-6 md:p-8" style="border:2px solid var(--rv);">
+        <div class="flex items-center justify-between mb-5">
+          <div class="font-semibold text-[#5423e7]">The AtomX way · direct blockchain settlement</div>
+          <div class="num text-sm font-semibold text-[#1e874c]">~15 minutes</div>
+        </div>
+        <div class="rail flex items-center gap-3">
+          <div class="node node-bank flex-1">Your US bank</div>
+          <div class="wire wire-live" style="min-width:120px;"><span class="pkt pkt-fast"></span></div>
+          <div class="node node-chain flex-1">Blockchain settlement<br><span class="text-[10px] font-normal opacity-80">on-chain, 24/7</span></div>
+          <div class="wire wire-live" style="min-width:120px;"><span class="pkt pkt-fast" style="animation-delay:.8s;"></span></div>
+          <div class="node node-payout flex-1">Their bank<br><span class="text-[10px] font-normal opacity-80">UPI · IMPS · RTGS</span></div>
+        </div>
+        <div class="mt-4 text-[13px] text-[#6c6c89]">One hop. Zero correspondent banks. The live market rate with a flat $4 fee, shown before you confirm.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="exp-divider"></div>
+
+<!-- =====================================================================
+     VARIATION B — "Everyone else is just a wrapper" infrastructure strip
+     ===================================================================== -->
+<section id="b" class="section" style="background:var(--fog);">
+  <div class="max-w-[1080px] mx-auto px-6">
+    <div class="text-center max-w-[660px] mx-auto">
+      <div class="eyebrow text-[#5423e7]">Direction B · The real difference</div>
+      <h2 class="font-display text-4xl md:text-5xl tracking-[-1.5px] leading-[1] mt-3">A nicer app is not new infrastructure.</h2>
+      <p class="mt-4 text-[17px] text-[#6c6c89]">Most "modern" transfer apps are a clean screen sitting on the same slow bank rails. AtomX is built on a different rail underneath.</p>
+    </div>
+
+    <div class="mt-12 grid md:grid-cols-3 gap-5">
+      <!-- Traditional -->
+      <div class="card p-7" style="box-shadow:none; border:1px solid var(--hair);">
+        <div class="eyebrow text-[#6c6c89]">Traditional banks</div>
+        <div class="font-display text-2xl font-semibold mt-2 tracking-[-.5px]">The old rail</div>
+        <ul class="mt-4 space-y-3 text-[14.5px] text-[#6c6c89]">
+          <li>Correspondent banking over SWIFT and ACH</li>
+          <li>3 to 5 banks in the middle</li>
+          <li>Banking hours only</li>
+          <li>Rates set with hidden margins</li>
+        </ul>
+      </div>
+      <!-- Fintech wrapper -->
+      <div class="card p-7" style="box-shadow:none; border:1px solid var(--hair);">
+        <div class="eyebrow text-[#6c6c89]">Other fintech apps</div>
+        <div class="font-display text-2xl font-semibold mt-2 tracking-[-.5px]">A wrapper on the old rail</div>
+        <ul class="mt-4 space-y-3 text-[14.5px] text-[#6c6c89]">
+          <li>A nice app over the same bank rails</li>
+          <li>Pre-loaded currency pools</li>
+          <li>Still 1 to 3 days, still bank-dependent</li>
+          <li>Fees often tucked into the FX rate</li>
+        </ul>
+      </div>
+      <!-- AtomX -->
+      <div class="card p-7" style="border:2px solid var(--rv);">
+        <div class="eyebrow text-[#5423e7]">AtomX Pay</div>
+        <div class="font-display text-2xl font-semibold mt-2 tracking-[-.5px] text-[#5423e7]">A new rail</div>
+        <ul class="mt-4 space-y-3 text-[14.5px] text-[#121217] font-medium">
+          <li>Native blockchain settlement protocol</li>
+          <li>Zero correspondent banks</li>
+          <li>Runs 24 hours, 7 days, 365 days</li>
+          <li>Live market rate, 0% markup, flat $4</li>
+        </ul>
+      </div>
+    </div>
+    <p class="text-center text-sm text-[#6c6c89] mt-7">The screen can look modern. The rail underneath is what actually makes it fast.</p>
+  </div>
+</section>
+
+<div class="exp-divider"></div>
+
+<!-- =====================================================================
+     VARIATION C — Live on-chain settlement receipt (makes "you can see it" real)
+     ===================================================================== -->
+<section id="c" class="section bg-white">
+  <div class="max-w-[1080px] mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="eyebrow text-[#5423e7]">Direction C · Proof you can see</div>
+      <h2 class="font-display text-4xl md:text-5xl tracking-[-1.5px] leading-[1] mt-3">A receipt you both can watch.</h2>
+      <p class="mt-4 text-[17px] text-[#6c6c89]">Because settlement happens on-chain, every stage is visible in real time. No more wondering where the money is. You see it leave, you see it land, and so does your family.</p>
+      <ul class="mt-6 space-y-3 text-[15px]">
+        <li class="flex gap-3"><span class="text-[#1e874c] font-bold">+</span> Each stage timestamped, nothing hidden</li>
+        <li class="flex gap-3"><span class="text-[#1e874c] font-bold">+</span> A shared reference both sides can check</li>
+        <li class="flex gap-3"><span class="text-[#1e874c] font-bold">+</span> Final and irreversible once confirmed</li>
+      </ul>
+    </div>
+
+    <!-- the receipt card -->
+    <div class="card p-7">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="eyebrow text-[#5423e7]">Settlement trace</div>
+          <div class="font-display text-2xl font-semibold mt-1">₹95,382 to Priya</div>
+        </div>
+        <div class="px-3 py-1 rounded-full text-xs font-semibold bg-[#eaf6ef] text-[#1e874c]" id="c-status">Settling</div>
+      </div>
+
+      <div class="mt-3 text-xs text-[#6c6c89] mono">ref AX-884291 · USD 1,000 · UPI</div>
+
+      <div class="mt-5" id="c-trace">
+        <div class="trace-step done"><div class="trace-dot">✓</div><div class="flex-1 flex justify-between text-sm"><span>Funded from US bank</span><span class="text-[#6c6c89] mono text-xs">14:22:04 EST</span></div></div>
+        <div class="trace-line"></div>
+        <div class="trace-step done"><div class="trace-dot">✓</div><div class="flex-1 flex justify-between text-sm"><span>Converted at live rate</span><span class="text-[#6c6c89] mono text-xs">14:22:39 EST</span></div></div>
+        <div class="trace-line"></div>
+        <div class="trace-step active"><div class="trace-dot">✓</div><div class="flex-1 flex justify-between text-sm"><span>Settling on-chain</span><span class="text-[#6c6c89] mono text-xs" id="c-conf">confirming</span></div></div>
+        <div class="trace-line"></div>
+        <div class="trace-step"><div class="trace-dot">✓</div><div class="flex-1 flex justify-between text-sm"><span>Delivered to UPI</span><span class="text-[#6c6c89] mono text-xs" id="c-eta">~9 min</span></div></div>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-[#ececf1] text-xs text-[#6c6c89]">
+        Confirmations <span class="mono text-[#121217]" id="c-blocks">3</span> · finalizes automatically
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="exp-divider"></div>
+
+<!-- =====================================================================
+     VARIATION D — "Is this crypto?" reassurance (defuses the fear)
+     ===================================================================== -->
+<section id="d" class="section" style="background:var(--fog);">
+  <div class="max-w-[820px] mx-auto px-6">
+    <div class="text-center">
+      <div class="eyebrow text-[#5423e7]">Direction D · The honest answer</div>
+      <h2 class="font-display text-4xl md:text-5xl tracking-[-1.5px] leading-[1] mt-3">Is this crypto? No.</h2>
+      <p class="mt-4 text-[17px] text-[#6c6c89]">You send US dollars. Your family receives Indian rupees. Blockchain is only the rail in the middle that makes it fast and transparent. You never touch a coin.</p>
+    </div>
+
+    <div class="card p-8 mt-10">
+      <div class="reassure-row">
+        <span class="reassure-no">✕</span>
+        <div><div class="font-semibold">No crypto wallet to set up</div><div class="text-[14.5px] text-[#6c6c89] mt-0.5">You link your normal US bank, the same as any app. Nothing new to manage.</div></div>
+      </div>
+      <div class="reassure-row">
+        <span class="reassure-no">✕</span>
+        <div><div class="font-semibold">No coins, no tokens, no price swings</div><div class="text-[14.5px] text-[#6c6c89] mt-0.5">Your money stays in regulated currency the whole way. It is never exposed to crypto volatility.</div></div>
+      </div>
+      <div class="reassure-row">
+        <span class="reassure-yes">✓</span>
+        <div><div class="font-semibold">Real dollars in, real rupees out</div><div class="text-[14.5px] text-[#6c6c89] mt-0.5">The exact INR amount is locked the moment you confirm. What you see is what they get.</div></div>
+      </div>
+      <div class="reassure-row" style="border-bottom:none;">
+        <span class="reassure-yes">✓</span>
+        <div><div class="font-semibold">Licensed and watched</div><div class="text-[14.5px] text-[#6c6c89] mt-0.5">MSB-licensed in the USA, FIU-registered in India, with full AML screening on every transfer.</div></div>
+      </div>
+    </div>
+    <p class="text-center text-[13px] text-[#6c6c89] mt-6">Built on blockchain. Backed by compliance.</p>
+  </div>
+</section>
+
+<footer class="bg-[#5423e7] text-white text-center py-10 text-sm">
+  <div class="opacity-80">Experiments only. None of this is wired into v11b yet.</div>
+</footer>
+
+<script>
+  // Variation C: tick up confirmations and flip the last stage to delivered, on a loop.
+  (function () {
+    var blocks = document.getElementById('c-blocks');
+    var conf = document.getElementById('c-conf');
+    var eta = document.getElementById('c-eta');
+    var status = document.getElementById('c-status');
+    var steps = document.querySelectorAll('#c-trace .trace-step');
+    var n = 3, mins = 9, delivered = false;
+    setInterval(function () {
+      if (delivered) return;
+      n += 1; if (blocks) blocks.textContent = n;
+      if (mins > 1 && n % 2 === 0) { mins -= 1; if (eta) eta.textContent = '~' + mins + ' min'; }
+      if (conf) conf.textContent = n + ' conf';
+      if (n >= 12) {
+        delivered = true;
+        steps[3].classList.add('done');
+        if (eta) eta.textContent = 'just now';
+        if (conf) conf.textContent = 'final';
+        if (status) { status.textContent = 'Delivered'; }
+      }
+    }, 1400);
+  })();
+</script>
+</body>
+</html>
