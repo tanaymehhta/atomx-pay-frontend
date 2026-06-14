@@ -343,16 +343,27 @@ html,body{ margin:0; background:var(--fog); }
   .livedot, .step-pulse, .status.is-progress svg{ animation:none; }
 }
 
-/* ============ variation D — adaptive first row ============ */
-.adapt-row{ display:grid; gap:24px; align-items:stretch; min-height:529px;
-  grid-template-columns:minmax(0,1fr) 92px;
-  transition:grid-template-columns .55s cubic-bezier(.45,.05,.2,1); }
-.adapt-row.is-transfer{ grid-template-columns:92px minmax(0,1fr); }
-.adapt-pane{ position:relative; overflow:hidden; min-width:0; display:flex; }
-.adapt-full{ flex:1; min-width:640px; display:flex; }
-.adapt-full>section, .adapt-full>.adapt-composer-wrap{ width:100%; height:100%; }
-@keyframes adapt-fade{ from{ opacity:0; } to{ opacity:1; } }
-@media (prefers-reduced-motion:reduce){ .adapt-row{ transition:none; } .adapt-full{ animation:none; } }
+/* ============ variation D — adaptive resizable first row ============ */
+.adapt-split{ display:flex; align-items:stretch; min-height:444px; }
+.adapt-pane{ position:relative; min-width:0; flex-grow:0; flex-shrink:0; display:flex;
+  transition:flex-basis .42s cubic-bezier(.45,.05,.2,1); }
+.adapt-split.is-dragging{ user-select:none; }
+.adapt-split.is-dragging .adapt-pane{ transition:none; }
+.adapt-slot{ flex:1; min-width:0; display:flex; }
+.adapt-slot > *{ flex:1; min-width:0; width:100%; }
+.adapt-slot > section, .adapt-slot > .adapt-composer-wrap{ height:100%; }
+.adapt-slot.is-tab{ animation:adapt-fade .3s ease both; }
+@keyframes adapt-fade{ from{ opacity:0; transform:scale(.985); } to{ opacity:1; transform:none; } }
+
+/* drag handle */
+.adapt-handle{ flex:none; width:26px; align-self:stretch; cursor:col-resize; display:grid; place-items:center;
+  touch-action:none; position:relative; }
+.adapt-grip{ width:7px; height:54px; border-radius:999px; background:var(--hair); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px; transition:background .18s, height .18s, width .18s; }
+.adapt-grip i{ width:3px; height:3px; border-radius:50%; background:var(--slate); opacity:.55; transition:background .18s; }
+.adapt-handle:hover .adapt-grip, .is-dragging .adapt-grip{ background:var(--rv); height:64px; width:8px; }
+.adapt-handle:hover .adapt-grip i, .is-dragging .adapt-grip i{ background:#fff; opacity:.95; }
+.adapt-handle::after{ content:""; position:absolute; inset:0 -6px; }
 
 .adapt-composer-wrap{ position:relative; display:flex; }
 .adapt-composer-wrap .composer{ flex:1; justify-content:center; }
@@ -364,83 +375,161 @@ html,body{ margin:0; background:var(--fog); }
 .adapt-composer-wrap > .adapt-collapse-btn{ position:absolute; top:18px; right:18px; z-index:2; }
 .at-top-right{ display:flex; align-items:center; gap:12px; }
 
-/* slim collapsed tab */
+/* compact live-transfer hero (used inside the split) */
+.at-hero--compact{ padding:22px 24px; gap:16px; }
+.at-hero--compact .at-amount{ font-size:42px; margin:4px 0 6px; }
+.at-hero--compact .at-progressbar{ margin:13px 0 8px; }
+.at-hero--compact .at-mid{ gap:20px; }
+.at-hero--compact .track-horizontal{ padding-top:16px; }
+.at-hero--compact .at-meta{ padding-top:14px; }
+.at-hero--compact .at-head{ gap:10px; }
+
+/* wider collapsed tab (vertical card) */
 .adapt-tab{ width:100%; height:100%; border:1px solid var(--hair); border-radius:var(--r-card);
-  background:#fff; cursor:pointer; display:flex; flex-direction:column; align-items:center;
-  justify-content:space-between; padding:20px 0; gap:14px; font-family:inherit;
-  transition:transform .2s, box-shadow .2s, border-color .2s; }
+  background:#fff; cursor:pointer; display:flex; flex-direction:column; align-items:stretch;
+  justify-content:space-between; padding:22px 20px; gap:18px; font-family:inherit; text-align:left;
+  transition:transform .2s, box-shadow .2s, border-color .2s; overflow:hidden; }
 .adapt-tab:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lift); }
-.adapt-tab--live{ background:linear-gradient(180deg,#f1ecff 0%, #fbfaff 70%); border-color:var(--violet-2); }
+.adapt-tab--live{ background:radial-gradient(120% 90% at 100% 0%, #f1ecff 0%, #fbfaff 55%); border-color:var(--violet-2); }
 .adapt-tab--live:hover{ border-color:var(--rv); }
+.adapt-tab--send:hover{ border-color:var(--ash); }
+.adapt-tab-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .adapt-tab-icon{ width:42px; height:42px; border-radius:13px; display:grid; place-items:center; font-size:19px; flex:none; }
 .adapt-tab-icon.send{ background:var(--rv); color:#fff; box-shadow:0 8px 18px -8px rgba(84,35,231,.6); }
 .adapt-tab-icon.live{ background:#fff; border:1px solid var(--violet-2); }
-.adapt-tab-icon.live .livedot{ width:12px; height:12px; }
-.adapt-tab-label{ writing-mode:vertical-rl; transform:rotate(180deg); font-family:'Plus Jakarta Sans';
-  font-weight:700; font-size:15.5px; letter-spacing:.01em; color:var(--obs); white-space:nowrap; }
-.adapt-tab--live .adapt-tab-label{ color:var(--rv); }
-.adapt-tab-foot{ display:flex; flex-direction:column; align-items:center; gap:11px; }
-.adapt-tab-eta{ writing-mode:vertical-rl; transform:rotate(180deg); font-family:'Plus Jakarta Sans';
-  font-weight:700; font-size:13px; color:var(--rv); letter-spacing:.05em; }
-.adapt-tab-chev{ width:28px; height:28px; border-radius:50%; background:var(--fog); color:var(--slate);
-  display:grid; place-items:center; font-size:13px; }
-.adapt-tab-chev.rot{ background:var(--rv); color:#fff; transform:rotate(180deg); }
+.adapt-tab-icon.live .livedot{ width:13px; height:13px; }
+.adapt-tab-flag{ font-size:10.5px; font-weight:800; letter-spacing:.12em; color:var(--rv); background:var(--violet-soft); padding:4px 9px; border-radius:999px; }
+.adapt-tab-mid{ display:flex; flex-direction:column; gap:5px; }
+.adapt-tab-eyebrow{ color:var(--slate); }
+.adapt-tab-title{ font-size:18px; font-weight:700; letter-spacing:-.02em; color:var(--obs); line-height:1.12; }
+.adapt-tab--live .adapt-tab-title{ color:var(--rv); }
+.adapt-tab-eta{ font-size:24px; font-weight:700; letter-spacing:-.02em; color:var(--obs); margin-top:2px; }
+.adapt-tab-eta small{ font-size:12.5px; font-weight:600; color:var(--slate); letter-spacing:0; }
+.adapt-tab-sub{ font-size:12.5px; line-height:1.4; }
+.adapt-tab-cta{ display:flex; align-items:center; justify-content:space-between; gap:8px;
+  font-size:13px; font-weight:600; color:var(--rv); padding-top:14px; border-top:1px solid var(--hair); }
+.adapt-tab--send .adapt-tab-cta{ color:var(--obs); }
+.adapt-tab-chev{ width:30px; height:30px; border-radius:50%; background:var(--violet-soft); color:var(--rv);
+  display:grid; place-items:center; font-size:14px; flex:none; transition:background .18s, transform .18s; }
+.adapt-tab--send .adapt-tab-chev{ background:var(--fog); color:var(--obs); }
+.adapt-tab:hover .adapt-tab-chev{ transform:translateX(2px); }
 
-/* ============ left sidebar (collapsible, dark) ============ */
-.dash-d.has-sidenav{ display:flex; align-items:flex-start; }
-.sidenav{ position:sticky; top:0; height:100vh; width:264px; flex:none; overflow:hidden;
-  background:#15151c; color:#fff; display:flex; flex-direction:column; z-index:30;
-  transition:width .34s cubic-bezier(.4,0,.2,1); }
-.sidenav-logo{ padding:26px 22px 20px; white-space:nowrap; }
-.sidenav-menu{ flex:1; padding:4px 16px; }
-.sidenav-eyebrow{ font-size:10.5px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
-  color:rgba(255,255,255,.4); padding:0 12px; margin-bottom:10px; white-space:nowrap; }
-.sidenav-item{ display:flex; align-items:center; gap:13px; padding:11px 14px; border-radius:14px;
-  font-size:15px; font-weight:500; color:rgba(255,255,255,.78); cursor:pointer; margin-bottom:3px;
-  transition:background .15s, color .15s; white-space:nowrap; }
-.sidenav-item:hover{ background:rgba(255,255,255,.07); color:#fff; }
-.sidenav-item.active{ background:var(--rv); color:#fff; font-weight:600;
-  box-shadow:0 10px 22px -12px rgba(84,35,231,.9); }
-.sidenav-ico{ width:20px; display:inline-grid; place-items:center; font-size:15px; flex:none; }
-.sidenav-lbl{ transition:opacity .2s ease; }
-.sidenav-user{ display:flex; align-items:center; gap:12px; padding:16px 20px;
-  border-top:1px solid rgba(255,255,255,.1); margin-top:auto; white-space:nowrap; }
-.sidenav-user-name{ font-size:14px; font-weight:600; line-height:1.15; }
-.sidenav-user-city{ font-size:12px; color:rgba(255,255,255,.55); line-height:1.2; }
-.dash-content{ flex:1; min-width:0; }
+@media (prefers-reduced-motion:reduce){ .adapt-pane{ transition:none; } .adapt-slot.is-tab{ animation:none; } }
 
-/* collapsed rail (manual toggle OR small screens) */
-.sidenav.is-collapsed{ width:74px; }
-.sidenav.is-collapsed .sidenav-item{ justify-content:center; gap:0; padding:11px 0; }
-.sidenav.is-collapsed .sidenav-lbl,
-.sidenav.is-collapsed .sidenav-eyebrow,
-.sidenav.is-collapsed .sidenav-user-txt,
-.sidenav.is-collapsed .ax-logo-word{ display:none; }
-.sidenav.is-collapsed .sidenav-logo{ padding:24px 0 18px; display:flex; justify-content:center; }
-.sidenav.is-collapsed .sidenav-user{ justify-content:center; padding:16px 0; }
+/* ============ variation D — sidebar shell ============ */
+.shell{ display:grid; grid-template-columns:auto 1fr; align-items:stretch; background:var(--fog); }
+.shell-main{ min-width:0; display:flex; flex-direction:column; }
 
-/* slim top bar */
-.dash-topbar{ height:64px; display:flex; align-items:center; justify-content:space-between; gap:14px;
-  padding:0 28px; background:rgba(255,255,255,.78); backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--hair); position:sticky; top:0; z-index:20; }
-.topbar-right{ display:flex; align-items:center; gap:14px; }
-.nav-toggle{ width:40px; height:40px; border-radius:12px; border:1px solid var(--hair); background:#fff;
-  color:var(--slate); display:grid; place-items:center; cursor:pointer; transition:color .15s, border-color .15s; }
-.nav-toggle:hover{ color:var(--obs); border-color:var(--ash); }
-.nav-toggle svg{ transition:transform .34s cubic-bezier(.4,0,.2,1); }
+.sidebar{ width:256px; background:#fff; border-right:1px solid var(--hair); display:flex; flex-direction:column; justify-content:space-between; padding:24px 18px; gap:24px; overflow:hidden; transition:width .32s cubic-bezier(.4,0,.2,1), padding .32s cubic-bezier(.4,0,.2,1); }
+.nav-collapsed .sidebar{ width:78px; }
+.sidebar-logo{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 6px 0 10px; margin-bottom:26px; }
+.nav-toggle{ flex:none; width:32px; height:32px; border-radius:9px; border:1px solid var(--hair); background:#fff; color:var(--slate); display:grid; place-items:center; cursor:pointer; font-size:17px; transition:color .15s, border-color .15s, background .15s; }
+.nav-toggle:hover{ color:var(--rv); border-color:var(--violet-2); background:var(--violet-soft); }
+.sidenav{ display:flex; flex-direction:column; gap:4px; }
+.sidelink{ display:flex; align-items:center; gap:13px; padding:11px 14px; border-radius:13px; font-size:14.5px; font-weight:500; color:var(--slate); cursor:pointer; transition:color .15s, background .15s; position:relative; white-space:nowrap; }
+.sidelink-icon{ font-size:18px; display:inline-flex; opacity:.85; flex:none; }
+.sidelink-label{ overflow:hidden; }
+.sidelink:hover{ color:var(--obs); background:var(--fog); }
+.sidelink.active{ color:var(--rv); background:var(--violet-soft); font-weight:600; }
+.sidelink.active .sidelink-icon{ opacity:1; }
+.sidelink-badge{ margin-left:auto; font-size:10px; font-weight:700; letter-spacing:.04em; color:#3a2c00; background:var(--lemon); padding:2px 7px; border-radius:999px; }
+.sidebar-bottom{ display:flex; flex-direction:column; gap:12px; }
+.side-kyc{ display:flex; align-items:center; gap:11px; padding:11px 13px; background:var(--emerald-bg); border-radius:14px; white-space:nowrap; overflow:hidden; }
+.side-kyc .kyc-badge{ background:#fff; flex:none; }
+.side-kyc-t{ font-size:12.5px; font-weight:600; color:#155e36; line-height:1.1; }
+.side-kyc-s{ font-size:11px; line-height:1.3; }
+.side-user{ display:flex; align-items:center; gap:11px; padding:9px 11px; border-radius:14px; border:1px solid var(--hair); background:#fff; cursor:pointer; text-align:left; font-family:inherit; transition:border-color .15s; white-space:nowrap; overflow:hidden; }
+.side-user:hover{ border-color:var(--ash); }
+.side-user-txt{ flex:1; min-width:0; }
+.side-user-name{ font-size:13.5px; font-weight:600; line-height:1.15; }
+.side-user-city{ font-size:11.5px; line-height:1.3; }
+.side-user-chev{ color:var(--ash); font-size:15px; display:inline-flex; transform:rotate(90deg); flex:none; }
+
+/* collapsed (icon-only rail) */
+.nav-collapsed .sidebar{ padding:24px 13px; }
+.nav-collapsed .sidebar-logo{ flex-direction:column; gap:14px; padding:6px 0 0; justify-content:center; }
+.nav-collapsed .ax-logo-word{ display:none; }
+.nav-collapsed .sidelink{ justify-content:center; padding:11px 0; gap:0; }
+.nav-collapsed .sidelink-label,
+.nav-collapsed .sidelink-badge,
+.nav-collapsed .side-kyc-txt,
+.nav-collapsed .side-user-txt,
+.nav-collapsed .side-user-chev,
+.nav-collapsed .dashbar-burger{ display:none; }
+.nav-collapsed .side-kyc{ justify-content:center; padding:11px 0; }
+.nav-collapsed .side-user{ justify-content:center; padding:9px 0; }
+
+/* slim in-content top bar */
+.dashbar{ position:sticky; top:0; z-index:15; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 36px; background:rgba(247,247,248,.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--hair); }
+.dashbar-left{ display:flex; align-items:center; gap:14px; }
+.dashbar-burger{ width:38px; height:38px; border-radius:11px; border:1px solid var(--hair); background:#fff; color:var(--slate); display:grid; place-items:center; cursor:pointer; font-size:18px; transition:color .15s, border-color .15s; }
+.dashbar-burger:hover{ color:var(--obs); border-color:var(--ash); }
+.dashbar-title{ font-size:19px; font-weight:700; letter-spacing:-.02em; line-height:1; }
+.dashbar-date{ font-size:12.5px; margin-top:3px; }
+.dashbar-right{ display:flex; align-items:center; gap:14px; }
+.dash-d .c-hero{ border-top:0; }
+.dash-d .c-hero-main{ padding-top:26px; }
+
+/* ============ variation D — transactions page ============ */
+.tx-page{ padding-top:26px; }
+.tx-headrow{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; }
+.tx-back{ display:inline-flex; align-items:center; gap:6px; border:0; background:none; color:var(--slate); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; padding:0; margin-bottom:8px; transition:color .15s; }
+.tx-back svg{ font-size:15px; }
+.tx-back:hover{ color:var(--rv); }
+.tx-title{ font-size:28px; font-weight:700; letter-spacing:-.025em; line-height:1; }
+.tx-sub{ font-size:14px; margin:7px 0 0; }
+.tx-export{ flex:none; }
+.tx-export svg{ font-size:16px; }
+
+.tx-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.tx-stat{ padding:16px 20px; display:flex; flex-direction:column; gap:4px; }
+.tx-stat-num{ font-size:25px; font-weight:700; letter-spacing:-.03em; line-height:1; }
+.tx-stat-num.is-accent{ color:var(--rv); }
+.tx-stat-label{ font-size:12.5px; font-weight:500; }
+
+.tx-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.tx-search{ flex:1; min-width:240px; display:flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--hair); border-radius:13px; padding:0 14px; height:44px; color:var(--slate); transition:border-color .15s, box-shadow .15s; }
+.tx-search:focus-within{ border-color:var(--rv); box-shadow:0 0 0 3px var(--violet-soft); }
+.tx-search svg{ font-size:17px; flex:none; }
+.tx-search input{ border:0; outline:0; background:none; font-family:inherit; font-size:14px; color:var(--obs); width:100%; }
+.tx-segment{ display:inline-flex; background:var(--violet-soft); border-radius:12px; padding:4px; gap:2px; }
+.tx-seg{ border:0; background:none; padding:8px 15px; border-radius:9px; font-size:13px; font-weight:600; color:var(--slate); cursor:pointer; font-family:inherit; transition:.15s; white-space:nowrap; }
+.tx-seg:hover{ color:var(--obs); }
+.tx-seg.on{ background:#fff; color:var(--rv); box-shadow:var(--shadow-sm); }
+
+.tx-table{ padding:8px 8px 14px; }
+.tx-row{ display:grid; grid-template-columns:1.7fr 1.3fr 1.1fr 1.2fr 1fr 0.9fr; align-items:center; gap:16px; padding:14px 18px; }
+.tx-row-head{ padding:14px 18px 12px; }
+.tx-row-head span{ font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); }
+.tx-amt-col{ text-align:right; }
+.tx-status-col{ display:flex; justify-content:flex-end; }
+.tx-group-label{ padding:14px 18px 6px; display:block; }
+.tx-group .tx-row{ border-top:1px solid var(--hair); }
+.tx-group .tx-row:first-of-type{ border-top:0; }
+.tx-row:not(.tx-row-head){ border-radius:14px; transition:background .15s; cursor:pointer; }
+.tx-row:not(.tx-row-head):hover{ background:var(--fog); }
+.tx-recipient{ display:flex; align-items:center; gap:12px; min-width:0; }
+.tx-name{ font-size:14.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-method{ display:flex; align-items:center; gap:8px; font-size:12.5px; min-width:0; }
+.tx-handle{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-date{ font-size:13px; }
+.tx-ref{ font-size:12.5px; letter-spacing:.01em; }
+.tx-amt{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.tx-inr{ font-size:15px; font-weight:700; letter-spacing:-.02em; }
+.tx-usd{ font-size:12px; }
+.tx-empty{ padding:34px 18px; text-align:center; font-size:14px; }
+
+@media (max-width:1080px){
+  .tx-stats{ grid-template-columns:repeat(2,1fr); }
+  .tx-row{ grid-template-columns:1.7fr 1fr 1fr; }
+  .tx-row .tx-date, .tx-row .tx-ref, .tx-row-head span:nth-child(3), .tx-row-head span:nth-child(4){ display:none; }
+}
 
 /* ============ responsive ============ */
 @media (max-width:1080px){
   .grid-split, .grid-bottom, .grid-command, .grid-funnel{ grid-template-columns:1fr; }
   .at-amount{ font-size:44px; }
   .navlinks{ display:none; }
-}
-@media (max-width:980px){
-  .sidenav{ width:74px; }
-  .sidenav-item{ justify-content:center; gap:0; padding:11px 0; }
-  .sidenav-lbl, .sidenav-eyebrow, .sidenav-user-txt, .ax-logo-word{ display:none; }
-  .sidenav-logo{ padding:24px 0 18px; display:flex; justify-content:center; }
-  .sidenav-user{ justify-content:center; padding:16px 0; }
 }
 </style>
 </head>
@@ -453,8 +542,6 @@ html,body{ margin:0; background:var(--fog); }
 
 <!-- ============================ engine ============================ -->
 <script type="text/babel" data-presets="react">
-/* AtomX Pay — shared live engine + formatting + rolling-digit number. */
-
 // ---------- formatting ----------
 const USD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const USD0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -466,7 +553,7 @@ function fmtRate(n) { return n.toFixed(4); }
 function pad2(n) { return String(n).padStart(2, '0'); }
 function mmss(total) { const m = Math.floor(total / 60); const s = total % 60; return m + ':' + pad2(s); }
 
-// ---------- rolling-digit number (vanilla port of @number-flow, in React) ----------
+// ---------- rolling-digit number ----------
 function RollingNumber({ value, className, style }) {
   const chars = String(value).split('');
   return (
@@ -496,10 +583,10 @@ const AtomXCtx = React.createContext(null);
 const useAtomX = () => React.useContext(AtomXCtx);
 
 const BASE_RATE = 95.3820;
-const LOCKED_RATE = 95.3820;       // rate locked on the active transfer
-const ACTIVE_USD = 1200;            // amount sent on the active transfer
-const TOTAL_ETA = 15 * 60;          // 15-minute promise, in seconds
-const START_ETA = 9 * 60;           // active transfer currently ~9 min out
+const LOCKED_RATE = 95.3820;
+const ACTIVE_USD = 1200;
+const TOTAL_ETA = 15 * 60;
+const START_ETA = 9 * 60;
 
 function AtomXProvider({ children }) {
   const [rate, setRate] = React.useState(BASE_RATE);
@@ -561,8 +648,6 @@ Object.assign(window, {
 
 <!-- ============================ parts ============================ -->
 <script type="text/babel" data-presets="react">
-/* AtomX Pay — shared dashboard parts. */
-
 // ---------------- data ----------------
 const RECIPIENTS = [
   { name: 'Priya Sharma',  rel: 'Sister',  method: 'UPI',         handle: 'priya@okhdfc',  color: '#5423e7', active: true },
@@ -600,6 +685,16 @@ const I = {
   play: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" {...p}><path d="M5 3.6l7 4.4-7 4.4z"/></svg>,
   chevron: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>,
   grid: (p) => <svg viewBox="0 0 16 16" width="1em" height="1em" fill="none" {...p}><rect x="2" y="2" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><rect x="9" y="2" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><rect x="2" y="9" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><rect x="9" y="9" width="5" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4"/></svg>,
+  users: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><circle cx="7" cy="6.2" r="2.8" stroke="currentColor" strokeWidth="1.5"/><path d="M2.4 14.4c.5-2.5 2.4-3.9 4.6-3.9s4.1 1.4 4.6 3.9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M12.2 3.9a2.6 2.6 0 010 4.9M13.4 14.4c-.2-1.2-.7-2.2-1.4-2.9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  receipt: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><path d="M4 2.2h10v13.6l-2-1.2-2 1.2-2-1.2-2 1.2V2.2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6.6 6.2h4.8M6.6 9.2h4.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  user: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><circle cx="9" cy="6" r="3.1" stroke="currentColor" strokeWidth="1.5"/><path d="M3.6 15.2c.7-3 3-4.6 5.4-4.6s4.7 1.6 5.4 4.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  bell: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><path d="M5 7.5a4 4 0 018 0c0 3 1.2 4 1.2 4H3.8S5 10.5 5 7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7.4 14.4a1.7 1.7 0 003.2 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  menu: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><path d="M3 5h12M3 9h12M3 13h12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>,
+  sidebarToggle: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><rect x="2.2" y="3" width="13.6" height="12" rx="2.4" stroke="currentColor" strokeWidth="1.5"/><path d="M7 3v12" stroke="currentColor" strokeWidth="1.5"/></svg>,
+  search: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><circle cx="8" cy="8" r="5.2" stroke="currentColor" strokeWidth="1.6"/><path d="M12 12l3.4 3.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  filter: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><path d="M2.5 4.5h13M5 9h8M7.5 13.5h3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  download: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><path d="M9 2.5v8.5M5.5 7.5L9 11l3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><path d="M3.5 13.5h11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  back: (p) => <svg viewBox="0 0 18 18" width="1em" height="1em" fill="none" {...p}><path d="M11 4l-5 5 5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 };
 
 // ---------------- atoms ----------------
@@ -644,7 +739,7 @@ function StatusPill({ status, size }) {
   return <span className={'status ' + s.cls + (size === 'lg' ? ' status-lg' : '')}>{s.icon}<span>{s.label}</span></span>;
 }
 
-// ---------------- top nav ----------------
+// ---------------- top nav (unused in D, kept for parity) ----------------
 function TopNav({ active = 'Dashboard' }) {
   const a = useAtomX();
   const items = [
@@ -669,9 +764,7 @@ function TopNav({ active = 'Dashboard' }) {
             <span className="livedot" /> <span className="muted">1 USD =</span>
             <RollingNumber className="num ink" value={'₹' + fmtRate(a.rate)} />
           </div>
-          <button className="iconbtn" title="Notifications" aria-label="Notifications">
-            <svg viewBox="0 0 18 18" width="18" height="18" fill="none"><path d="M5 7.5a4 4 0 018 0c0 3 1.2 4 1.2 4H3.8S5 10.5 5 7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7.4 14.4a1.7 1.7 0 003.2 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-          </button>
+          <button className="iconbtn" title="Notifications" aria-label="Notifications"><I.bell /></button>
           <div className="userchip">
             <Avatar name="Ananya Sharma" color="#121217" size={34} />
             <div className="userchip-txt">
@@ -680,6 +773,83 @@ function TopNav({ active = 'Dashboard' }) {
             </div>
           </div>
         </div>
+      </div>
+    </header>
+  );
+}
+
+// ---------------- sidebar (Variation D) ----------------
+function Sidebar({ active = 'Dashboard', collapsed, onToggle, onNavigate }) {
+  const items = [
+    { name: 'Dashboard',    icon: <I.grid /> },
+    { name: 'Send money',   icon: <I.arrow /> },
+    { name: 'Recipients',   icon: <I.users /> },
+    { name: 'Transactions', icon: <I.receipt /> },
+    { name: 'Profile',      icon: <I.user /> },
+  ];
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-top">
+        <div className="sidebar-logo">
+          <Logo />
+          <button className="nav-toggle" onClick={onToggle} title={collapsed ? 'Expand menu' : 'Collapse menu'}
+            aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} aria-expanded={!collapsed}>
+            <I.sidebarToggle />
+          </button>
+        </div>
+        <nav className="sidenav">
+          {items.map((it) => (
+            <a key={it.name} className={'sidelink' + (it.name === active ? ' active' : '')}
+              onClick={() => onNavigate && onNavigate(it.name)}
+              title={collapsed ? it.name : undefined}>
+              <span className="sidelink-icon">{it.icon}</span>
+              <span className="sidelink-label">{it.name}</span>
+              {it.name === 'Send money' && <span className="sidelink-badge">New</span>}
+            </a>
+          ))}
+        </nav>
+      </div>
+      <div className="sidebar-bottom">
+        <div className="side-kyc" title={collapsed ? 'Identity verified · KYC complete' : undefined}>
+          <span className="kyc-badge"><I.shield /></span>
+          <div className="side-kyc-txt">
+            <div className="side-kyc-t">Identity verified</div>
+            <div className="side-kyc-s muted">KYC complete</div>
+          </div>
+        </div>
+        <button className="side-user" title={collapsed ? 'Ananya Sharma · San Jose, CA' : undefined}>
+          <Avatar name="Ananya Sharma" color="#121217" size={36} />
+          <div className="side-user-txt">
+            <div className="side-user-name">Ananya Sharma</div>
+            <div className="side-user-city muted">San Jose, CA</div>
+          </div>
+          <span className="side-user-chev"><I.chevron /></span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+// Slim in-content top bar for the sidebar layout: page title + live rate + bell.
+function DashTopbar({ title = 'Dashboard', subtitle = 'Saturday, June 14', collapsed, onToggle }) {
+  const a = useAtomX();
+  return (
+    <header className="dashbar">
+      <div className="dashbar-left">
+        <button className="dashbar-burger" onClick={onToggle} title={collapsed ? 'Expand menu' : 'Collapse menu'} aria-label="Toggle menu">
+          <I.menu />
+        </button>
+        <div>
+          <h2 className="dashbar-title font-display">{title}</h2>
+          <span className="dashbar-date muted">{subtitle}</span>
+        </div>
+      </div>
+      <div className="dashbar-right">
+        <div className="nav-rate">
+          <span className="livedot" /> <span className="muted">1 USD =</span>
+          <RollingNumber className="num ink" value={'₹' + fmtRate(a.rate)} />
+        </div>
+        <button className="iconbtn" title="Notifications" aria-label="Notifications"><I.bell /></button>
       </div>
     </header>
   );
@@ -818,10 +988,10 @@ function MetaStrip() {
   );
 }
 
-function ActiveTransferHero({ variant = 'ring', collapsible, onCollapse }) {
+function ActiveTransferHero({ variant = 'ring', collapsible, onCollapse, compact }) {
   const a = useAtomX();
   return (
-    <section className={'at-hero card at-' + variant}>
+    <section className={'at-hero card at-' + variant + (compact ? ' at-hero--compact' : '')}>
       <div className="at-top">
         <div className="at-head">
           <span className="at-flag">LIVE TRANSFER</span>
@@ -851,7 +1021,7 @@ function ActiveTransferHero({ variant = 'ring', collapsible, onCollapse }) {
           <div className="at-progressbar"><span style={{ width: (a.progress * 100).toFixed(2) + '%' }} /></div>
           <div className="at-progress-cap muted"><I.bolt /> Settling on-chain · {(a.progress * 100).toFixed(0)}% of the way home</div>
         </div>
-        {variant === 'ring' && <RingCountdown />}
+        {variant === 'ring' && <RingCountdown size={compact ? 132 : 168} />}
       </div>
 
       {variant === 'ring'
@@ -976,11 +1146,11 @@ function RecipientList({ variant = 'list', limit }) {
 }
 
 // ---------------- recent transfers ----------------
-function RecentTransfers({ rows }) {
+function RecentTransfers({ rows, onViewAll }) {
   const data = rows ? RECENTS.slice(0, rows) : RECENTS;
   return (
     <section className="card panel">
-      <PanelHead title="Recent transfers" action="View all" />
+      <PanelHead title="Recent transfers" action="View all" onAction={onViewAll} />
       <ul className="recent">
         {data.map((r, i) => (
           <li key={i} className="rrow">
@@ -997,6 +1167,107 @@ function RecentTransfers({ rows }) {
         ))}
       </ul>
     </section>
+  );
+}
+
+// ---------------- transactions page ----------------
+const TRANSACTIONS = [
+  { name: 'Priya Sharma', inr: 114458, usd: 1200, status: 'progress',  method: 'UPI',  handle: 'priya@okhdfc',  ref: 'AXP-7K2M-9QD4', date: 'Today · 7:33 PM',  group: 'Today' },
+  { name: 'Aarav Mehta',  inr: 46500,  usd: 488,  status: 'delivered', method: 'HDFC', handle: '•••• 4821',     ref: 'AXP-5T1B-3LP9', date: 'Jun 12 · 2:14 PM', group: 'June 2026' },
+  { name: 'Lakshmi Iyer', inr: 78900,  usd: 828,  status: 'delivered', method: 'ICICI',handle: '•••• 7720',     ref: 'AXP-9P4K-2WQ1', date: 'Jun 8 · 9:02 AM',  group: 'June 2026' },
+  { name: 'Sunita Kumar', inr: 23850,  usd: 250,  status: 'delivered', method: 'UPI',  handle: 'sunita@okaxis',  ref: 'AXP-3M8N-7RD5', date: 'Jun 1 · 6:48 PM',  group: 'June 2026' },
+  { name: 'Vikram Rao',   inr: 47650,  usd: 500,  status: 'failed',    method: 'UPI',  handle: 'vikram@oksbi',   ref: 'AXP-1A2C-8XK0', date: 'May 28 · 11:20 AM', group: 'May 2026' },
+  { name: 'Vikram Rao',   inr: 190760, usd: 2000, status: 'delivered', method: 'UPI',  handle: 'vikram@oksbi',   ref: 'AXP-6H3L-4TB7', date: 'May 24 · 8:05 PM', group: 'May 2026' },
+  { name: 'Priya Sharma', inr: 95380,  usd: 1000, status: 'delivered', method: 'UPI',  handle: 'priya@okhdfc',  ref: 'AXP-2D9F-5VN3', date: 'May 18 · 7:41 PM', group: 'May 2026' },
+  { name: 'Aarav Mehta',  inr: 38150,  usd: 400,  status: 'delivered', method: 'HDFC', handle: '•••• 4821',     ref: 'AXP-8K1Q-6MJ2', date: 'May 11 · 3:30 PM', group: 'May 2026' },
+  { name: 'Lakshmi Iyer', inr: 66770,  usd: 700,  status: 'delivered', method: 'ICICI',handle: '•••• 7720',     ref: 'AXP-4R7T-9PL8', date: 'May 4 · 10:12 AM', group: 'May 2026' },
+];
+const TX_FILTERS = ['All', 'In progress', 'Delivered', 'Failed'];
+const TX_STATUS_KEY = { 'In progress': 'progress', 'Delivered': 'delivered', 'Failed': 'failed' };
+
+function TransactionsPage({ onBack }) {
+  const a = useAtomX();
+  const [filter, setFilter] = React.useState('All');
+  const [q, setQ] = React.useState('');
+
+  const rows = TRANSACTIONS.filter((t) => {
+    if (filter !== 'All' && t.status !== TX_STATUS_KEY[filter]) return false;
+    if (q.trim()) {
+      const s = (t.name + ' ' + t.ref + ' ' + t.handle).toLowerCase();
+      if (!s.includes(q.trim().toLowerCase())) return false;
+    }
+    return true;
+  });
+  const groups = [];
+  rows.forEach((t) => {
+    let g = groups.find((x) => x.label === t.group);
+    if (!g) { g = { label: t.group, items: [] }; groups.push(g); }
+    g.items.push(t);
+  });
+
+  const totalUsd = TRANSACTIONS.reduce((s, t) => s + (t.status === 'failed' ? 0 : t.usd), 0);
+  const inProgress = TRANSACTIONS.filter((t) => t.status === 'progress').length;
+  const delivered = TRANSACTIONS.filter((t) => t.status === 'delivered').length;
+
+  return (
+    <main className="dash-main tx-page">
+      <div className="tx-headrow">
+        <div className="tx-head-left">
+          <button className="tx-back" onClick={onBack}><I.back /> Dashboard</button>
+          <h1 className="tx-title font-display">Transactions</h1>
+          <p className="tx-sub muted">{TRANSACTIONS.length} transfers · {fmtUSD0(totalUsd)} sent · {inProgress} in progress</p>
+        </div>
+        <button className="btn btn-ghost tx-export"><I.download /> Export CSV</button>
+      </div>
+
+      <div className="tx-stats">
+        <div className="tx-stat card"><div className="tx-stat-num font-display num">{fmtUSD0(totalUsd)}</div><div className="tx-stat-label muted">Total sent</div></div>
+        <div className="tx-stat card"><div className="tx-stat-num font-display num">{delivered}</div><div className="tx-stat-label muted">Delivered</div></div>
+        <div className="tx-stat card"><div className="tx-stat-num font-display num is-accent">{inProgress}</div><div className="tx-stat-label muted">In progress</div></div>
+        <div className="tx-stat card"><div className="tx-stat-num font-display num">14 min</div><div className="tx-stat-label muted">Avg. delivery</div></div>
+      </div>
+
+      <div className="tx-toolbar">
+        <div className="tx-search">
+          <I.search />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, reference, UPI ID…" />
+        </div>
+        <div className="tx-segment">
+          {TX_FILTERS.map((f) => (
+            <button key={f} className={'tx-seg' + (f === filter ? ' on' : '')} onClick={() => setFilter(f)}>{f}</button>
+          ))}
+        </div>
+      </div>
+
+      <section className="card tx-table">
+        <div className="tx-row tx-row-head">
+          <span>Recipient</span><span>Method</span><span>Date</span><span>Reference</span><span className="tx-amt-col">Amount</span><span className="tx-status-col">Status</span>
+        </div>
+        {groups.length === 0 && <div className="tx-empty muted">No transactions match your filters.</div>}
+        {groups.map((g) => (
+          <div key={g.label} className="tx-group">
+            <div className="tx-group-label eyebrow muted">{g.label}</div>
+            {g.items.map((t, i) => (
+              <div key={i} className="tx-row">
+                <span className="tx-recipient">
+                  <Avatar name={t.name} color={RECIPIENTS.find((x) => x.name === t.name)?.color || '#5423e7'} size={38} />
+                  <span className="tx-name">{t.name}</span>
+                </span>
+                <span className="tx-method"><MethodTag method={t.method === 'UPI' ? 'UPI' : 'Bank · ' + t.method} /> <span className="muted tx-handle">{t.handle}</span></span>
+                <span className="tx-date muted">{t.date}</span>
+                <span className="tx-ref num muted">{t.ref}</span>
+                <span className="tx-amt tx-amt-col">
+                  <span className="tx-inr num font-display">{fmtINR(t.inr)}</span>
+                  <span className="tx-usd num muted">{fmtUSD0(t.usd)}</span>
+                </span>
+                <span className="tx-status-col"><StatusPill status={t.status} /></span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </section>
+      <TrustFooter />
+    </main>
   );
 }
 
@@ -1064,11 +1335,11 @@ function KycCard({ inline }) {
 }
 
 // ---------------- panel head + footer ----------------
-function PanelHead({ title, action }) {
+function PanelHead({ title, action, onAction }) {
   return (
     <div className="panel-head">
       <h3 className="panel-title font-display">{title}</h3>
-      {action && <button className="panel-action">{action} <I.chevron /></button>}
+      {action && <button className="panel-action" onClick={onAction}>{action} <I.chevron /></button>}
     </div>
   );
 }
@@ -1087,56 +1358,103 @@ function TrustFooter() {
 
 Object.assign(window, {
   RECIPIENTS, RECENTS, STEPS, initials, I,
-  Logo, Avatar, MethodTag, StatusPill, TopNav, Greeting,
+  Logo, Avatar, MethodTag, StatusPill, TopNav, Sidebar, DashTopbar, Greeting,
   KpiCard, KpiRow, KpiInline, RingCountdown, StepTracker, MetaStrip,
-  ActiveTransferHero, SendPanel, SendComposer, RecipientList, RecentTransfers,
+  ActiveTransferHero, SendPanel, SendComposer, RecipientList, RecentTransfers, TransactionsPage, TRANSACTIONS,
   Sparkline, FxWidget, KycCard, PanelHead, TrustFooter,
 });
 </script>
 
 <!-- ============================ variation D ============================ -->
 <script type="text/babel" data-presets="react">
-/* AtomX Pay — VARIATION D "Adaptive" (based on C). First row is a pair of
-   panels that expand/collapse: one is always full, the other a slim clickable
-   tab. No gap — the row always fills. Default: Send composer open, Live
-   transfer tabbed. */
-
 function CollapsedTab({ kind, onClick }) {
   const a = useAtomX();
-  if (kind === 'transfer') {
-    return (
-      <button className="adapt-tab adapt-tab--live" onClick={onClick} title="Open live transfer" aria-label="Expand live transfer">
-        <span className="adapt-tab-icon live"><span className="livedot" /></span>
-        <span className="adapt-tab-label">Live transfer</span>
-        <span className="adapt-tab-foot">
-          <span className="adapt-tab-eta num">{a.etaText}</span>
-          <span className="adapt-tab-chev rot"><I.chevron /></span>
-        </span>
-      </button>
-    );
-  }
+  const live = kind === 'transfer';
   return (
-    <button className="adapt-tab adapt-tab--send" onClick={onClick} title="Open send composer" aria-label="Expand send to India">
-      <span className="adapt-tab-icon send"><I.arrow /></span>
-      <span className="adapt-tab-label">Send to India</span>
-      <span className="adapt-tab-foot"><span className="adapt-tab-chev"><I.chevron /></span></span>
+    <button className={'adapt-tab adapt-tab--' + (live ? 'live' : 'send')} onClick={onClick}
+      title={live ? 'Open live transfer' : 'Open send to India'} aria-label={live ? 'Expand live transfer' : 'Expand send to India'}>
+      <span className="adapt-tab-top">
+        <span className={'adapt-tab-icon ' + (live ? 'live' : 'send')}>
+          {live ? <span className="livedot" /> : <I.arrow />}
+        </span>
+        {live
+          ? <StatusPill status={a.delivered ? 'delivered' : 'progress'} />
+          : <span className="adapt-tab-flag">Fast</span>}
+      </span>
+      <span className="adapt-tab-mid">
+        <span className="adapt-tab-eyebrow eyebrow">{live ? 'Live transfer' : 'Send money'}</span>
+        <span className="adapt-tab-title font-display">{live ? 'To Priya Sharma' : 'Send to India'}</span>
+        {live
+          ? <span className="adapt-tab-eta font-display num">{a.etaText}<small> min left</small></span>
+          : <span className="adapt-tab-sub muted">Live rate · 0% markup · $4 flat</span>}
+      </span>
+      <span className="adapt-tab-cta">
+        <span>{live ? 'Open tracker' : 'Open composer'}</span>
+        <span className="adapt-tab-chev"><I.chevron /></span>
+      </span>
     </button>
   );
 }
 
+// Resizable split: drag the divider to set how much space each panel gets.
+const ADAPT_SNAPS = { send: 0.82, both: 0.5, live: 0.18 };
+const ADAPT_MIN = 0.18, ADAPT_MAX = 0.82, ADAPT_TAB = 0.27;
+
 function AdaptiveFirstRow() {
-  const [open, setOpen] = React.useState('send'); // 'send' | 'transfer'
+  const ref = React.useRef(null);
+  const [ratio, setRatio] = React.useState(ADAPT_SNAPS.send); // left (Send) share of the row
+  const [dragging, setDragging] = React.useState(false);
+
+  const clamp = (v) => Math.max(ADAPT_MIN, Math.min(ADAPT_MAX, v));
+  const snap = (v) => [ADAPT_SNAPS.live, ADAPT_SNAPS.both, ADAPT_SNAPS.send]
+    .reduce((best, p) => (Math.abs(p - v) < Math.abs(best - v) ? p : best));
+
+  React.useEffect(() => {
+    if (!dragging) return;
+    const move = (e) => {
+      const r = ref.current.getBoundingClientRect();
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      setRatio(clamp((x - r.left) / r.width));
+    };
+    const up = () => { setDragging(false); setRatio((v) => snap(v)); };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('touchmove', move);
+      window.removeEventListener('touchend', up);
+    };
+  }, [dragging]);
+
+  const startDrag = (e) => { e.preventDefault(); setDragging(true); };
+  const sendTab = ratio < ADAPT_TAB;
+  const liveTab = (1 - ratio) < ADAPT_TAB;
+
   return (
-    <div className={'adapt-row is-' + open}>
-      <div className="adapt-pane">
-        {open === 'send'
-          ? <div className="adapt-full" key="send-full"><AdaptiveComposer onCollapse={() => setOpen('transfer')} /></div>
-          : <CollapsedTab kind="send" onClick={() => setOpen('send')} />}
+    <div className={'adapt-split' + (dragging ? ' is-dragging' : '')} ref={ref}>
+      <div className="adapt-pane" style={{ flexBasis: `calc(${(ratio * 100).toFixed(3)}% - 13px)` }}>
+        <div className={'adapt-slot' + (sendTab ? ' is-tab' : '')}>
+          {sendTab
+            ? <CollapsedTab kind="send" onClick={() => setRatio(ADAPT_SNAPS.send)} />
+            : <AdaptiveComposer onCollapse={() => setRatio(ADAPT_SNAPS.live)} />}
+        </div>
       </div>
-      <div className="adapt-pane">
-        {open === 'transfer'
-          ? <div className="adapt-full" key="tr-full"><ActiveTransferHero variant="ring" collapsible onCollapse={() => setOpen('send')} /></div>
-          : <CollapsedTab kind="transfer" onClick={() => setOpen('transfer')} />}
+
+      <div className="adapt-handle" onPointerDown={startDrag} onTouchStart={startDrag}
+        role="separator" aria-label="Drag to resize the panels"
+        title="Drag to resize — park it in the middle to watch both">
+        <span className="adapt-grip"><i /><i /><i /></span>
+      </div>
+
+      <div className="adapt-pane" style={{ flexBasis: `calc(${((1 - ratio) * 100).toFixed(3)}% - 13px)` }}>
+        <div className={'adapt-slot' + (liveTab ? ' is-tab' : '')}>
+          {liveTab
+            ? <CollapsedTab kind="transfer" onClick={() => setRatio(ADAPT_SNAPS.live)} />
+            : <ActiveTransferHero variant="ring" compact collapsible onCollapse={() => setRatio(ADAPT_SNAPS.send)} />}
+        </div>
       </div>
     </div>
   );
@@ -1153,95 +1471,54 @@ function AdaptiveComposer({ onCollapse }) {
   );
 }
 
-// Left violet sidebar — primary navigation (replaces the top nav links).
-function SideNav({ active = 'Dashboard', collapsed }) {
-  const items = [
-    { name: 'Dashboard',    ico: '📍' },
-    { name: 'Send money',   ico: '↗' },
-    { name: 'Recipients',   ico: '👥' },
-    { name: 'Transactions', ico: '📋' },
-    { name: 'Profile',      ico: '⚙️' },
-  ];
+function DashboardBody({ onViewAllTx }) {
   return (
-    <aside className={'sidenav' + (collapsed ? ' is-collapsed' : '')}>
-      <div className="sidenav-logo"><Logo light /></div>
-      <nav className="sidenav-menu">
-        <div className="sidenav-eyebrow">Menu</div>
-        {items.map((it) => (
-          <a key={it.name} className={'sidenav-item' + (it.name === active ? ' active' : '')}>
-            <span className="sidenav-ico">{it.ico}</span>
-            <span className="sidenav-lbl">{it.name}</span>
-          </a>
-        ))}
-      </nav>
-      <div className="sidenav-user">
-        <Avatar name="Ananya Sharma" color="rgba(255,255,255,0.2)" size={40} />
-        <div className="sidenav-user-txt">
-          <div className="sidenav-user-name">Ananya Sharma</div>
-          <div className="sidenav-user-city">San Jose, CA</div>
-        </div>
+    <React.Fragment>
+      <div className="c-hero">
+        <div className="hero-wash c-hero-wash" aria-hidden="true" />
+        <main className="dash-main c-hero-main">
+          <Greeting />
+          <AdaptiveFirstRow />
+        </main>
       </div>
-    </aside>
-  );
-}
-
-// Slim top bar inside the content column — sidebar toggle + live rate + notifications.
-function TopBar({ collapsed, onToggle }) {
-  const a = useAtomX();
-  return (
-    <div className="dash-topbar">
-      <button className="nav-toggle" onClick={onToggle}
-        title={collapsed ? 'Expand menu' : 'Collapse menu'} aria-label="Toggle menu" aria-expanded={!collapsed}>
-        <svg viewBox="0 0 18 18" width="18" height="18" fill="none" style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }}>
-          <path d="M11 4l-5 5 5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M15 4v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
-      </button>
-      <div className="topbar-right">
-        <div className="nav-rate">
-          <span className="livedot" /> <span className="muted">1 USD =</span>
-          <RollingNumber className="num ink" value={'₹' + fmtRate(a.rate)} />
+      <main className="dash-main c-body">
+        <RecipientList variant="row" />
+        <KpiRow />
+        <div className="grid-bottom">
+          <RecentTransfers rows={4} onViewAll={onViewAllTx} />
+          <div className="bottom-rail">
+            <FxWidget />
+            <KycCard />
+          </div>
         </div>
-        <button className="iconbtn" title="Notifications" aria-label="Notifications">
-          <svg viewBox="0 0 18 18" width="18" height="18" fill="none"><path d="M5 7.5a4 4 0 018 0c0 3 1.2 4 1.2 4H3.8S5 10.5 5 7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7.4 14.4a1.7 1.7 0 003.2 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-        </button>
-      </div>
-    </div>
+        <TrustFooter />
+      </main>
+    </React.Fragment>
   );
 }
 
 function VariationD() {
-  const [collapsed, setCollapsed] = React.useState(false);
+  const [navOpen, setNavOpen] = React.useState(true);
+  const [section, setSection] = React.useState('Dashboard'); // 'Dashboard' | 'Transactions'
+  const toggleNav = () => setNavOpen((v) => !v);
+  const go = (name) => { if (name === 'Dashboard' || name === 'Transactions') setSection(name); };
+  const onTx = section === 'Transactions';
   return (
-    <div className="ax dash dash-c dash-d has-sidenav">
-      <SideNav active="Dashboard" collapsed={collapsed} />
-      <div className="dash-content">
-        <TopBar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
-        <div className="c-hero">
-          <div className="hero-wash c-hero-wash" aria-hidden="true" />
-          <main className="dash-main c-hero-main">
-            <Greeting />
-            <AdaptiveFirstRow />
-          </main>
-        </div>
-        <main className="dash-main c-body">
-          <RecipientList variant="row" />
-          <KpiRow />
-          <div className="grid-bottom">
-            <RecentTransfers rows={4} />
-            <div className="bottom-rail">
-              <FxWidget />
-              <KycCard />
-            </div>
-          </div>
-          <TrustFooter />
-        </main>
+    <div className={'ax dash dash-c dash-d shell' + (navOpen ? '' : ' nav-collapsed')}>
+      <Sidebar active={section} onNavigate={go} collapsed={!navOpen} onToggle={toggleNav} />
+      <div className="shell-main">
+        <DashTopbar title={onTx ? 'Transactions' : 'Dashboard'}
+          subtitle={onTx ? TRANSACTIONS.length + ' transfers · 1 in progress' : 'Saturday, June 14'}
+          collapsed={!navOpen} onToggle={toggleNav} />
+        {onTx
+          ? <TransactionsPage onBack={() => setSection('Dashboard')} />
+          : <DashboardBody onViewAllTx={() => setSection('Transactions')} />}
       </div>
     </div>
   );
 }
 
-Object.assign(window, { VariationD, AdaptiveFirstRow, CollapsedTab, AdaptiveComposer, SideNav, TopBar });
+Object.assign(window, { VariationD, AdaptiveFirstRow, CollapsedTab, AdaptiveComposer, DashboardBody });
 </script>
 
 <!-- ============================ app ============================ -->
